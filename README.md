@@ -99,4 +99,4 @@ A stranger clones this repo and can:
 
 ## License
 
-MIT
+[License](LICENSE)
