@@ -9,6 +9,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [003](#adr-003) | GRPO as the default algorithm, PPO as a comparison arm | Accepted |
 | [004](#adr-004) | EvalPlus as the held-out layer, not generated property tests | Accepted |
 | [005](#adr-005) | Container isolation from day one | Accepted |
+| [006](#adr-006) | Policy variant: Qwen2.5-Coder-1.5B base, measured fallback | Accepted |
 
 ---
 
@@ -18,7 +19,7 @@ Each record states the context, the decision, the consequences accepted, and —
 
 **Context.** The artifact's value is what it demonstrates about execution-reward dynamics: whether a gap opens mid-training, how it varies across seeds, whether a detector catches it early. That evidence requires many runs, not one impressive run.
 
-**Decision.** Qwen2.5-Coder-1.5B as the policy for every arm.
+**Decision.** Qwen2.5-Coder-1.5B as the policy for every arm. Variant (base vs Instruct) decided separately in ADR-006.
 
 **Consequences.**
 - Many runs on a single A100, with seed replication affordable. Six runs for H1 rather than one.
@@ -81,7 +82,7 @@ The original design generated property-based tests with Hypothesis for each prob
 - The single largest technical risk in the original design is removed from the critical path.
 - The tradeoff: the partition is now fixed by someone else's construction rather than tunable. The visible/held-out split becomes a documented property of the benchmark rather than a knob, and its limitations are inherited.
 
-**What would reverse it.** If the EvalPlus augmented suite turns out to be barely harder than the canonical tests for this model — a small and static `G_baseline` — then the instrument has little dynamic range and a stronger held-out layer is needed. This is measurable in Phase 3, before any training, and the result is reported either way.
+**What would reverse it.** If MBPP+ turns out to be barely harder than the canonical tests for this model — a small and static `G_baseline` — then the instrument has little dynamic range and a stronger held-out layer is needed. This is measurable in Phase 3, before any training, and the result is reported either way.
 
 ---
 
@@ -100,3 +101,20 @@ The original design generated property-based tests with Hypothesis for each prob
 - More upfront work in the phase before anything visibly "works."
 
 **What would reverse it.** If container startup latency dominates the training loop — measured, not assumed — the mitigation is a warm container pool with recycling rather than a retreat to bare subprocesses. Dropping to subprocess isolation would only be justified if the measurement showed containers to be impractical *and* the threat model were narrowed explicitly, and both parts of that would be recorded here.
+
+---
+
+## ADR-006
+
+### Base vs Instruct variant: Qwen2.5-Coder-1.5B base, with a measured fallback
+
+**Context.** ADR-001 fixes the model family and size but not the variant. Qwen2.5-Coder-1.5B ships in a base version and an instruction-tuned (`-Instruct`) version. The two differ in how reliably they follow a "write a function" prompt format, and in what a measured capability means. Most public RLVR-on-code efforts use `-Instruct` for format reliability and comparability; a study whose central claim is about generalization has a specific reason to prefer base.
+
+**Decision.** The base model, not `-Instruct`, as the policy for every arm — contingent on a measured format-failure rate, with a fallback fixed in advance.
+
+**Consequences.**
+- Cleaner semantics for H0, which is the project's load-bearing precondition. H0 asks whether measured pass-rates reflect generalization rather than memorization. Instruction tuning adds a second learned layer on top of pretraining, so on an `-Instruct` model a pass-rate — or a perturbation-induced drop — could reflect either the base model's coding ability or what the tuning taught. Base isolates raw capability, keeping the one measurement everything depends on maximally clean.
+- The cost is more reward lost to malformed output early in training, since base follows the function-emission format less reliably than `-Instruct`. Handled by a fixed prompt template and parsing tolerance in the reward function, not by defaulting to `-Instruct`.
+- Comparability caveat: results are then not directly comparable to the `-Instruct`-based public efforts. Named in the writeup.
+
+**What would reverse it.** The base model's malformed-output rate is measured in Phase 2/3, as part of the base-pass-rate check that runs before any training. If that rate is tolerable — unparseable completions a small enough fraction that the signal survives — base stands. If format failures are frequent enough to swamp the signal regardless of template and parsing tolerance, the first remedy is the SFT warm-start from ADR-001, which addresses format-following without full instruction-tuning; moving to `-Instruct` is the second, and the instruction-tuning confound it reintroduces into H0 is named explicitly. Which remedy is chosen is recorded here, with the measured failure rate that motivated it.
