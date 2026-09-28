@@ -1,22 +1,24 @@
 # CodeExec-RL
 
+![CI](https://github.com/shilpamusale/codeexec-rl/actions/workflows/ci.yml/badge.svg)
+
 **An execution-grounded RL environment for code generation, and a study of visible-test overfitting.**
 
 A policy model reads a programming task and emits a solution. The solution runs in an isolated container against a test suite. The pass result is the reward. GRPO optimizes the policy.
 
 The research question is whether that reward is Goodhartable: does optimizing against the tests you can see widen the gap between what the model passes and what it actually gets right?
 
-**Start with [THESIS.md](THESIS.md).** The hypotheses were written before the implementation, and the commit history shows it.
+**Start with [THESIS.md](THESIS.md).** The hypotheses were fixed at the outset — they land in the first substantive commit, before any implementation fills the skeleton in.
 
 ---
 
 ## Status
 
-**Phase 0 — Frame.** Repository skeleton, CI, and research framing only. No implementation yet.
+**Phase 0 — Frame: complete.** Repository skeleton, CI, and research framing are in place, with CI green on the skeleton. Phase 1 (the sandbox) is where the build begins.
 
 | Phase | State |
 |---|---|
-| 0 · Frame | In progress |
+| 0 · Frame | Done |
 | 1 · Sandbox | Not started |
 | 2 · Task and test layer | Not started |
 | 3 · Base-model measurement (H0, `G_baseline`) | Not started |
@@ -29,7 +31,7 @@ The research question is whether that reward is Goodhartable: does optimizing ag
 
 - A containerized, concurrent, reproducible sandbox for executing untrusted model-generated code, with measured throughput.
 - An execution-reward harness with sparse and shaped variants, fully logged.
-- A visible/held-out test partition built on EvalPlus.
+- A visible/held-out test partition built on MBPP+.
 - A contamination probe and an untrained baseline, both reported before any training.
 - A GRPO training loop on Qwen2.5-Coder-1.5B, cheap enough to run many times.
 - One ablation at three seeds per arm, with a limitations-led writeup.
@@ -100,3 +102,4 @@ A stranger clones this repo and can:
 ## License
 
 [License](LICENSE)
+
