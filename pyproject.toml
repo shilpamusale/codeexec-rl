@@ -44,3 +44,6 @@ files = ["src", "tests"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 addopts = "-q --strict-markers"
+markers = [
+    "integration: tests that require Docker and run real containers (slower)",
+]
