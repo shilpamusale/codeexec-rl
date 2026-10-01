@@ -93,3 +93,26 @@ def test_write_inside_scratch_succeeds() -> None:
 
     assert result.returncode == 0
     assert "WROTE INSIDE SCRATCH" in result.stdout
+
+
+def test_memory_limit_stops_allocation() -> None:
+    """Code cannot exhaust host memory: the container memory limit stops it.
+
+    The allocation may fail as a Python MemoryError or be killed abruptly by the
+    kernel OOM-killer, so this asserts the behavior (the allocation did not
+    succeed) rather than a specific error message.
+    """
+    code = "x = [0] * (10 ** 10)\nprint('ALLOCATED HUGE')\n"
+    result = run_code(code)
+
+    assert result.returncode != 0
+    assert "ALLOCATED HUGE" not in result.stdout
+
+
+def test_process_limit_stops_fork_bomb() -> None:
+    """Code cannot exhaust the process table: --pids-limit caps spawned processes."""
+    code = "import os\nfor _ in range(500):\n    os.fork()\nprint('FORKED MANY')\n"
+    result = run_code(code)
+
+    assert result.returncode != 0
+    assert "FORKED MANY" not in result.stdout
