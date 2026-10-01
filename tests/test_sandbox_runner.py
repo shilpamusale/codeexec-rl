@@ -41,3 +41,55 @@ def test_captures_error_and_nonzero_exit() -> None:
 
     assert result.returncode != 0
     assert "ValueError" in result.stderr
+
+
+def test_normal_code_runs_under_isolation() -> None:
+    """Normal code still runs under --read-only (bytecode writes are disabled)."""
+    result = run_code("print('still works')")
+
+    assert result.returncode == 0
+    assert "still works" in result.stdout
+
+
+def test_network_access_is_blocked() -> None:
+    """Code cannot reach the network: --network none leaves no route out."""
+    code = (
+        "import urllib.request\n"
+        "urllib.request.urlopen('http://example.com', timeout=5)\n"
+        "print('REACHED NETWORK')\n"
+    )
+    result = run_code(code)
+
+    assert result.returncode != 0
+    assert "REACHED NETWORK" not in result.stdout
+
+
+def test_write_outside_scratch_is_blocked() -> None:
+    """The filesystem is read-only outside the scratch mount."""
+    code = (
+        "with open('/tmp/escape.txt', 'w') as f:\n"
+        "    f.write('hi')\n"
+        "print('WROTE OUTSIDE SCRATCH')\n"
+    )
+    result = run_code(code)
+
+    assert result.returncode != 0
+    assert "WROTE OUTSIDE SCRATCH" not in result.stdout
+
+
+def test_write_inside_scratch_succeeds() -> None:
+    """The scratch mount is writable by the sandbox user.
+
+    Regression test: the tmpfs mount must be owned by the container's non-root
+    user (uid=1000). Without that, a freshly-mounted tmpfs is root-owned and the
+    unprivileged user cannot write to it, breaking all legitimate scratch use.
+    """
+    code = (
+        "with open('/sandbox/ok.txt', 'w') as f:\n"
+        "    f.write('hi')\n"
+        "print('WROTE INSIDE SCRATCH')\n"
+    )
+    result = run_code(code)
+
+    assert result.returncode == 0
+    assert "WROTE INSIDE SCRATCH" in result.stdout

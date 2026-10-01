@@ -33,7 +33,19 @@ def run_code(code: str) -> RawResult:
     """
     try:
         completed = subprocess.run(
-            ["docker", "run", "--rm", "-i", IMAGE, "python"],
+            [
+                "docker",
+                "run",
+                "--rm",
+                "-i",
+                "--network",
+                "none",
+                "--read-only",
+                "--tmpfs",
+                "/sandbox:size=64m,uid=1000,mode=0700",
+                IMAGE,
+                "python",
+            ],
             input=code,
             capture_output=True,
             text=True,
