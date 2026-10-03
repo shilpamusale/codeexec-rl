@@ -116,3 +116,11 @@ def test_process_limit_stops_fork_bomb() -> None:
 
     assert result.returncode != 0
     assert "FORKED MANY" not in result.stdout
+
+
+def test_infinite_loop_times_out() -> None:
+    """Code that never terminates is killed at the wall-clock limit."""
+    result = run_code("while True:\n    pass\n")
+
+    assert result.timed_out is True
+    assert result.returncode != 0
