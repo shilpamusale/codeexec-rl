@@ -3,8 +3,9 @@
 Runs many sandbox executions concurrently, with a bound on how many containers
 run at once. Wraps the synchronous 'run_code' in worker threads (each execution
 blocks on its container, so the work is I/O-bound from the pool's perspective
-and threads give real concurrency). Bounded parallelism is enforced by a semaphore;
-cancellation and backpressure build on this.
+and threads give real concurrency). Bounded parallelism is enforced by a semaphore. 
+Cancellation and backpressure are deferred (see FUTURE.md): current usage submits known, 
+finite batches, which the semaphore already bounds.
 """
 
 import asyncio
