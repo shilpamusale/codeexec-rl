@@ -57,19 +57,22 @@ def measure_level(concurrency: int, n: int) -> float:
 
 def main() -> None:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    rows = ["concurrency, throughput_per_sec"]
+    rows = ["concurrency,throughput_per_sec"]
+    levels: list[int] = []
+    throughputs: list[float] = []
 
     print(f"Benchmarking: {EXECUTIONS_PER_LEVEL} executions per level, levels={CONCURRENCY_LEVELS}")
-
     for concurrency in CONCURRENCY_LEVELS:
         _clean_containers()
         throughput = measure_level(concurrency, EXECUTIONS_PER_LEVEL)
-        print(f" concurrency = {concurrency:>2}: {throughput:5.1f} exec/sec")
-        rows.append(f"{concurrency}, {throughput: .2f}")
+        print(f"  concurrency={concurrency:>2}: {throughput:5.1f} exec/sec")
+        rows.append(f"{concurrency},{throughput:.2f}")
+        levels.append(concurrency)
+        throughputs.append(throughput)
 
     _clean_containers()
     OUTPUT_PATH.write_text("\n".join(rows) + "\n")
-    print(f"\n Wrote {OUTPUT_PATH}")
+    print(f"\nWrote {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ dev = [
     "pytest-asyncio>=0.23",
     "mypy>=1.8",
     "ruff>=0.4",
+    
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -39,6 +40,14 @@ python_version = "3.11"
 strict = true
 warn_unreachable = true
 files = ["src", "tests"]
+
+# matplotlib (for the throughput chart) pulls in numpy, whose current stubs use
+# Python 3.12+ syntax that trips mypy's 3.11 target. Skip type-checking these
+# third-party libraries; only our use of them at the boundary is checked.
+[[tool.mypy.overrides]]
+module = ["matplotlib.*", "numpy.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
