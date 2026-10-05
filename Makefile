@@ -1,4 +1,4 @@
-.PHONY: check lint type test fmt
+.PHONY: check lint type test format
 
 check: lint type test
 
@@ -6,7 +6,7 @@ lint:
 	ruff check src tests
 	ruff format --check src tests
 
-fmt:
+format:
 	ruff format src tests
 	ruff check --fix src tests
 
