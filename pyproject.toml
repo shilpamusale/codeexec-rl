@@ -9,7 +9,9 @@ description = "An execution-grounded RL environment for code generation, and a s
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-dependencies = []
+dependencies = [
+    "evalplus==0.3.1",
+]
 
 # ML dependencies are added per phase and pinned exactly when introduced.
 # Phase 3 adds vllm + transformers; Phase 4 adds trl + torch. Pinning at the
@@ -45,8 +47,13 @@ files = ["src", "tests"]
 # Python 3.12+ syntax that trips mypy's 3.11 target. Skip type-checking these
 # third-party libraries; only our use of them at the boundary is checked.
 [[tool.mypy.overrides]]
+module = ["evalplus.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 module = ["matplotlib.*", "numpy.*"]
 follow_imports = "skip"
+follow_imports_for_stubs = true
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
@@ -55,4 +62,5 @@ asyncio_mode = "auto"
 addopts = "-q --strict-markers"
 markers = [
     "integration: tests that require Docker and run real containers (slower)",
+    "dataset: tests that download EvalPlus datasets and run reference solutions (slower, network)",
 ]

@@ -103,6 +103,7 @@ The original design generated property-based tests with Hypothesis for each prob
 **What would reverse it.** If container startup latency dominates the training loop — measured, not assumed — the mitigation is a warm container pool with recycling rather than a retreat to bare subprocesses. Dropping to subprocess isolation would only be justified if the measurement showed containers to be impractical *and* the threat model were narrowed explicitly, and both parts of that would be recorded here.
 
 **Status update:** Container startup measured as the throughput bottleneck (~3.5 exec/sec/core, trivial workload). Warm pool deferred pending Phase 4 training-throughput data. gVisor evaluated and not adopted. See the Phase 1 writeup (analysis/sandbox.md).
+
 ---
 
 ## ADR-006
