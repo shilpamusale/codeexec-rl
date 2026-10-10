@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 # drop the whole problem - its referece solution is too unreliable.
 
 MIN_VISIBLE_TESTS_KEPT = 1
+MIN_HELDOUT_TESTS_KEPT = 1
 
 
 def _load_function(solution_code: str, entry_point: str) -> object:
@@ -91,6 +92,9 @@ def _make_problem(record: dict[str, object], source: str) -> Problem | None:
 
     if len(visible) < MIN_VISIBLE_TESTS_KEPT:
         logger.warning("dropping %s: no usable visible tests after validation", task_id)
+        return None
+    if len(heldout) < MIN_HELDOUT_TESTS_KEPT:
+        logger.warning("dropping %s: no held-out tests (cannot measure the gap)", task_id)
         return None
 
     return Problem(

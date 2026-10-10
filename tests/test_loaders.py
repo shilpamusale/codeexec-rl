@@ -16,7 +16,7 @@ pytestmark = pytest.mark.dataset
 
 # Expected problem counts for the pinned EvalPlus
 # version(evalplus == 0.3.1:MBPP+ dataset v0.2.0,HumanEval+ dataset v0.1.10).
-EXPECTED_MBPP_COUNT = 378
+EXPECTED_MBPP_COUNT = 377
 EXPECTED_HUMANEVAL_COUNT = 164
 
 
