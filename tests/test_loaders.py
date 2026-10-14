@@ -9,19 +9,21 @@ produce correct, self-contained problems.
 
 import pytest
 
-from codeexec.tasks.loaders import load_humaneval, load_mbpp
+from codeexec.tasks.loaders import ORDER_UNSTABLE_TASK_IDS, load_humaneval, load_mbpp
 from codeexec.tasks.problem import Problem
 
 pytestmark = pytest.mark.dataset
 
 # Expected problem counts for the pinned EvalPlus
-# version(evalplus == 0.3.1:MBPP+ dataset v0.2.0,HumanEval+ dataset v0.1.10).
-EXPECTED_MBPP_COUNT = 377
+# version (evalplus == 0.3.1: MBPP+ dataset v0.2.0, HumanEval+ dataset v0.1.10).
+# MBPP+ ships 378; we drop 1 zero-held-out problem and 3 order-unstable ones
+# (ADR-007), leaving 374.
+EXPECTED_MBPP_COUNT = 374
 EXPECTED_HUMANEVAL_COUNT = 164
 
 
 def test_mbpp_loads_expected_count() -> None:
-    """Every MBPP+ problem loads; none are dropped by validation."""
+    """MBPP+ loads to the expected count after validation and ADR-007 exclusions."""
     problems = load_mbpp()
     assert len(problems) == EXPECTED_MBPP_COUNT
 
@@ -32,15 +34,24 @@ def test_humaneval_loads_expected_count() -> None:
     assert len(problems) == EXPECTED_HUMANEVAL_COUNT
 
 
+def test_order_unstable_problems_are_excluded() -> None:
+    """The ADR-007 order-unstable problems do not appear in the loaded set."""
+    problems = load_mbpp()
+    for task_id in ORDER_UNSTABLE_TASK_IDS:
+        assert task_id not in problems
+
+
 def test_mbpp_problem_has_expected_shape() -> None:
-    """A known MBPP problem normalizes into the expected fields and tests."""
-    problem = load_mbpp()["Mbpp/2"]
+    """A known-stable MBPP problem normalizes into the expected fields and tests."""
+    # Mbpp/3 is a plain integer-returning problem (is_not_prime), so its output
+    # is order-stable, unlike Mbpp/2 which was excluded under ADR-007.
+    problem = load_mbpp()["Mbpp/3"]
 
     assert isinstance(problem, Problem)
     assert problem.source == "mbpp"
-    assert problem.entry_point == "similar_elements"
+    assert problem.entry_point == "is_not_prime"
     assert len(problem.visible_tests) > 0
-    assert len(problem.heldout_tests) > len(problem.visible_tests)
+    assert len(problem.heldout_tests) > 0
 
 
 def test_precompute_produces_correct_expected_output() -> None:

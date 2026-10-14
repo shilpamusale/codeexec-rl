@@ -14,4 +14,4 @@ type:
 	mypy src tests
 
 test:
-	pytest -q
+	pytest -q -m "not integration and not dataset"

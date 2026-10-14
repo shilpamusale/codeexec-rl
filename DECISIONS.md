@@ -10,6 +10,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [004](#adr-004) | EvalPlus as the held-out layer, not generated property tests | Accepted |
 | [005](#adr-005) | Container isolation from day one | Accepted |
 | [006](#adr-006) | Policy variant: Qwen2.5-Coder-1.5B base, measured fallback | Accepted |
+| [007](#adr-007) | Strict reward comparison; drop order-unstable problems | Accepted |
 
 ---
 
@@ -120,3 +121,30 @@ The original design generated property-based tests with Hypothesis for each prob
 - Comparability caveat: results are then not directly comparable to the `-Instruct`-based public efforts. Named in the writeup.
 
 **What would reverse it.** The base model's malformed-output rate is measured in Phase 2/3, as part of the base-pass-rate check that runs before any training. If that rate is tolerable — unparseable completions a small enough fraction that the signal survives — base stands. If format failures are frequent enough to swamp the signal regardless of template and parsing tolerance, the first remedy is the SFT warm-start from ADR-001, which addresses format-following without full instruction-tuning; moving to `-Instruct` is the second, and the instruction-tuning confound it reintroduces into H0 is named explicitly. Which remedy is chosen is recorded here, with the measured failure rate that motivated it.
+
+---
+
+## ADR-007
+
+### Strict reward comparison, and dropping order-unstable problems
+
+**Context.** The reward function decides, for each test, whether a solution's output matches the expected answer. That comparison *is* the reward's operational definition of "correct," which makes it the measuring instrument for the whole study. A comparison that is too loose scores a wrong answer as right — the exact Goodhart failure H1 is built to detect — so the instrument must not have the flaw it is meant to measure.
+
+Expected outputs are pre-computed once at load time by running each dataset's canonical solution, then stored in the `Problem`. Model solutions are run later, in a separate sandbox process. Comparison therefore happens across a process boundary.
+
+**Decision.** The reward comparison (`_compare`) is strict:
+- `int` and `float` match within `atol` (a correct `4` vs `4.0` should not fail on type);
+- `list` and `tuple` are distinct (a tuple is not a list);
+- `bool` and `int` are distinct (`True` is not `1`), checked before the numeric branch since `bool` is a subclass of `int`;
+- a length guard precedes element-wise recursion, so a shorter result cannot match a longer expected via `zip` truncation;
+- `atol` applies only at float leaves; `inf == inf` is handled by exact-equality-before-tolerance (`abs(inf - inf)` is `nan`); `nan` never matches `nan`.
+
+Validating the instrument against ground truth — running every canonical solution against its own stored tests, which must pass 100% by construction — surfaced three MBPP problems (`Mbpp/2`, `Mbpp/579`, `Mbpp/769`) whose canonical returns an unordered collection (`tuple(set(...))`). The element order of their stored `expected` is non-deterministic across Python processes (hash-seed dependent), so a correct model solution would be graded as failing on element order alone. These three are **excluded** rather than rescued by loosening the comparison.
+
+**Consequences.**
+- The reward is a strict instrument, consistent with the strict EvalPlus held-out suite (ADR-004) it is measured against.
+- The exclusion is 3 of 377 MBPP+ problems (0.8%), measured by running all canonicals under two different hash seeds and diffing — not estimated. At that fraction the training distribution is unaffected.
+- This is the third principled exclusion at the task layer: one for zero held-out tests (cannot contribute to the gap being measured) and three for order-instability, alongside non-finite float *inputs* which are handled in source generation rather than dropped. Each is logged at load time; the task-id list is a single named constant (`ORDER_UNSTABLE_TASK_IDS`) shared by the loader and its tests.
+- The rejected alternative — an order-insensitive (multiset) comparison — would make `[1,2,3]` match `[3,2,1]` for *every* problem, including sorting problems where order is correctness. That trades a 0.8% false-negative for a systematic false-*positive* risk across the whole dataset, which is the loose-instrument failure the study is about. Not taken.
+
+**What would reverse it.** If a *large* fraction of the training distribution turned out to be order-unstable, dropping would bias the distribution and the fix would shift to canonicalizing unordered outputs at load time (sorting the stored `expected` for genuinely-unordered return types, per problem) while keeping the comparison strict. At 0.8% that cost is not warranted. Loosening the comparison itself is not a reversal path — it is ruled out by the thesis.

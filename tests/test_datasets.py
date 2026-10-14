@@ -6,7 +6,7 @@ from codeexec.tasks.datasets import ood_problems, training_problems
 
 pytestmark = pytest.mark.dataset
 
-EXPECTED_TRAINING_COUNT = 377  # MBPP+
+EXPECTED_TRAINING_COUNT = 374  # MBPP+ (378 shipped - 1 zero-held-out - 3 order-unstable, ADR-007)
 EXPECTED_OOD_COUNT = 164  # HumanEval+
 
 
