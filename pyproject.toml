@@ -47,7 +47,7 @@ files = ["src", "tests"]
 # Python 3.12+ syntax that trips mypy's 3.11 target. Skip type-checking these
 # third-party libraries; only our use of them at the boundary is checked.
 [[tool.mypy.overrides]]
-module = ["evalplus.*"]
+module = ["evalplus.*","torch", "torch.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
