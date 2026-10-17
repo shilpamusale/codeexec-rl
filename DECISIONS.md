@@ -49,6 +49,34 @@ Each record states the context, the decision, the consequences accepted, and —
 
 **What would reverse it.** If the H0 contamination probe shows severe memorization, the training distribution switches to the perturbed variants, or to a less contaminated task source. This decision is explicitly contingent on H0, and H0 runs first for exactly that reason.
 
+**Status update — H0 pre-registration (recorded before the perturbed run).** The
+H0 contamination probe is pre-registered here so the verdict is read off a fixed
+rule rather than argued for after the number is seen.
+
+- *Sample.* The frozen 100-problem MBPP+ sample (seed 0) behind the base-model
+  smoke test. Paired: same problems, canonical prompt vs perturbed prompt, with
+  everything else held constant (Qwen2.5-Coder-1.5B base, zero-shot-plus-stub,
+  greedy/temp-0, same extraction + subprocess grader).
+- *Instrument.* The Section D perturbation generator (semantic-preserving rename
+  + docstring paraphrase, each kept only if its renamed canonical still passes the
+  sandbox gate). Perturbed completions are graded against the perturbed problem's
+  own tests.
+- *Statistic.* drop = canonical_pass - perturbed_pass, reported with a McNemar
+  test (paired) and a bootstrap CI on the drop.
+- *Decision rule (fixed in advance).*
+  - drop <= 5 pp -> clean. Surface form is not carrying the pass-rate; the
+    contamination precondition holds; ADR-002 stands and training stays on MBPP+.
+  - 5 pp < drop < 15 pp -> ambiguous. Escalate to the full gated set (~374) for a
+    precise estimate before any verdict; the n=100 CI is too wide to decide.
+  - drop >= 15 pp -> contaminated. ADR-002 reverses; the training distribution
+    switches to the perturbed variants (the Section D generator becomes the
+    fallback it was built to be), opened as its own ADR.
+- *Power caveat.* At n=100 and a ~0.57 base rate, a sub-5pp result means "no drop
+  large enough to detect at this n," not "proven zero." Acceptable because a drop
+  that small yields the same action (train on MBPP+) either way.
+
+The measured result and verdict will be appended once the run completes.
+
 ---
 
 ## ADR-003
