@@ -255,3 +255,23 @@ def test_run_tests_end_to_end() -> None:
 
     syntax_error = run_tests("def add(a, b)\n    return a+b", "add", [((2, 3), 5)], 0.0)
     assert syntax_error.crashed  # no sentinel printed
+
+
+def test_slow_case_fails_only_itself_not_whole_suite() -> None:
+    """A single case that exceeds the per-case timeout fails alone; the other
+    cases in the same suite still grade and the sentinel still prints.
+    Guards the ADR-008 per-case-timeout fix (one slow stress input used to
+    time out the whole process -> 0/N)."""
+    code = (
+        "import time\n"
+        "def f(n):\n"
+        "    if n == 99:\n"
+        "        time.sleep(10)   # exceeds PER_CASE_TIMEOUT_SECONDS\n"
+        "    return n * 2\n"
+    )
+    tests = [((1,), 2), ((2,), 4), ((99,), 198), ((3,), 6)]
+    result = run_tests(code, "f", tests, 0.0)
+    assert result.total == 4
+    assert result.passed == 3  # the three fast cases pass
+    assert not result.crashed  # sentinel printed; suite did NOT crash
+    assert not result.timed_out  # outer process did not time out

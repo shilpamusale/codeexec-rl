@@ -17,6 +17,12 @@ TestCases = Sequence[tuple[tuple[object, ...], object]]
 
 RESULT_SENTINEL = "###CODEEXEC_RESULT_a3f9###"
 
+# Per-case wall-clock budget inside the harness. A single slow test case fails
+# only that case (SIGALRM -> TimeoutError -> counted as a failure), not the whole
+# suite. The outer sandbox timeout in run_code remains as a hard backstop for what
+# SIGALRM can't interrupt (C-level calls, huge allocations). See DECISIONS.md ADR-008.
+PER_CASE_TIMEOUT_SECONDS = 2
+
 # A copy of _compare as TEXT, embedded verbatim into every generated harness.
 # It must be stdlib-only (the sandbox has no access to our package), so it uses
 # `import math as _math` and the underscore-prefixed names to avoid clashing with
@@ -50,6 +56,31 @@ def _compare(result, expected, atol):
             return False
         return all(_compare(result[k], expected[k], atol) for k in expected)
     return result == expected
+    return result == expected
+
+import signal as _signal
+
+class _CaseTimeout(Exception):
+    pass
+
+def _alarm_handler(_signum, _frame):
+    raise _CaseTimeout()
+
+_signal.signal(_signal.SIGALRM, _alarm_handler)
+
+def _run_one_case(_fn, _args, _expected, _atol, _budget):
+    # Arm a per-case alarm; cancel it the instant the case returns so a fast
+    # case never leaves a pending alarm to fire during the next one.
+    _signal.alarm(_budget)
+    try:
+        _result = _fn(*_args)
+        return _compare(_result, _expected, _atol)
+    except BaseException:
+        # Any failure (wrong answer, raise, or _CaseTimeout) = this case failed.
+        # BaseException so _CaseTimeout (if ever not an Exception subclass) is caught.
+        return False
+    finally:
+        _signal.alarm(0)
 """
 
 
@@ -184,15 +215,21 @@ def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) ->
     for args, expected in tests:
         lines.append(f"    ({_to_source(tuple(args))}, {_to_source(expected)}),")
     lines.append("]")
+    # lines.append(f"_fn = {entry_point}")
+    # lines.append("_passed = 0")
+    # lines.append("for _args, _expected in _cases:")
+    # lines.append("    try:")
+    # lines.append("        _result = _fn(*_args)")
+    # lines.append("        if _compare(_result, _expected, _atol):")
+    # lines.append("            _passed += 1")
+    # lines.append("    except Exception:")
+    # lines.append("        pass")  # a raising test counts as a failure; keep going
     lines.append(f"_fn = {entry_point}")
+    lines.append(f"_budget = {PER_CASE_TIMEOUT_SECONDS}")
     lines.append("_passed = 0")
     lines.append("for _args, _expected in _cases:")
-    lines.append("    try:")
-    lines.append("        _result = _fn(*_args)")
-    lines.append("        if _compare(_result, _expected, _atol):")
-    lines.append("            _passed += 1")
-    lines.append("    except Exception:")
-    lines.append("        pass")  # a raising test counts as a failure; keep going
+    lines.append("    if _run_one_case(_fn, _args, _expected, _atol, _budget):")
+    lines.append("        _passed += 1")
     lines.append(
         f"print('{RESULT_SENTINEL} ' + _json.dumps({{'passed': _passed, 'total': len(_cases)}}))"
     )
