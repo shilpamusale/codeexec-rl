@@ -62,16 +62,9 @@ Each record states the context, the decision, the consequences accepted, and —
   - drop >= 15 pp -> contaminated. ADR-002 reverses; the training distribution switches to the perturbed variants (the Section D generator becomes the fallback it was built to be), opened as its own ADR.
 - *Power caveat.* At n=100 and a ~0.57 base rate, a sub-5pp result means "no drop large enough to detect at this n," not "proven zero." Acceptable because a drop that small yields the same action (train on MBPP+) either way.
 
-**Result (appended after the run).** Canonical pass@1 = 0.550 (55/100), perturbed
-pass@1 = 0.520 (52/100), drop = +3.0 pp. McNemar exact test on 11 discordant pairs
-(7 canon-only, 4 pert-only): p = 0.549 — not distinguishable from zero. Bootstrap
-95% CI on the drop: [-3.0, +10.0] pp (straddles zero). Perturbed malformed rate
-0.010, no format-failure confound. The near-symmetric discordant split is the
-signature of noise, not one-directional memorization. **Verdict: CLEAN** — drop is
-below the 5 pp pre-registered threshold and non-significant, so ADR-002 is not
-reversed and training proceeds on MBPP+. No escalation to the full 369 is
-warranted. Power caveat: MDE at n=100 is ~20 pp, so a mild (<~20 pp) effect cannot
-be excluded; this does not change the action. See analysis/h0.md.
+#### (This pass@1 is plus-graded — visible AND held-out tests — not visible-only; the visible-only rate is 0.65. See ADR-004 status / analysis/g_baseline.md.)
+
+**Result (appended after the run).** Canonical pass@1 = 0.550 (55/100), perturbed pass@1 = 0.520 (52/100), drop = +3.0 pp. McNemar exact test on 11 discordant pairs (7 canon-only, 4 pert-only): p = 0.549 — not distinguishable from zero. Bootstrap 95% CI on the drop: [-3.0, +10.0] pp (straddles zero). Perturbed malformed rate 0.010, no format-failure confound. The near-symmetric discordant split is the signature of noise, not one-directional memorization. **Verdict: CLEAN** — drop is below the 5 pp pre-registered threshold and non-significant, so ADR-002 is not reversed and training proceeds on MBPP+. No escalation to the full 369 is warranted. Power caveat: MDE at n=100 is ~20 pp, so a mild (<~20 pp) effect cannot be excluded; this does not change the action. See analysis/h0.md.
 
 ---
 
@@ -111,6 +104,20 @@ The original design generated property-based tests with Hypothesis for each prob
 
 **What would reverse it.** If MBPP+ turns out to be barely harder than the canonical tests for this model — a small and static `G_baseline` — then the instrument has little dynamic range and a stronger held-out layer is needed. This is measurable in Phase 3, before any training, and the result is reported either way.
 
+## Status Update
+
+G_baseline measured on the frozen 100 (seed 0, 369 pool), Qwen2.5-Coder-1.5B base, greedy:
+
+- **Visible pass@1:** 0.650
+- **Plus pass@1 (base AND held-out):** 0.550
+- **G_baseline:** +10.0 pp
+- **Bootstrap 95% CI:** [+5.0, +16.0] (excludes zero)
+
+The reversal condition — MBPP+ barely harder than canonical, yielding a small static gap with no dynamic range — is **not triggered**. The gap is meaningfully nonzero, so the held-out suite can resolve overfitting and ΔG has approximately 10 pp of headroom.
+
+Instrument validated; proceed to Phase 4.
+
+See [`analysis/g_baseline.md`](analysis/g_baseline.md).
 ---
 
 ## ADR-005
@@ -150,6 +157,7 @@ The original design generated property-based tests with Hypothesis for each prob
 
 **Status update.** Malformed-output rate measured at 0.02 (2/100) on the same frozen 100-problem sample (seed 0), zero-shot-plus-stub prompt — 98% of completions parse into a function named `entry_point`. Far below the tolerance threshold, so **base stands**: no few-shot prompting, SFT warm-start, or move to -Instruct is needed, and H0's contamination semantics stay clean. The prompt is locked as zero-shot-plus-stub for the baseline and every training arm, so the prompt choice does not affect delta-G. See notebooks/smoke_test_base_model.ipynb.
 
+#### (This pass@1 is plus-graded — visible AND held-out tests — not visible-only; the visible-only rate is 0.65. See ADR-004 status / analysis/g_baseline.md.)
 ---
 
 ## ADR-007
