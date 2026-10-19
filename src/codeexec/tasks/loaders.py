@@ -34,16 +34,42 @@ MIN_HELDOUT_TESTS_KEPT = 1
 # 3 of 377 MBPP+ problems (0.8%). See DECISIONS.md ADR-007.
 ORDER_UNSTABLE_TASK_IDS = frozenset({"Mbpp/2", "Mbpp/579", "Mbpp/769"})
 
+# MBPP problems whose canonical solution cannot produce a gradeable result at
+# all, so they can never anchor a valid measurement (the canonical fails its own
+# gate, perturbed or not). Distinct from ORDER_UNSTABLE (ADR-007, a comparison
+# issue) -- here the reference solution itself is ungradeable. Surfaced by the
+# Phase 3 H0 instrument-readiness check. See DECISIONS.md ADR-009.
+#   Mbpp/599: canonical too slow on its own stress input (sum(range(10**8)))
+#             -> exceeds the per-case + sandbox timeout (ADR-008).
+#   Mbpp/630: canonical returns a ~2 MB nested list -> harness cannot handle it.
+#   Mbpp/737: canonical returns a re.Match object -> no valid source representation.
+#   Mbpp/794: canonical returns a re.Match object -> no valid source representation.
+UNGRADEABLE_CANONICAL_TASK_IDS = frozenset({"Mbpp/599", "Mbpp/630", "Mbpp/737", "Mbpp/794"})
+
+# MBPP problems whose canonical is correct but at least one held-out input is
+# itself invalid (no correct function could satisfy it), so a correct model
+# solution would be graded as failing on bad test data. We exclude rather than
+# hand-edit the EvalPlus suite (keeping ADR-004's citable, unmodified benchmark).
+# See DECISIONS.md ADR-009.
+#   Mbpp/734: canonical passes 104/107 of its own tests; >=1 held-out input is
+#             invalid (e.g. expects a nonzero result for an empty-list input).
+CORRUPT_HELDOUT_TASK_IDS = frozenset({"Mbpp/734"})
+
 
 def _load_function(solution_code: str, entry_point: str) -> object:
     """Execute `solution_code` and return the function named `entry_point`.
 
-    The code is run in fresh namespace; the named function object is pulled out
-    of that namespace so it can be called to compute expected outputs.
+    The code is run in a fresh namespace; the named function object is pulled out
+    of that namespace so it can be called to compute expected outputs. Warnings
+    are suppressed: these are trusted dataset canonicals, some of which use
+    regexes with unescaped backslashes (SyntaxWarning) that are not ours to fix.
     """
+    import warnings
 
     namespace: dict[str, object] = {}
-    exec(solution_code, namespace)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        exec(solution_code, namespace)
     fn = namespace[entry_point]
     return fn
 
@@ -81,6 +107,12 @@ def _make_problem(record: dict[str, object], source: str) -> Problem | None:
     # alone, across the loader/sandbox process boundary. See ADR-007.
     if task_id in ORDER_UNSTABLE_TASK_IDS:
         logger.info("dropping %s: order-unstable canonical output (ADR-007)", task_id)
+        return None
+    if task_id in UNGRADEABLE_CANONICAL_TASK_IDS:
+        logger.info("dropping %s: canonical not gradeable (ADR-009)", task_id)
+        return None
+    if task_id in CORRUPT_HELDOUT_TASK_IDS:
+        logger.info("dropping %s: corrupt held-out input(s) (ADR-009)", task_id)
         return None
 
     entry_point = str(record["entry_point"])

@@ -3,6 +3,7 @@ preserving the spec exactly. Lead-in rephrasing plus a tight, hand-vetted
 synonym map; assert (call-site) lines are left untouched, and if no transform
 applies the prompt is returned unchanged (a meaning-preserving no-op).
 
+
 Paraphrase is conservative by construction because the validation gate cannot
 see it (it executes tests, not prose) -- see ADR / DESIGN.
 """

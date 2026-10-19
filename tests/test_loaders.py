@@ -9,7 +9,13 @@ produce correct, self-contained problems.
 
 import pytest
 
-from codeexec.tasks.loaders import ORDER_UNSTABLE_TASK_IDS, load_humaneval, load_mbpp
+from codeexec.tasks.loaders import (
+    CORRUPT_HELDOUT_TASK_IDS,
+    ORDER_UNSTABLE_TASK_IDS,
+    UNGRADEABLE_CANONICAL_TASK_IDS,
+    load_humaneval,
+    load_mbpp,
+)
 from codeexec.tasks.problem import Problem
 
 pytestmark = pytest.mark.dataset
@@ -18,7 +24,7 @@ pytestmark = pytest.mark.dataset
 # version (evalplus == 0.3.1: MBPP+ dataset v0.2.0, HumanEval+ dataset v0.1.10).
 # MBPP+ ships 378; we drop 1 zero-held-out problem and 3 order-unstable ones
 # (ADR-007), leaving 374.
-EXPECTED_MBPP_COUNT = 374
+EXPECTED_MBPP_COUNT = 369
 EXPECTED_HUMANEVAL_COUNT = 164
 
 
@@ -38,6 +44,20 @@ def test_order_unstable_problems_are_excluded() -> None:
     """The ADR-007 order-unstable problems do not appear in the loaded set."""
     problems = load_mbpp()
     for task_id in ORDER_UNSTABLE_TASK_IDS:
+        assert task_id not in problems
+
+
+def test_ungradeable_canonicals_are_excluded() -> None:
+    """The ADR-009 ungradeable-canonical problems do not appear in the loaded set."""
+    problems = load_mbpp()
+    for task_id in UNGRADEABLE_CANONICAL_TASK_IDS:
+        assert task_id not in problems
+
+
+def test_corrupt_heldout_problems_are_excluded() -> None:
+    """The ADR-009 corrupt-held-out problems do not appear in the loaded set."""
+    problems = load_mbpp()
+    for task_id in CORRUPT_HELDOUT_TASK_IDS:
         assert task_id not in problems
 
 
