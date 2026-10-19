@@ -13,7 +13,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [007](#adr-007) | Strict reward comparison; drop order-unstable problems | Accepted |
 | [008](#adr-008) | Per-case timeout in the test harness | Accepted |
 | [009](#adr-009) | Exclude ungradeable / corrupt-held-out MBPP problems | Accepted |
-| [010](#adr-010) | Training box: Lambda on-demand, 1x A100 80GB | Accepted |
+| [010](#adr-010) | Training box: Lambda on-demand, 1x A100 40GB | Accepted |
 ---
 
 ## ADR-001
@@ -216,33 +216,39 @@ This is a reward-instrument defect, not a data problem. During training it would
 - H0 and all downstream measurement run on the 369 problems whose ground truth is sound.
 
 **What would reverse it.** If a *large* fraction of the distribution turned out to be ungradeable, wholesale dropping would bias the distribution and the fix would shift to addressing the instrument limitations directly (a larger per-case budget, a size cap with a defined semantics, a value-wise comparison for non-reprable return types) rather than excluding. At five problems that cost is not warranted. Rescuing `Mbpp/734` by filtering only its bad held-out inputs would be reconsidered only if corrupt-input problems were numerous enough to matter; at one, exclusion is the honest and cheaper call.
----
+
 ---
 
 ## ADR-010
 
-### Training box: Lambda Cloud on-demand, 1x A100 SXM 80GB
+### Training box: Lambda Cloud on-demand, 1x A100 SXM4 40GB
 
 **Context.** Phase 4 is the first phase that trains the policy, and it needs two things on the same machine: a GPU large enough to run GRPO on Qwen2.5-Coder-1.5B, and a Docker daemon, because every completion the policy produces is graded through the container sandbox (ADR-005). Phases 1-3 ran generation on Colab's free tier (T4, no Docker, session limits), which can measure a base model but cannot train one or run the real sandbox. That constraint has been open since Phase 0.
 
-A rough memory budget for full-parameter GRPO at 1.5B: bf16 weights ~3 GB, gradients ~3 GB, AdamW optimizer states (fp32) ~12 GB, so roughly 18-24 GB before activations, a ~3 GB reference model if the KL term is on, and the generation engine's cache. That fits on 40 GB only with careful tuning; on 80 GB it fits with headroom.
+A rough memory budget for full-parameter GRPO at 1.5B: bf16 weights ~3 GB, gradients ~3 GB, AdamW optimizer states (fp32) ~12 GB, so roughly 18 GB before activations, a ~3 GB reference model if the KL term is on, and the generation engine's memory. That fits in 40 GB, but without much spare room.
 
-**Decision.** Lambda Cloud on-demand, a single A100 SXM 80GB ($2.79 per GPU-hour at decision time, plus tax), on the default Lambda Stack image (Ubuntu 22.04, CUDA, Docker, NVIDIA container toolkit). A Lambda persistent filesystem in the same region holds checkpoints, results and logs.
+**Decision.** Lambda Cloud on-demand, a single A100 SXM4 40GB ($1.99 per GPU-hour at decision time, plus tax; 30 vCPUs, 200 GiB RAM, 0.5 TiB local SSD), on the default Lambda Stack image (Ubuntu 22.04, CUDA, Docker, NVIDIA container toolkit). A Lambda persistent filesystem holds checkpoints, results and logs; it is created once the training instance's region is known, in that region.
+
+Backup order if the primary has no capacity when needed:
+1. Lambda 1x H100 PCIe 80GB ($3.29/hr, 26 vCPUs). Same account and image, no quota process, more memory headroom.
+2. GCP a2-highgpu-1g (1x A100 40GB, 12 vCPUs, ~$3.67/hr on-demand in us-central1). Requires a GPU quota grant, requested at decision time; fewer vCPUs means slower grading.
 
 Alternatives considered:
 - Colab free: ruled out. T4 GPU, no Docker, session limits.
-- GCP: considered. Lambda is cheaper and meets the GPU + Docker requirement.
-- Lambda A100 40GB ($1.99/hr): the fallback if 80GB capacity is unavailable (see reversal).
+- Lambda A100 80GB: not offered as a single-GPU instance (8-GPU only).
+- GCP as primary: considered. Lambda is cheaper per GPU-hour, gives more vCPUs per GPU, and needs no quota grant.
+- Lambda A6000 48GB ($1.09/hr): 14 vCPUs would roughly halve sandbox grading throughput.
+- Lambda GH200 96GB ($2.29/hr): ARM64 host; every dependency and the sandbox image would need ARM builds.
 
 **Consequences.**
-- Memory headroom for generation and full fine-tuning on one GPU, so the Phase 4 stability work is not compounded by out-of-memory debugging.
-- No session limit, but billing runs while the instance is up, so instances are shut down when idle. Estimated 90-180 GPU-hours across Phases 4-5 (spec estimate including a 50% buffer), roughly $250-500. Actuals are recorded here at the end of Phase 4.
-- The instance's local disk is treated as disposable. Anything that must survive lives on the persistent filesystem (mounted at `/lambda/nfs/<name>`) or is pushed to git / experiment tracking. The filesystem must be created in the same region as the instance and attached at launch.
+- Estimated 90-180 GPU-hours across Phases 4-5 (spec estimate including a 50% buffer), roughly $180-360 on the primary. Actuals are recorded here at the end of Phase 4.
+- Memory is adequate but not roomy. The known levers if it gets tight are gradient checkpointing, a capped generation memory share, and an 8-bit optimizer. Any lever used is recorded, because it can constrain group size or generation length.
+- No session limit, but billing runs while the instance is up, so instances are shut down when idle.
+- The instance's local disk is treated as disposable. Anything that must survive lives on the persistent filesystem (mounted at `/lambda/nfs/<name>`) or is pushed to git / experiment tracking. The filesystem must be in the same region as the instance and attached at launch.
+- On-demand capacity fluctuates by the hour: at decision time the 1x A100 40GB went in and out of capacity within an hour, and every other single-GPU type except the A10 was unavailable. Steps that need only Docker and CPUs (sandbox verification, grader parity, throughput) may run on a 1x A10 (same image, 30 vCPUs), so their results carry over to the primary.
 - The box becomes part of the measurement path: G_baseline is re-measured here (ADR-004 status update) so dtype, generation engine and grader match every training checkpoint.
-- Sandbox throughput is bounded by the instance's vCPUs (~3.5 exec/sec/core measured in Phase 1, ADR-005). Instance specs: [vCPUs / RAM / local disk / region, filled in when the box is launched].
-- On-demand capacity can be sold out in a region, which can delay a session.
+- Sandbox throughput is bounded by vCPUs (~3.5 exec/sec/core measured in Phase 1, ADR-005): 30 on the primary, 26 on the H100 PCIe backup, 12 on GCP.
 
-**What would reverse it.** If 1x A100 80GB capacity is repeatedly unavailable, drop to the A100 40GB and make the memory fit explicitly (gradient checkpointing, a smaller generation memory share), recording the change here because it may constrain group size or generation length. If the Section A throughput measurement shows grading is CPU-bound enough to leave the GPU idle, the first remedy is the ADR-005 warm container pool; the second is an instance with more vCPUs.
-
+**What would reverse it.** If the memory levers cannot make a stable training configuration fit in 40 GB, move to the H100 PCIe 80GB backup and record why. If Lambda capacity repeatedly blocks work, follow the backup order above. If the Section A throughput measurement shows grading is CPU-bound enough to leave the GPU idle, the first remedy is the ADR-005 warm container pool; the second is an instance with more vCPUs.
 
 ---
