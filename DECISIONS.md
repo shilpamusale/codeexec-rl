@@ -31,7 +31,7 @@ Each record states the context, the decision, the consequences accepted, and —
 
 **What would reverse it.** If 1.5B proves too weak to improve on the task distribution under GRPO — `visible_pass` flat against baseline — there is no optimization pressure and nothing to overfit with. The first remedy is a short SFT warm-start before GRPO, recorded as its own ADR rather than slipped in silently. Moving up a size class is the second, and it costs seed replication, which is the more valuable property.
 
-**Status update.** Base pass@1 measured at 0.57 (57/100) on a frozen 100-problem MBPP+ sample (seed 0), Qwen2.5-Coder-1.5B base, greedy/temp-0, zero-shot-plus-stub prompt. Well above floor and below ceiling, so there is optimization headroom for H1 to move. The "too weak to improve" reversal condition is not triggered; no SFT warm-start or size-class change needed. See notebooks/smoke_test_base_model.ipynb. (This estimate predates the ADR-009 exclusions; the H0 control arm is re-measured on the 369-problem pool — see the ADR-002 status update.)
+**Status update.** Base pass@1 measured at 0.57 (57/100) on a frozen 100-problem MBPP+ sample (seed 0), Qwen2.5-Coder-1.5B base, greedy/temp-0, zero-shot-plus-stub prompt. Well above floor and below ceiling, so there is optimization headroom for H1 to move. The "too weak to improve" reversal condition is not triggered; no SFT warm-start or size-class change needed. See notebooks/smoke_test_base_model.ipynb. (This estimate predates the ADR-009 exclusions; the H0 control arm is re-measured on the 369-problem pool — see the ADR-002 status update. This pass@1 is plus-graded — visible AND held-out tests — not visible-only; the visible-only rate is 0.65. See ADR-004 status / analysis/g_baseline.md.)
 
 ---
 
@@ -62,9 +62,7 @@ Each record states the context, the decision, the consequences accepted, and —
   - drop >= 15 pp -> contaminated. ADR-002 reverses; the training distribution switches to the perturbed variants (the Section D generator becomes the fallback it was built to be), opened as its own ADR.
 - *Power caveat.* At n=100 and a ~0.57 base rate, a sub-5pp result means "no drop large enough to detect at this n," not "proven zero." Acceptable because a drop that small yields the same action (train on MBPP+) either way.
 
-#### (This pass@1 is plus-graded — visible AND held-out tests — not visible-only; the visible-only rate is 0.65. See ADR-004 status / analysis/g_baseline.md.)
-
-**Result (appended after the run).** Canonical pass@1 = 0.550 (55/100), perturbed pass@1 = 0.520 (52/100), drop = +3.0 pp. McNemar exact test on 11 discordant pairs (7 canon-only, 4 pert-only): p = 0.549 — not distinguishable from zero. Bootstrap 95% CI on the drop: [-3.0, +10.0] pp (straddles zero). Perturbed malformed rate 0.010, no format-failure confound. The near-symmetric discordant split is the signature of noise, not one-directional memorization. **Verdict: CLEAN** — drop is below the 5 pp pre-registered threshold and non-significant, so ADR-002 is not reversed and training proceeds on MBPP+. No escalation to the full 369 is warranted. Power caveat: MDE at n=100 is ~20 pp, so a mild (<~20 pp) effect cannot be excluded; this does not change the action. See analysis/h0.md.
+**Result (appended after the run).** Canonical pass@1 = 0.550 (55/100), perturbed pass@1 = 0.520 (52/100), drop = +3.0 pp. McNemar exact test on 11 discordant pairs (7 canon-only, 4 pert-only): p = 0.549 — not distinguishable from zero. Bootstrap 95% CI on the drop: [-3.0, +10.0] pp (straddles zero). Perturbed malformed rate 0.010, no format-failure confound. The near-symmetric discordant split is the signature of noise, not one-directional memorization. **Verdict: CLEAN** — drop is below the 5 pp pre-registered threshold and non-significant, so ADR-002 is not reversed and training proceeds on MBPP+. No escalation to the full 369 is warranted. Power caveat: MDE at n=100 is ~20 pp, so a mild (<~20 pp) effect cannot be excluded; this does not change the action. See analysis/h0.md. (Both arms are plus-graded — visible AND held-out tests — so 0.550 is the plus rate, not visible-only; visible-only on the same sample is 0.65, see ADR-004 status. The paired comparison is unaffected because both arms used the same grading.)
 
 ---
 
@@ -104,20 +102,10 @@ The original design generated property-based tests with Hypothesis for each prob
 
 **What would reverse it.** If MBPP+ turns out to be barely harder than the canonical tests for this model — a small and static `G_baseline` — then the instrument has little dynamic range and a stronger held-out layer is needed. This is measurable in Phase 3, before any training, and the result is reported either way.
 
-## Status Update
+**Status update.** G_baseline measured on the frozen 100 (seed 0, 369 pool), Qwen2.5-Coder-1.5B base, greedy: visible pass@1 = 0.650, plus pass@1 (base AND held-out) = 0.550, so **G_baseline = +10.0 pp**, bootstrap 95% CI [+5.0, +16.0] (excludes zero). The reversal condition — MBPP+ barely harder than canonical, yielding a small static gap with no dynamic range — is **not** triggered: the gap is meaningfully nonzero, so the held-out suite can resolve overfitting and ΔG has ~10 pp of headroom. Instrument validated; proceed to Phase 4. See analysis/g_baseline.md.
 
-G_baseline measured on the frozen 100 (seed 0, 369 pool), Qwen2.5-Coder-1.5B base, greedy:
+**Status update — baseline of record for delta-G (recorded before the Phase 4 re-measurement).** The +10.0 pp above was measured on Colab (T4, fp16, HF `generate`, stdin subprocess grader). Training grades through the Docker sandbox and generates on the training box, so G_baseline is re-measured there under the exact evaluation path every training checkpoint will use: same dtype, generation engine, `max_new_tokens=256` and Docker grader. That box measurement is the reference for delta-G = G_final - G_baseline, so the subtraction stays on one instrument. Grader parity is checked separately first: the same saved completions are graded by both the subprocess grader and the Docker sandbox, and must agree on all 100 problems. The Colab +10.0 pp stays as the Phase 3 record, and if the two baselines differ, both are reported with the cause.
 
-- **Visible pass@1:** 0.650
-- **Plus pass@1 (base AND held-out):** 0.550
-- **G_baseline:** +10.0 pp
-- **Bootstrap 95% CI:** [+5.0, +16.0] (excludes zero)
-
-The reversal condition — MBPP+ barely harder than canonical, yielding a small static gap with no dynamic range — is **not triggered**. The gap is meaningfully nonzero, so the held-out suite can resolve overfitting and ΔG has approximately 10 pp of headroom.
-
-Instrument validated; proceed to Phase 4.
-
-See [`analysis/g_baseline.md`](analysis/g_baseline.md).
 ---
 
 ## ADR-005
@@ -155,9 +143,8 @@ See [`analysis/g_baseline.md`](analysis/g_baseline.md).
 
 **What would reverse it.** The base model's malformed-output rate is measured in Phase 2/3, as part of the base-pass-rate check that runs before any training. If that rate is tolerable — unparseable completions a small enough fraction that the signal survives — base stands. If format failures are frequent enough to swamp the signal regardless of template and parsing tolerance, the first remedy is the SFT warm-start from ADR-001, which addresses format-following without full instruction-tuning; moving to `-Instruct` is the second, and the instruction-tuning confound it reintroduces into H0 is named explicitly. Which remedy is chosen is recorded here, with the measured failure rate that motivated it.
 
-**Status update.** Malformed-output rate measured at 0.02 (2/100) on the same frozen 100-problem sample (seed 0), zero-shot-plus-stub prompt — 98% of completions parse into a function named `entry_point`. Far below the tolerance threshold, so **base stands**: no few-shot prompting, SFT warm-start, or move to -Instruct is needed, and H0's contamination semantics stay clean. The prompt is locked as zero-shot-plus-stub for the baseline and every training arm, so the prompt choice does not affect delta-G. See notebooks/smoke_test_base_model.ipynb.
+**Status update.** Malformed-output rate measured at 0.02 (2/100) on the same frozen 100-problem sample (seed 0), zero-shot-plus-stub prompt — 98% of completions parse into a function named `entry_point`. Far below the tolerance threshold, so **base stands**: no few-shot prompting, SFT warm-start, or move to -Instruct is needed, and H0's contamination semantics stay clean. The prompt is locked as zero-shot-plus-stub for the baseline and every training arm, so the prompt choice does not affect delta-G. See notebooks/smoke_test_base_model.ipynb. (This pass@1 is plus-graded — visible AND held-out tests — not visible-only; the visible-only rate is 0.65. See ADR-004 status / analysis/g_baseline.md.)
 
-#### (This pass@1 is plus-graded — visible AND held-out tests — not visible-only; the visible-only rate is 0.65. See ADR-004 status / analysis/g_baseline.md.)
 ---
 
 ## ADR-007
