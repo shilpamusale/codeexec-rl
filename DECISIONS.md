@@ -11,6 +11,8 @@ Each record states the context, the decision, the consequences accepted, and —
 | [005](#adr-005) | Container isolation from day one | Accepted |
 | [006](#adr-006) | Policy variant: Qwen2.5-Coder-1.5B base, measured fallback | Accepted |
 | [007](#adr-007) | Strict reward comparison; drop order-unstable problems | Accepted |
+| [008](#adr-008) | Per-case timeout in the test harness | Accepted |
+| [009](#adr-009) | Exclude ungradeable / corrupt-held-out MBPP problems | Accepted |
 
 ---
 
@@ -29,7 +31,7 @@ Each record states the context, the decision, the consequences accepted, and —
 
 **What would reverse it.** If 1.5B proves too weak to improve on the task distribution under GRPO — `visible_pass` flat against baseline — there is no optimization pressure and nothing to overfit with. The first remedy is a short SFT warm-start before GRPO, recorded as its own ADR rather than slipped in silently. Moving up a size class is the second, and it costs seed replication, which is the more valuable property.
 
-**Status update.** Base pass@1 measured at 0.57 (57/100) on a frozen 100-problem MBPP+ sample (seed 0), Qwen2.5-Coder-1.5B base, greedy/temp-0, zero-shot-plus-stub prompt. Well above floor and below ceiling, so there is optimization headroom for H1 to move. The "too weak to improve" reversal condition is not triggered; no SFT warm-start or size-class change needed. See notebooks/smoke_test_base_model.ipynb.
+**Status update.** Base pass@1 measured at 0.57 (57/100) on a frozen 100-problem MBPP+ sample (seed 0), Qwen2.5-Coder-1.5B base, greedy/temp-0, zero-shot-plus-stub prompt. Well above floor and below ceiling, so there is optimization headroom for H1 to move. The "too weak to improve" reversal condition is not triggered; no SFT warm-start or size-class change needed. See notebooks/smoke_test_base_model.ipynb. (This estimate predates the ADR-009 exclusions; the H0 control arm is re-measured on the 369-problem pool — see the ADR-002 status update.)
 
 ---
 
@@ -49,33 +51,27 @@ Each record states the context, the decision, the consequences accepted, and —
 
 **What would reverse it.** If the H0 contamination probe shows severe memorization, the training distribution switches to the perturbed variants, or to a less contaminated task source. This decision is explicitly contingent on H0, and H0 runs first for exactly that reason.
 
-**Status update — H0 pre-registration (recorded before the perturbed run).** The
-H0 contamination probe is pre-registered here so the verdict is read off a fixed
-rule rather than argued for after the number is seen.
+**Status update — H0 pre-registration (recorded before the perturbed run).** The H0 contamination probe is pre-registered so the verdict is read off a fixed rule rather than argued for after the number is seen.
 
-- *Sample.* The frozen 100-problem MBPP+ sample (seed 0) behind the base-model
-  smoke test. Paired: same problems, canonical prompt vs perturbed prompt, with
-  everything else held constant (Qwen2.5-Coder-1.5B base, zero-shot-plus-stub,
-  greedy/temp-0, same extraction + subprocess grader).
-- *Instrument.* The Section D perturbation generator (semantic-preserving rename
-  + docstring paraphrase, each kept only if its renamed canonical still passes the
-  sandbox gate). Perturbed completions are graded against the perturbed problem's
-  own tests.
-- *Statistic.* drop = canonical_pass - perturbed_pass, reported with a McNemar
-  test (paired) and a bootstrap CI on the drop.
+- *Sample.* A frozen 100-problem MBPP+ sample (seed 0) drawn from the post-exclusion pool of 369 problems (ADR-009 removed 5 from the 374 the earlier smoke test used, so the sample universe changed; the exclusions were decided on canonical-gate failures with no model-outcome data, which is what keeps this refinement honest). Paired: same problems, canonical prompt vs perturbed prompt, with everything else held constant (Qwen2.5-Coder-1.5B base, zero-shot-plus-stub, greedy/temp-0, same extraction + subprocess grader). The canonical arm is re-measured on this 369-pool sample; the earlier 0.57 stands as the pre-exclusion smoke estimate and is superseded for H0.
+- *Instrument.* The Section D perturbation generator (semantic-preserving rename + docstring paraphrase, each kept only if its renamed canonical still passes the sandbox gate). Perturbed completions are graded against the perturbed problem's own tests.
+- *Statistic.* drop = canonical_pass - perturbed_pass, reported with a McNemar test (paired) and a bootstrap CI on the drop.
 - *Decision rule (fixed in advance).*
-  - drop <= 5 pp -> clean. Surface form is not carrying the pass-rate; the
-    contamination precondition holds; ADR-002 stands and training stays on MBPP+.
-  - 5 pp < drop < 15 pp -> ambiguous. Escalate to the full gated set (~374) for a
-    precise estimate before any verdict; the n=100 CI is too wide to decide.
-  - drop >= 15 pp -> contaminated. ADR-002 reverses; the training distribution
-    switches to the perturbed variants (the Section D generator becomes the
-    fallback it was built to be), opened as its own ADR.
-- *Power caveat.* At n=100 and a ~0.57 base rate, a sub-5pp result means "no drop
-  large enough to detect at this n," not "proven zero." Acceptable because a drop
-  that small yields the same action (train on MBPP+) either way.
+  - drop <= 5 pp -> clean. Surface form is not carrying the pass-rate; the contamination precondition holds; ADR-002 stands and training stays on MBPP+.
+  - 5 pp < drop < 15 pp -> ambiguous. Escalate to the full gated set (~369) for a precise estimate before any verdict; the n=100 CI is too wide to decide.
+  - drop >= 15 pp -> contaminated. ADR-002 reverses; the training distribution switches to the perturbed variants (the Section D generator becomes the fallback it was built to be), opened as its own ADR.
+- *Power caveat.* At n=100 and a ~0.57 base rate, a sub-5pp result means "no drop large enough to detect at this n," not "proven zero." Acceptable because a drop that small yields the same action (train on MBPP+) either way.
 
-The measured result and verdict will be appended once the run completes.
+**Result (appended after the run).** Canonical pass@1 = 0.550 (55/100), perturbed
+pass@1 = 0.520 (52/100), drop = +3.0 pp. McNemar exact test on 11 discordant pairs
+(7 canon-only, 4 pert-only): p = 0.549 — not distinguishable from zero. Bootstrap
+95% CI on the drop: [-3.0, +10.0] pp (straddles zero). Perturbed malformed rate
+0.010, no format-failure confound. The near-symmetric discordant split is the
+signature of noise, not one-directional memorization. **Verdict: CLEAN** — drop is
+below the 5 pp pre-registered threshold and non-significant, so ADR-002 is not
+reversed and training proceeds on MBPP+. No escalation to the full 369 is
+warranted. Power caveat: MDE at n=100 is ~20 pp, so a mild (<~20 pp) effect cannot
+be excluded; this does not change the action. See analysis/h0.md.
 
 ---
 
@@ -180,3 +176,48 @@ Validating the instrument against ground truth — running every canonical solut
 - The rejected alternative — an order-insensitive (multiset) comparison — would make `[1,2,3]` match `[3,2,1]` for *every* problem, including sorting problems where order is correctness. That trades a 0.8% false-negative for a systematic false-*positive* risk across the whole dataset, which is the loose-instrument failure the study is about. Not taken.
 
 **What would reverse it.** If a *large* fraction of the training distribution turned out to be order-unstable, dropping would bias the distribution and the fix would shift to canonicalizing unordered outputs at load time (sorting the stored `expected` for genuinely-unordered return types, per problem) while keeping the comparison strict. At 0.8% that cost is not warranted. Loosening the comparison itself is not a reversal path — it is ruled out by the thesis.
+
+---
+
+## ADR-008
+
+### Per-case timeout in the test harness
+
+**Context.** The harness runs all of a problem's test cases in one sandbox process under a single outer wall-clock. That makes one pathological case — a stress input on which a correct-but-unoptimized solution is merely slow — abort the entire suite before it prints its result line, so every case in that problem scores as a failure (0/N). The Phase 3 H0 baseline surfaced this on `Mbpp/599`, whose own canonical times out on a large stress input and so scored 0/91 despite being correct on the other 90 cases.
+
+This is a reward-instrument defect, not a data problem. During training it would systematically punish correct solutions that are slow on a single stress input — zeroing their whole reward rather than docking one test — which is exactly the kind of mismeasurement the project exists to avoid, and it would distort H1/H2.
+
+**Decision.** Each test case runs under its own per-case wall-clock (`PER_CASE_TIMEOUT_SECONDS = 2`), enforced inside the generated harness with a `SIGALRM` alarm armed before each call and cancelled the instant it returns. A case that exceeds the budget raises, is counted as a single failure, and the suite continues and still reports. The outer sandbox timeout is kept as a hard backstop for what `SIGALRM` cannot interrupt (C-level calls, large allocations). A timed-out case counts as a plain failure (correct RL semantics: no answer in time = wrong); `TestResult`'s shape is unchanged, so nothing downstream moves.
+
+**Consequences.**
+- One slow case fails alone; the rest of the suite grades normally. Correct-but-slow solutions are scored per-case, not zeroed wholesale.
+- The timeout logic lives inside the embedded harness source as a helper, not as line-by-line assembly, so it is written and tested once rather than reconstructed per build.
+- `SIGALRM` is POSIX-only and main-thread-only — fine for the Linux sandbox, and noted as a portability assumption.
+- Validated by a 60-problem sample gate (unchanged: no grading regression) and a harness unit test proving a single slow case fails in isolation while its suite-mates pass.
+
+**What would reverse it.** If per-case `SIGALRM` proved insufficient — e.g. the dominant failure mode were C-level calls it cannot interrupt — the fallback is per-case subprocess isolation, accepting its cost in the training hot path. If 2s turned out to wrongly fail legitimately-heavy correct solutions, the budget is the single knob to revisit, measured rather than guessed.
+
+---
+
+## ADR-009
+
+### Exclude MBPP problems whose canonical fails its own gate
+
+**Context.** The ground-truth invariant behind the reward instrument (ADR-007) is that every problem's canonical solution passes 100% of its own stored tests. The Phase 3 H0 instrument-readiness check ran this gate over the H0 sample and surfaced five MBPP problems that violate it — and, critically, violate it identically with or without perturbation, so they can never anchor a valid canonical-vs-perturbed measurement. Investigation (per-problem, through the real sandbox) found two distinct causes, which this ADR keeps distinct rather than lumping under one label.
+
+**Decision.** Two load-time exclusions, each a single named constant shared by the loader and its tests, logged on drop:
+
+- `UNGRADEABLE_CANONICAL_TASK_IDS` — the canonical cannot produce a gradeable result at all:
+  - `Mbpp/599`: canonical is too slow on its own stress input (`sum(range(10**8))`), exceeding the per-case and sandbox timeouts (ADR-008). The instrument is now correct; the reference solution genuinely cannot pass its own stress test.
+  - `Mbpp/630`: canonical returns a ~2 MB nested list; the harness cannot represent or handle a value that size.
+  - `Mbpp/737`, `Mbpp/794`: canonical returns a `re.Match` object, which has no valid source representation and is not comparable by value.
+- `CORRUPT_HELDOUT_TASK_IDS` — the canonical is correct but at least one held-out input is itself invalid:
+  - `Mbpp/734`: canonical passes 104/107 of its own tests; >=1 held-out input is nonsensical for the spec (e.g. expects a nonzero result from an empty-list input), so a correct model solution would be graded as failing on bad data.
+
+**Consequences.**
+- MBPP+ drops from 374 to 369 (5 of 374, 1.3%). Combined with the three order-unstable exclusions (ADR-007) and the one zero-held-out drop, the task layer now excludes nine problems total, each logged at load time with a documented, cause-specific reason.
+- The two causes are kept in separate constants because they are different defects: one is an ungradeable reference solution, the other is corrupt test data around a valid solution. A single "gate fail" label would misdescribe `Mbpp/734`.
+- The alternative — rescuing problems by changing the instrument — is rejected for the same reason as ADR-007: special-casing `re.Match` comparison, or hand-editing EvalPlus's held-out inputs for `Mbpp/734`, would modify the measuring apparatus to fit the data, surrendering ADR-004's citable unmodified benchmark and ADR-007's strict grader. These are the exact loose-instrument failures the study is about.
+- H0 and all downstream measurement run on the 369 problems whose ground truth is sound.
+
+**What would reverse it.** If a *large* fraction of the distribution turned out to be ungradeable, wholesale dropping would bias the distribution and the fix would shift to addressing the instrument limitations directly (a larger per-case budget, a size cap with a defined semantics, a value-wise comparison for non-reprable return types) rather than excluding. At five problems that cost is not warranted. Rescuing `Mbpp/734` by filtering only its bad held-out inputs would be reconsidered only if corrupt-input problems were numerous enough to matter; at one, exclusion is the honest and cheaper call.

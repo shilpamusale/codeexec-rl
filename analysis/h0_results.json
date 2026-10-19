@@ -1,0 +1,702 @@
+{
+  "Mbpp/436": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/460": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/63": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/271": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/593": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/577": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/451": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/300": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/569": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/419": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/644": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/244": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/590": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/127": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/284": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/792": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/96": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/742": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/267": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/607": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/731": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/131": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/306": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/98": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/85": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/394": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/566": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/626": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/99": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/415": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/472": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/310": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/736": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/755": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/234": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/620": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/800": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/476": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/600": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/272": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/75": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/618": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/12": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/95": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/447": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/748": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/3": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/739": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/583": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/395": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/262": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/390": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/77": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/223": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/632": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/247": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/260": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/128": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/615": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/479": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/94": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/89": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/312": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/592": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/580": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/103": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/299": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/763": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/292": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/116": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/765": {
+    "canon_pass": false,
+    "canon_malformed": true,
+    "pert_pass": false,
+    "pert_malformed": true,
+    "perturbed_ok": true
+  },
+  "Mbpp/745": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/612": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/764": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/798": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/287": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/477": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/784": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/809": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/311": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/261": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/290": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/171": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/222": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/172": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/58": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/758": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/568": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/82": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/93": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/120": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/132": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/62": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/730": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/440": {
+    "canon_pass": false,
+    "canon_malformed": true,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/603": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/281": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/602": {
+    "canon_pass": false,
+    "canon_malformed": false,
+    "pert_pass": false,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/257": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  },
+  "Mbpp/242": {
+    "canon_pass": true,
+    "canon_malformed": false,
+    "pert_pass": true,
+    "pert_malformed": false,
+    "perturbed_ok": true
+  }
+}
