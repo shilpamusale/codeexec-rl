@@ -257,6 +257,7 @@ def test_run_tests_end_to_end() -> None:
     assert syntax_error.crashed  # no sentinel printed
 
 
+@pytest.mark.integration
 def test_slow_case_fails_only_itself_not_whole_suite() -> None:
     """A single case that exceeds the per-case timeout fails alone; the other
     cases in the same suite still grade and the sentinel still prints.
