@@ -1,0 +1,38 @@
+workload=trivial  programs=1  executions/level=192  vCPUs=30  levels=[1, 2, 4, 8, 16, 24, 32, 48]
+  concurrency=  1:    4.0 exec/sec  (192/192 completed, 48.3s)
+  concurrency=  2:    7.7 exec/sec  (192/192 completed, 25.1s)
+  concurrency=  4:   14.4 exec/sec  (192/192 completed, 13.3s)
+  concurrency=  8:   25.5 exec/sec  (192/192 completed, 7.5s)
+  concurrency= 16:   35.7 exec/sec  (192/192 completed, 5.4s)
+  concurrency= 24:   38.1 exec/sec  (192/192 completed, 5.0s)
+  concurrency= 32:   38.8 exec/sec  (192/192 completed, 4.9s)
+  concurrency= 48:   38.3 exec/sec  (192/192 completed, 5.0s)
+
+completed count stable across levels: yes
+wrote analysis/throughput_box_trivial.csv
+dropping Mbpp/793: no held-out tests (cannot measure the gap)
+workload=visible  programs=98  executions/level=192  vCPUs=30  levels=[1, 2, 4, 8, 16, 24, 32, 48]
+  concurrency=  1:    3.1 exec/sec  (192/192 completed, 61.1s)
+  concurrency=  2:    6.1 exec/sec  (192/192 completed, 31.6s)
+  concurrency=  4:   11.6 exec/sec  (192/192 completed, 16.6s)
+  concurrency=  8:   20.8 exec/sec  (192/192 completed, 9.2s)
+  concurrency= 16:   31.6 exec/sec  (192/192 completed, 6.1s)
+  concurrency= 24:   34.2 exec/sec  (192/192 completed, 5.6s)
+  concurrency= 32:   34.9 exec/sec  (192/192 completed, 5.5s)
+  concurrency= 48:   34.9 exec/sec  (192/192 completed, 5.5s)
+
+completed count stable across levels: yes
+wrote analysis/throughput_box_visible.csv
+dropping Mbpp/793: no held-out tests (cannot measure the gap)
+workload=full  programs=98  executions/level=192  vCPUs=30  levels=[1, 2, 4, 8, 16, 24, 32, 48]
+  concurrency=  1:    1.6 exec/sec  (188/192 completed, 119.3s)
+  concurrency=  2:    3.2 exec/sec  (188/192 completed, 60.0s)
+  concurrency=  4:    6.1 exec/sec  (188/192 completed, 31.7s)
+  concurrency=  8:    9.3 exec/sec  (188/192 completed, 20.6s)
+  concurrency= 16:   12.3 exec/sec  (188/192 completed, 15.6s)
+  concurrency= 24:   13.0 exec/sec  (188/192 completed, 14.8s)
+  concurrency= 32:   13.3 exec/sec  (188/192 completed, 14.5s)
+  concurrency= 48:   13.2 exec/sec  (188/192 completed, 14.6s)
+
+completed count stable across levels: yes
+wrote analysis/throughput_box_full.csv

@@ -174,3 +174,23 @@ What it does not establish, and does not claim:
   training data shows whether the measured ceiling is a real constraint.
 - **Function-level only.** The sandbox runs single, self-contained programs. Nothing
   here concerns multi-file or repository-level execution — out of scope by design.
+
+
+---
+
+## Addendum: the training box (Phase 4, Section A)
+
+The Phase 1 curve characterized a shared 2-core Codespace with a trivial workload. On the Phase 4 training box (Lambda A100, 30 vCPUs; ADR-010) the sandbox was re-measured with the workload training actually generates: the 98 well-formed frozen-100 base-model completions inside the grading harness, 192 executions per concurrency level. Script: `scripts/throughput_under_load.py`; data: `analysis/throughput_box_{trivial,visible,full}.csv` and `analysis/throughput_box.log`.
+
+| Workload | One execution is | Alone (concurrency 1) | Plateau | Completed at every level |
+|---|---|---|---|---|
+| trivial | `pass` (container overhead only) | 251 ms | 38.8 exec/s | 192/192 |
+| visible | a V1 reward call (visible tests) | 318 ms | 34.9 exec/s | 192/192 |
+| full | a V0 reward call / plus eval (visible + held-out) | 621 ms avg | 13.3 exec/s | 188/192 |
+
+- **Container lifecycle still dominates.** Start and teardown are 79% of a visible reward call (251 of 318 ms) and about 60% of a full one, excluding timeouts.
+- **The ceiling is not the core count.** Every workload flattens by concurrency ~24, below the 30 vCPUs, at ~1.3 exec/s per vCPU. The limit is the serialized container lifecycle, so more cores would not raise it and a warm pool would. (Phase 1's figure was ~3.7 exec/s in total on 2 cores, ~1.8 per core.)
+- **Load does not change grading outcomes.** The completed count is identical from concurrency 1 to 48 in every workload. The 4 incomplete `full` executions are the same slow programs timing out at every level, not load-induced failures.
+- **For full-suite grading, the tail matters.** A program that hits the 10 s timeout holds its slot for 10 s, so a batch can never finish faster than its slowest program; at high concurrency a single straggler is a large share of the ~14.5 s each level took.
+
+The warm-pool decision these numbers support is recorded in ADR-005.

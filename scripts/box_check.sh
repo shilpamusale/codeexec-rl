@@ -25,7 +25,8 @@ echo "== Host"
 ok "Kernel: $(uname -r)"
 
 echo "== CPU, memory, disk"
-# vCPUs bound sandbox throughput (~3.5 exec/sec/core in Phase 1), so record them.
+# Record vCPUs: sandbox throughput scales with them only up to the container-lifecycle
+# plateau (~39 exec/s on the 30-vCPU box; see analysis/sandbox.md).
 ok "vCPUs: $(nproc)"
 ok "RAM: $(awk '/MemTotal/ {printf "%.0f GiB", $2 / 1024 / 1024}' /proc/meminfo)"
 ok "Disk free on /: $(df -h --output=avail / | tail -1 | tr -d ' ')"

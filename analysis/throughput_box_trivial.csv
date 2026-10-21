@@ -1,0 +1,9 @@
+workload,vcpus,concurrency,executions,completed,seconds,throughput_per_sec
+trivial,30,1,192,192,48.26,3.98
+trivial,30,2,192,192,25.08,7.65
+trivial,30,4,192,192,13.33,14.40
+trivial,30,8,192,192,7.54,25.47
+trivial,30,16,192,192,5.37,35.73
+trivial,30,24,192,192,5.03,38.14
+trivial,30,32,192,192,4.95,38.82
+trivial,30,48,192,192,5.01,38.33
