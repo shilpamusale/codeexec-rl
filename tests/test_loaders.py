@@ -23,7 +23,7 @@ pytestmark = pytest.mark.dataset
 # Expected problem counts for the pinned EvalPlus
 # version (evalplus == 0.3.1: MBPP+ dataset v0.2.0, HumanEval+ dataset v0.1.10).
 # MBPP+ ships 378; we drop 1 zero-held-out problem and 3 order-unstable ones
-# (ADR-007), leaving 374, then 5 whose canonical fails its own gate (ADR-009), 
+# (ADR-007), leaving 374, then 5 whose canonical fails its own gate (ADR-009),
 # leaving 369.
 EXPECTED_MBPP_COUNT = 369
 EXPECTED_HUMANEVAL_COUNT = 164
