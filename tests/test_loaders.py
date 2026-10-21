@@ -29,44 +29,51 @@ EXPECTED_MBPP_COUNT = 369
 EXPECTED_HUMANEVAL_COUNT = 164
 
 
-def test_mbpp_loads_expected_count() -> None:
+# Each load re-runs every canonical solution (~15-20 s), so load once per module
+# and share the result. Tests only read the problems, never mutate them.
+@pytest.fixture(scope="module")
+def mbpp() -> dict[str, Problem]:
+    return load_mbpp()
+
+
+@pytest.fixture(scope="module")
+def humaneval() -> dict[str, Problem]:
+    return load_humaneval()
+
+
+def test_mbpp_loads_expected_count(mbpp: dict[str, Problem]) -> None:
     """MBPP+ loads to the expected count after validation and ADR-007 exclusions."""
-    problems = load_mbpp()
-    assert len(problems) == EXPECTED_MBPP_COUNT
+    assert len(mbpp) == EXPECTED_MBPP_COUNT
 
 
-def test_humaneval_loads_expected_count() -> None:
+def test_humaneval_loads_expected_count(humaneval: dict[str, Problem]) -> None:
     """Every HumanEval+ problem loads; the body-concatenation is correct."""
-    problems = load_humaneval()
-    assert len(problems) == EXPECTED_HUMANEVAL_COUNT
+    assert len(humaneval) == EXPECTED_HUMANEVAL_COUNT
 
 
-def test_order_unstable_problems_are_excluded() -> None:
+def test_order_unstable_problems_are_excluded(mbpp: dict[str, Problem]) -> None:
     """The ADR-007 order-unstable problems do not appear in the loaded set."""
-    problems = load_mbpp()
     for task_id in ORDER_UNSTABLE_TASK_IDS:
-        assert task_id not in problems
+        assert task_id not in mbpp
 
 
-def test_ungradeable_canonicals_are_excluded() -> None:
+def test_ungradeable_canonicals_are_excluded(mbpp: dict[str, Problem]) -> None:
     """The ADR-009 ungradeable-canonical problems do not appear in the loaded set."""
-    problems = load_mbpp()
     for task_id in UNGRADEABLE_CANONICAL_TASK_IDS:
-        assert task_id not in problems
+        assert task_id not in mbpp
 
 
-def test_corrupt_heldout_problems_are_excluded() -> None:
+def test_corrupt_heldout_problems_are_excluded(mbpp: dict[str, Problem]) -> None:
     """The ADR-009 corrupt-held-out problems do not appear in the loaded set."""
-    problems = load_mbpp()
     for task_id in CORRUPT_HELDOUT_TASK_IDS:
-        assert task_id not in problems
+        assert task_id not in mbpp
 
 
-def test_mbpp_problem_has_expected_shape() -> None:
+def test_mbpp_problem_has_expected_shape(mbpp: dict[str, Problem]) -> None:
     """A known-stable MBPP problem normalizes into the expected fields and tests."""
     # Mbpp/3 is a plain integer-returning problem (is_not_prime), so its output
     # is order-stable, unlike Mbpp/2 which was excluded under ADR-007.
-    problem = load_mbpp()["Mbpp/3"]
+    problem = mbpp["Mbpp/3"]
 
     assert isinstance(problem, Problem)
     assert problem.source == "mbpp"
@@ -75,9 +82,11 @@ def test_mbpp_problem_has_expected_shape() -> None:
     assert len(problem.heldout_tests) > 0
 
 
-def test_precompute_produces_correct_expected_output() -> None:
+def test_precompute_produces_correct_expected_output(
+    humaneval: dict[str, Problem],
+) -> None:
     """The pre-computed expected output matches the canonical solution's result."""
-    problem = load_humaneval()["HumanEval/0"]
+    problem = humaneval["HumanEval/0"]
 
     assert problem.source == "humaneval"
     assert problem.entry_point == "has_close_elements"
