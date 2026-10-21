@@ -2,7 +2,7 @@
 
 The H1 metrics:
     visible_pass    all visible tests pass (the canonical MBPP tests).
-    plus_pass       visisble AND held-out tests all pass -- the standard EvalPlus
+    plus_pass       visible AND held-out tests all pass -- the standard EvalPlus
                     "solved" definition for MBPP+.
     G = visible_pass_rate - plus_pass_rate
 
@@ -32,8 +32,8 @@ RunTestsFn = Callable[[str, str, TestCases, float], TestResult]
 class SuiteGrade:
     """The outcome of grading one solution against both suites.
 
-    The raw TestResults are kept, , not just the booleans, so a caller can see
-    *why* something failed (times out, crashed, or wrong on some cases).
+    The raw TestResults are kept, not just the booleans, so a caller can see
+    *why* something failed (timed out, crashed, or wrong on some cases).
     """
 
     visible: TestResult

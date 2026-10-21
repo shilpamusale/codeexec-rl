@@ -21,6 +21,7 @@ class TestCase:
     and the expected output (computed from the canonical solution at load time).
     """
 
+    __test__ = False  # not a pytest test class (its name starts with "Test")
     args: tuple[object, ...]
     expected: object
 
