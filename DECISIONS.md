@@ -251,4 +251,6 @@ Alternatives considered:
 
 **What would reverse it.** If the memory levers cannot make a stable training configuration fit in 40 GB, move to the H100 PCIe 80GB backup and record why. If Lambda capacity repeatedly blocks work, follow the backup order above. If the Section A throughput measurement shows grading is CPU-bound enough to leave the GPU idle, the first remedy is the ADR-005 warm container pool; the second is an instance with more vCPUs.
 
+**Status update — first launch (Section A, 2026-10-21).** Launched `gpu_1x_a100_sxm4` in us-east-1 (Virginia) on the Lambda Stack 22.04 image. The box check (analysis/box_env_lambda_a100.txt) confirmed Ubuntu 22.04.5 LTS, 30 vCPUs, 216 GiB RAM, 472 GB free local disk, Docker 29.2.1 (runc, cgroup v2), and system Python 3.10.12; the repo runs on Python 3.11.17 installed with uv. `nvidia-smi` reported an A100-SXM4-80GB on this instance although the instance type is sold as 40GB. The memory budget stays planned for 40 GB, because the SKU does not guarantee the larger card on the next launch.
+
 ---

@@ -1,0 +1,19 @@
+== Host
+  [OK]   OS: Ubuntu 22.04.5 LTS
+  [OK]   Kernel: 6.8.0-1046-nvidia
+== CPU, memory, disk
+  [OK]   vCPUs: 30
+  [OK]   RAM: 216 GiB
+  [OK]   Disk free on /: 472G
+  [WARN] No persistent filesystem attached (expected for Section A; needed for training)
+== GPU
+  [OK]   GPU: NVIDIA A100-SXM4-80GB, 81920 MiB, 580.105.08
+== Python
+  [OK]   System python3: Python 3.10.12
+  [WARN] python3.11 not found; the repo needs >=3.11 (install with uv during setup)
+== Docker
+  [OK]   Docker version 29.2.1, build a5c7197
+  [OK]   Runtime: runc, cgroup v2
+  [OK]   Container runs with --network none
+
+RESULT: all required checks passed
