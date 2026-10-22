@@ -4,13 +4,8 @@ test set in the Phase 1 sandbox and turn the TestResult into a scalar reward.
 
 Design(locked):
     - Arm-agnostic: the caller passes the `tests` to grade against. V1 passes the
-      visible tests; V0 passes the full suite. The are is a training-config choice,
-      not baked into the reward. (decision a)
-    - r_shaped's run_bonus defaults to 0.0 - the base instrument is pure fraction;
-      the partial-credit-for-running bonus is an explicit, logged experimental knob,
-      not a hidden default. (decision b)
-    - A timeout or a crash scored 0.0 for both: no completed suite means no evidence
-      of correctness. (decision c).
+      visible tests; V0 passes the visible tests plus held-out split A (ADR-013).
+      The arm is a training-config choice, not baked into the reward. (decision a)
 """
 
 from __future__ import annotations
