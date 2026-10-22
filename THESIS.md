@@ -110,7 +110,7 @@ Stated in advance so it cannot be decided after the fact:
 
 | Claim | Status |
 |---|---|
-| H0 | Not yet measured — Phase 3 |
+| H0 | Measured — **clean**. Perturbed pass@1 0.52 vs canonical 0.55 on the frozen 100: drop +3.0 pp, McNemar p = 0.549, 95% CI [−3.0, +10.0] pp, below the pre-registered 5 pp threshold; ADR-002 stands. One seeded perturbation per problem, not several as anticipated above (see the analysis/h0.md limitations). See analysis/h0.md. |
 | H1 | Not yet measured — Phase 5 |
 | H2 | Stretch, uncommitted |
 
