@@ -15,6 +15,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [009](#adr-009) | Exclude ungradeable / corrupt-held-out MBPP problems | Accepted |
 | [010](#adr-010) | Training box: Lambda on-demand, 1x A100 40GB | Accepted |
 | [011](#adr-011) | GRPO via TRL GRPOTrainer + vLLM colocate, pinned | Accepted |
+| [012](#adr-012) | Environment: thin stateless plain-Python env, no Gymnasium | Accepted |
 ---
 
 ## ADR-001
@@ -131,6 +132,7 @@ The original design generated property-based tests with Hypothesis for each prob
 **Status update:** Container startup measured as the throughput bottleneck (~3.5 exec/sec/core, trivial workload). Warm pool deferred pending Phase 4 training-throughput data. gVisor evaluated and not adopted. See the Phase 1 writeup (analysis/sandbox.md).
 
 **Status update — training-box throughput (Phase 4, Section A).** Re-measured on the training box (ADR-010; 30 vCPUs) with real reward programs at concurrency 1-48: plateaus of 38.8 exec/s (trivial), 34.9 (visible, one V1 reward call) and 13.3 (full, one V0 reward call), all reached by concurrency ~24, below the vCPU count. Container start and teardown are 79% of a visible reward call. The ceiling is the serialized container lifecycle, not cores, so a larger instance would not raise it and a warm pool would. Correction to the status line above: Phase 1 measured ~3.7 exec/s in total on a 2-core machine (~1.8 per core), not 3.5 per core. Load does not change grading outcomes: the completed count is identical at every concurrency level in every workload. **Decision: the warm pool stays deferred, now on measured supply.** At the plateau, grading 64 visible reward calls takes ~1.8 s (128: ~3.7 s); full-suite calls cost ~2.7x more, plus up to 10 s whenever one program times out. Whether that matters depends on generation and update time per step, which Section C measures. Rule, fixed now: adopt the warm pool if grading exceeds 25% of step wall time in the first stable training run; if the timeout tail rather than the mean dominates, the timeout budgets (runner 10 s, ADR-008's 2 s per case) are the lever instead. See the training-box addendum in analysis/sandbox.md and analysis/throughput_box_*.csv.
+
 ---
 
 ## ADR-006
@@ -259,7 +261,6 @@ Alternatives considered:
 **Status update — first launch (Section A, 2026-10-21).** Launched `gpu_1x_a100_sxm4` in us-east-1 (Virginia) on the Lambda Stack 22.04 image. The box check (analysis/box_env_lambda_a100.txt) confirmed Ubuntu 22.04.5 LTS, 30 vCPUs, 216 GiB RAM, 472 GB free local disk, Docker 29.2.1 (runc, cgroup v2), and system Python 3.10.12; the repo runs on Python 3.11.17 installed with uv. `nvidia-smi` reported an A100-SXM4-80GB on this instance although the instance type is sold as 40GB. The memory budget stays planned for 40 GB, because the SKU does not guarantee the larger card on the next launch. Throughput measured on this box (ADR-005 status update) plateaus below the vCPU count, so the vCPU figures in the consequences above do not bound grading as assumed, and an instance with more vCPUs is not a remedy for the grading ceiling.
 
 ---
----
 
 ## ADR-011
 
@@ -283,3 +284,18 @@ Alternatives considered:
 **What would reverse it.** If a stable GRPO configuration cannot be reached because of TRL itself (a trainer bug, or an unfixable interaction between vLLM colocate and the 40 GB memory budget), as distinct from ordinary hyperparameter instability, move generation to TRL's in-process transformers path first, then to another implementation, and record which failure forced it.
 
 ---
+
+## ADR-012
+
+### Environment interface: a thin, stateless, plain-Python environment; no Gymnasium
+
+**Context.** Episodes are single-shot: the observation is a prompt, the action is one completion, and the reward ends the episode. TRL's reward-function interface (ADR-011) could serve as the environment by itself, but that would tie the environment to one trainer, and the project describes itself as an RL environment. The spec asks whether a Gymnasium wrapper earns its place.
+
+**Decision.** A small plain-Python `CodeExecEnv`: `prompt(task_id)` returns the observation, and `step(task_id, completion)` extracts the function, grades it in the sandbox and returns the reward with its details. It is stateless: the task is an argument to `step`, not state set by a reset, so a GRPO group's completions can be graded concurrently without an instance pool. The TRL reward function is a thin adapter over `step`. Gymnasium is not used.
+
+**Consequences.**
+- The environment is independent of the trainer and CPU-testable without TRL. A different trainer, such as a Phase 6 PPO arm in another library (ADR-003 status update), reuses it unchanged, so a comparison changes the optimizer and nothing else.
+- No new dependency; the cost is one small layer between the trainer and the graders.
+- No Gymnasium compatibility: no trainer in use consumes Gymnasium environments, and its spaces fit token sequences poorly. TRL's own environment API, aimed at multi-turn tool use, is not used either, for the same coupling reason.
+
+**What would reverse it.** If multi-step episodes are built (FUTURE.md, item 6), the environment gains per-episode state and this interface is revisited. If a trainer that consumes Gymnasium environments is adopted, a thin Gymnasium adapter is added over `CodeExecEnv` rather than replacing it.
