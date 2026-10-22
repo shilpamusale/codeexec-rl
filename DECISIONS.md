@@ -16,6 +16,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [010](#adr-010) | Training box: Lambda on-demand, 1x A100 40GB | Accepted |
 | [011](#adr-011) | GRPO via TRL GRPOTrainer + vLLM colocate, pinned | Accepted |
 | [012](#adr-012) | Environment: thin stateless plain-Python env, no Gymnasium | Accepted |
+| [013](#adr-013) | Held-out split: V0 rewards on A, B is the measurement | Accepted |
 ---
 
 ## ADR-001
@@ -299,3 +300,27 @@ Alternatives considered:
 - No Gymnasium compatibility: no trainer in use consumes Gymnasium environments, and its spaces fit token sequences poorly. TRL's own environment API, aimed at multi-turn tool use, is not used either, for the same coupling reason.
 
 **What would reverse it.** If multi-step episodes are built (FUTURE.md, item 6), the environment gains per-episode state and this interface is revisited. If a trainer that consumes Gymnasium environments is adopted, a thin Gymnasium adapter is added over `CodeExecEnv` rather than replacing it.
+
+---
+
+## ADR-013
+
+### Held-out split: V0 rewards on held-out A; held-out B is the measurement and never enters any reward
+
+**Context.** THESIS defined V0's reward as the full MBPP+ suite while also stating that the held-out suite never enters any reward. V0 as designed therefore trains on its own measurement: G counts problems that pass the visible tests but fail held-out, and V0's reward scores exactly those cases 0, so V0's gap would shrink by construction instead of acting as a control. That biases the V1-versus-V0 comparison toward H1, and it is the defect the spec cited to drop V3 ("once the held-out set enters the reward it is no longer held out"). The spec judged a three-way partition infeasible on sparse tests, but only the visible tests are sparse (median 3 per problem); the held-out suite has a median of 105 tests per problem (minimum 13; 3 of the 369 problems have fewer than 20).
+
+**Decision.** Each problem's held-out tests are split once, before any training, into two disjoint parts:
+- **B, the measurement split.** `heldout_pass` and G are measured on the visible tests plus B. B never enters any reward, in any arm.
+- **A, the reward split.** V0's reward is computed on the visible tests plus A. V1's reward is computed on the visible tests only.
+
+Split rule: for a problem with n held-out tests, rank test indices 0..n-1 by `sha256(f"heldout-split-v1:{task_id}:{i}")` (hex digest, ascending); B is the first ceil(n/2) indices of that ranking, A the rest, and each part keeps the tests' loaded order. SHA-256 ranking is identical on every machine and Python version, unlike `random.shuffle`. This decision is committed before G_baseline is re-measured on B.
+
+**Re-baselining, pre-registered.** G_baseline is re-derived on B from the saved frozen-100 completions (analysis/completions_frozen100.json), graded by the Docker sandbox, with a bootstrap 95% CI computed as in analysis/g_baseline.md. Dynamic-range rule, fixed now: if the CI's lower bound is above zero, the 50/50 split stands. If the CI includes zero, the split moves to one-third A and two-thirds B (same ranking; B is the first ceil(2n/3)) and is re-checked once. If that CI also includes zero, training does not start until the V0 design is revisited. The Phase 3 full-suite G_baseline (+10.0 pp) remains on the record.
+
+**Consequences.**
+- The THESIS invariant holds again: the measurement never enters any reward, in any arm. V0 becomes a genuine control, a dense reward (visible plus ~52 held-out tests) against V1's sparse one (~3 tests), instead of one constrained by construction.
+- Measurement is less strict than the full suite (~52 held-out tests instead of ~105), so G_baseline on B is expected to be at most the full-suite +10.0 pp.
+- The standard full-suite MBPP+ pass-rate is still reported for the baseline and V1, which never train on held-out tests, so the citable number (ADR-004) survives. For V0 the full suite includes A, which V0 trains on, so it is not used as a V0 measurement.
+- `heldout_pass` keeps the EvalPlus "plus" form (ADR-004 status: visible AND held-out pass), now restricted to B.
+
+**What would reverse it.** The dynamic-range rule above. Separately, if A and B turned out to differ systematically in difficulty, the split would be redrawn under a new seed string (`heldout-split-v2`) and the reason recorded.

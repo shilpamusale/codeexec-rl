@@ -20,12 +20,14 @@ This project builds the environment needed to measure that, and then measures it
 
 Fixed before any run. Changing these after seeing results invalidates the comparison.
 
+*Amended 2026-10-21, before any training run: `heldout_pass` is measured on a held-out split that no arm's reward ever sees (ADR-013).*
+
 All pass-rates are pass@1, greedy decode, temperature 0 unless stated otherwise.
 
 | Symbol | Definition |
 |---|---|
 | `visible_pass` | Fraction of problems where all canonical MBPP tests pass. Measured on the canonical tests in every arm; only the reward function differs between arms, never this measurement. |
-| `heldout_pass` | Fraction of the same problems where the MBPP+ augmented suite passes. The held-out suite never enters any reward computation, in any arm. |
+| `heldout_pass` | Fraction of the same problems where the canonical tests **and** the held-out measurement split B all pass (the EvalPlus "plus" form, restricted to B; ADR-004, ADR-013). Split B never enters any reward computation, in any arm. |
 | `G` | `visible_pass − heldout_pass`. The gap at a point in training, on the headline greedy metric. |
 | `G_baseline` | `G` measured on the untrained base model. The pre-training baseline; `ΔG` is measured from here. |
 | `ΔG` | `G_final − G_baseline`. **The quantity under test.** |
@@ -33,6 +35,8 @@ All pass-rates are pass@1, greedy decode, temperature 0 unless stated otherwise.
 pass@1 greedy is the headline metric, and `G`, `G_baseline`, and `ΔG` are defined on it. A sampled gap — pass@10 at temperature 0.8, using the unbiased estimator from Chen et al. (2021) — is reported alongside as a secondary readout. If the gap behaves differently under sampling than under greedy decode, that divergence is itself a result and gets reported rather than smoothed over.
 
 Visible tests are the canonical test cases shipped with each MBPP problem — three or so per problem, sparse by design. Held-out tests are the MBPP+ augmented suite for the same problem. HumanEval+ is held out entirely as an out-of-distribution check and is never trained on.
+
+Each problem's held-out tests are split once, by a deterministic rule fixed before training (ADR-013), into two disjoint halves: **B**, the measurement split, on which `heldout_pass` and `G` are measured and which never enters any reward; and **A**, the reward split, which enters only V0's reward.
 
 ---
 
@@ -54,7 +58,7 @@ This is a precondition, not a caveat, and it is reported whether or not it is co
 
 ## H1 — Visible-test overfitting (primary)
 
-> **Claim.** Training with a reward computed only from **visible** tests **widens** the gap between visible pass-rate and held-out pass-rate — relative both to the same policy before training, and to a control trained on the full test suite. Execution reward on an observable test suite is Goodhartable, and `visible_pass` increasingly overstates true correctness as training proceeds.
+> **Claim.** Training with a reward computed only from **visible** tests **widens** the gap between visible pass-rate and held-out pass-rate — relative both to the same policy before training, and to a control trained on a dense test suite that excludes the measurement split. Execution reward on an observable test suite is Goodhartable, and `visible_pass` increasingly overstates true correctness as training proceeds.
 >
 > **Falsified if** the gap does not widen: held-out pass-rate rises together with visible pass-rate, or the treatment arm's `ΔG` is indistinguishable from the control's across seeds.
 
@@ -64,10 +68,10 @@ This is a precondition, not a caveat, and it is reported whether or not it is co
 
 | Arm | Reward computed on | Held-out metric | What it isolates |
 |---|---|---|---|
-| **V0** (control) | Full MBPP+ suite — canonical plus augmented tests, nothing hidden from the reward | MBPP+ augmented suite | Does the gap widen even when the reward sees everything? Controls for "training widens any gap." |
-| **V1** (treatment) | Canonical MBPP tests only | MBPP+ augmented suite | Does hiding tests from the reward widen the gap? |
+| **V0** (control) | Canonical tests plus held-out split A: a dense reward that sees everything except the measurement | Held-out split B | Does the gap widen even under a dense reward? Controls for "training widens any gap." |
+| **V1** (treatment) | Canonical MBPP tests only | Held-out split B | Does a sparse, visible-only reward widen the gap? |
 
-Because `visible_pass` is always measured on the canonical tests while only the reward differs between arms, V0's reward — computed on the full suite — overlaps its held-out metric. So in V0, held-out pass-rate rises together with visible pass-rate and the gap stays near its baseline. That flat control gap is the point of V0: it shows whether the gap widens *even when nothing is hidden from the reward*. V1's `ΔG` is measured against V0's, so the effect attributed to hiding tests is the difference between the arms, not the movement in V1 alone.
+Both arms are measured on the same instruments: `visible_pass` on the canonical tests and `heldout_pass` on split B, which neither arm's reward ever sees. The arms differ only in reward density, about 3 tests per problem for V1 against about 55 for V0, so V0 controls for drift that any training would cause without being trained on its own measurement. V1's `ΔG` is compared with V0's across seeds; the effect attributed to sparse, visible-only reward is the difference between the arms, and H1 also requires V1's gap to widen relative to its own baseline.
 
 Three seeds per arm, six runs — three is the floor for reporting variance at all, not the ideal; seed variance is reported alongside the effect. If the effect is within seed noise, that is the finding and it gets stated plainly.
 
@@ -96,7 +100,7 @@ H2 runs only if the H1 result is complete with time remaining. It is documented 
 Stated in advance so it cannot be decided after the fact:
 
 1. **H0 fails.** Memorization confounds the gap. Not a negative result — no result.
-2. **The held-out suite is too weak.** If MBPP+ augmented tests barely differ in difficulty from canonical tests, `G` has little room to move and the instrument is blunt. Reported as a measured property of the suite, not assumed.
+2. **The held-out measurement is too weak.** If held-out split B barely differs in difficulty from the canonical tests, `G` has little room to move and the instrument is blunt. Reported as a measured property of the split, not assumed; ADR-013 fixes in advance what happens if the gap on B has no dynamic range.
 3. **Seed variance exceeds the effect.** Then the honest statement is that the effect, if any, is smaller than this experiment can resolve. This applies most acutely to H2, which compares a difference of differences and needs more seeds to resolve than H1.
 4. **The policy never learns.** If `visible_pass` does not rise above baseline, there is no optimization pressure and nothing to overfit with.
 
