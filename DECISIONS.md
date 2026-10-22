@@ -14,6 +14,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [008](#adr-008) | Per-case timeout in the test harness | Accepted |
 | [009](#adr-009) | Exclude ungradeable / corrupt-held-out MBPP problems | Accepted |
 | [010](#adr-010) | Training box: Lambda on-demand, 1x A100 40GB | Accepted |
+| [011](#adr-011) | GRPO via TRL GRPOTrainer + vLLM colocate, pinned | Accepted |
 ---
 
 ## ADR-001
@@ -82,6 +83,7 @@ Each record states the context, the decision, the consequences accepted, and —
 
 **What would reverse it.** If GRPO proves unstable on this task at this scale in a way PPO does not, the default flips and the reasoning is recorded here. If the group-sampling cost turns out to dominate wall-clock — several completions per problem multiplies generation, and generation is expected to dominate — that is a throughput argument for revisiting, measured in Phase 3 rather than guessed at now.
 
+**Status update — PPO arm availability (Phase 4).** TRL removed `PPOTrainer` in v1.13.0 (Sep 2026), and GRPO runs on TRL 1.16.0 (ADR-011), so the optional Phase 6 PPO comparison arm cannot use the same library at the pinned version. If that arm is ever run, the options are a different PPO implementation or an older TRL pinned for that arm alone. Either way the comparison would differ in implementation as well as algorithm, and that confound is stated with the result. Phase 4 is unaffected.
 ---
 
 ## ADR-004
@@ -255,5 +257,29 @@ Alternatives considered:
 **What would reverse it.** If the memory levers cannot make a stable training configuration fit in 40 GB, move to the H100 PCIe 80GB backup and record why. If Lambda capacity repeatedly blocks work, follow the backup order above. If the Section A throughput measurement shows grading is CPU-bound enough to leave the GPU idle, the first remedy is the ADR-005 warm container pool; the second is an instance with more vCPUs.
 
 **Status update — first launch (Section A, 2026-10-21).** Launched `gpu_1x_a100_sxm4` in us-east-1 (Virginia) on the Lambda Stack 22.04 image. The box check (analysis/box_env_lambda_a100.txt) confirmed Ubuntu 22.04.5 LTS, 30 vCPUs, 216 GiB RAM, 472 GB free local disk, Docker 29.2.1 (runc, cgroup v2), and system Python 3.10.12; the repo runs on Python 3.11.17 installed with uv. `nvidia-smi` reported an A100-SXM4-80GB on this instance although the instance type is sold as 40GB. The memory budget stays planned for 40 GB, because the SKU does not guarantee the larger card on the next launch. Throughput measured on this box (ADR-005 status update) plateaus below the vCPU count, so the vCPU figures in the consequences above do not bound grading as assumed, and an instance with more vCPUs is not a remedy for the grading ceiling.
+
+---
+---
+
+## ADR-011
+
+### GRPO implementation: TRL GRPOTrainer with vLLM colocate, pinned
+
+**Context.** ADR-003 fixes GRPO as the algorithm but not the implementation. Phase 4 needs a trainer that runs on one GPU (ADR-010), samples several completions per prompt, and computes rewards through the Docker sandbox (ADR-005) using the validated graders (ADR-004, ADR-007, ADR-008). The implementation is the optimizer, not the subject of the study, so the criterion is the fewest moving parts that can learn.
+
+**Decision.** Hugging Face TRL `GRPOTrainer`, with generation by vLLM in colocate mode (vLLM runs inside the trainer process and shares the single GPU). Versions are resolved together and pinned exactly at introduction: trl 1.16.0, vllm 0.31.0 (the top of TRL 1.16.0's supported range, >=0.22.0 and <=0.31.0), torch 2.13.0, transformers 5.17.0, accelerate 1.15.0, datasets 5.1.0. The full resolved set (231 packages, Python 3.11, linux x86-64) is committed as requirements/train.lock. The `train` extra is installed only on the training box; CI and the CPU-tested core do not depend on it.
+
+Alternatives considered:
+- verl: production-grade and scalable, but built around Ray and multi-GPU training; heavy for one GPU and a 1.5B model.
+- A hand-written GRPO loop: full control, but every optimizer bug would be the project's own, in the phase whose main risk is stability.
+- Unsloth GRPO: memory-efficient, but LoRA-centred and implemented by patching library internals; less transparent.
+
+**Consequences.**
+- The reward plugs in without an adapter: TRL passes every non-prompt dataset column to the reward function as a keyword argument, so a `task_id` column lets the reward look up the `Problem` and grade with the existing harness. Reward functions may be async, which suits the I/O-bound sandbox, and can log extra per-step metrics.
+- The KL penalty is off by default (beta = 0.0): it is neither applied nor logged unless set explicitly. Whether to set it is a Section C stability decision, recorded when made.
+- TRL moves fast, so the exact pins are load-bearing: an upgrade is a deliberate change with its own commit, never drift.
+- TRL removed `PPOTrainer` in v1.13.0; see the ADR-003 status update.
+
+**What would reverse it.** If a stable GRPO configuration cannot be reached because of TRL itself (a trainer bug, or an unfixable interaction between vLLM colocate and the 40 GB memory budget), as distinct from ordinary hyperparameter instability, move generation to TRL's in-process transformers path first, then to another implementation, and record which failure forced it.
 
 ---

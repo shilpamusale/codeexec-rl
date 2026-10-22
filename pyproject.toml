@@ -14,16 +14,24 @@ dependencies = [
 ]
 
 # ML dependencies are added per phase and pinned exactly when introduced.
-# Phase 3 adds vllm + transformers; Phase 4 adds trl + torch. Pinning at the
-# point of introduction rather than up front keeps unused version churn out of
-# the lockfile, but every addition is pinned, never floated. See ADR-003.
+# Phase 4 adds the training stack (ADR-011) as the `train` extra, installed only
+# on the training box. The full resolved set is pinned in requirements/train.lock.
+# Pinning at the point of introduction rather than up front keeps unused version
+# churn out of the lockfile, but every addition is pinned, never floated.
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
     "mypy>=1.8",
-    "ruff>=0.4",
-    
+    "ruff>=0.4",    
+]
+train = [
+    "trl[vllm]==1.16.0",
+    "vllm==0.31.0",
+    "torch==2.13.0",
+    "transformers==5.17.0",
+    "accelerate==1.15.0",
+    "datasets==5.1.0",
 ]
 
 [tool.hatch.build.targets.wheel]
