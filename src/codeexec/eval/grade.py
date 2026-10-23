@@ -53,8 +53,17 @@ def _pairs(tests: Sequence[TestCase]) -> list[tuple[tuple[object, ...], object]]
     return [(tc.args, tc.expected) for tc in tests]
 
 
-def grade_two_suites(code: str, problem: Problem, run: RunTestsFn = run_tests) -> SuiteGrade:
+def grade_two_suites(
+    code: str,
+    problem: Problem,
+    run: RunTestsFn = run_tests,
+    heldout: Sequence[TestCase] | None = None,
+) -> SuiteGrade:
     """Grade `code` on the visible suite, then on visible + held-out.
+
+    `heldout` chooses the held-out tests for the plus run. None means all of
+    them: the standard MBPP+ "plus", as Phase 3 measured it. For the ADR-013
+    measurement, pass held-out split B (`split_heldout(problem).measurement`).
 
     The plus suite runs only if visible passed: plus requires visible by
     definition, so a visible failure already decides plus_pass = False and the
@@ -65,6 +74,7 @@ def grade_two_suites(code: str, problem: Problem, run: RunTestsFn = run_tests) -
     visible = run(code, problem.entry_point, _pairs(problem.visible_tests), problem.atol)
     if not visible.all_passed:
         return SuiteGrade(visible=visible, plus=None)
-    all_tests = (*problem.visible_tests, *problem.heldout_tests)
+    held = problem.heldout_tests if heldout is None else heldout
+    all_tests = (*problem.visible_tests, *held)
     plus = run(code, problem.entry_point, _pairs(all_tests), problem.atol)
     return SuiteGrade(visible=visible, plus=plus)

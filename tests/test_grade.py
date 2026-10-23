@@ -86,6 +86,15 @@ def test_plus_run_is_visible_then_heldout_in_one_call() -> None:
     assert plus_call[2] == [((1,), 2), ((5,), 10), ((7,), 14)]
 
 
+def test_heldout_argument_chooses_the_plus_suite() -> None:
+    """Passing a held-out subset (e.g. split B) grades plus on visible + that subset only."""
+    problem = _problem()
+    runner = RecordingRunner([_passed(1), _passed(2)])
+    grade_two_suites("code", problem, run=runner, heldout=problem.heldout_tests[1:])
+    _visible_call, plus_call = runner.calls
+    assert plus_call[2] == [((1,), 2), ((7,), 14)]
+
+
 def test_code_entry_point_and_atol_are_passed_through() -> None:
     runner = RecordingRunner([_passed(1), _passed(3)])
     grade_two_suites("def double(n): ...", _problem(atol=1e-6), run=runner)
