@@ -70,9 +70,9 @@ def run_code(code: str) -> RawResult:
     program with quotes and special characters arrives intact. The container is
     network-isolated, runs on a read-only filesystem with a small writable scratch mount,
     and is bounded in memory, process count, and wall-clock time. The time limit is enforced
-    inside the container by `timeout`, with a subprocess-level backdrop.Inside `timeout`, 
+    inside the container by `timeout`, with a subprocess-level backdrop.Inside `timeout`,
     a shell prints STARTED_MARKER and then `exec`s the program, so exit codes are the program's own.
-    `--pull never` means a missing image fails at once instead of being fetched. 
+    `--pull never` means a missing image fails at once instead of being fetched.
     The container is always removed, whether it exits, errors, or times out.
     """
     container_name = f"codeexec-{uuid.uuid4().hex}"
