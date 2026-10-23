@@ -14,12 +14,14 @@ import pytest
 
 from codeexec.rewards.harness import (
     RESULT_SENTINEL,
+    SandboxInfraError,
     _compare,
     _parse_result,
     _to_source,
     build_harness,
     run_tests,
 )
+from codeexec.sandbox import runner
 
 
 # --------------------------------------------------------------------------- #
@@ -276,3 +278,11 @@ def test_slow_case_fails_only_itself_not_whole_suite() -> None:
     assert result.passed == 3  # the three fast cases pass
     assert not result.crashed  # sentinel printed; suite did NOT crash
     assert not result.timed_out  # outer process did not time out
+
+
+@pytest.mark.integration
+def test_real_infra_failure_raises_instead_of_scoring(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A real sandbox failure (missing image) is retried once, then raised: never scored."""
+    monkeypatch.setattr(runner, "IMAGE", "codeexec-sandbox-does-not-exist")
+    with pytest.raises(SandboxInfraError, match="No such image"):
+        run_tests("def add(a, b):\n    return a + b", "add", [((2, 3), 5)], 0.0)

@@ -1,9 +1,13 @@
 import json
+import logging
 import math
+import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from codeexec.sandbox.runner import run_code
+from codeexec.sandbox.runner import RawResult, run_code
+
+logger = logging.getLogger(__name__)
 
 # A test case as the harness consumes it: (positional args, expected result).
 # Sequence (not list) so callers can pass a list of concretely-typed tuples:
@@ -22,6 +26,21 @@ RESULT_SENTINEL = "###CODEEXEC_RESULT_a3f9###"
 # suite. The outer sandbox timeout in run_code remains as a hard backstop for what
 # SIGALRM can't interrupt (C-level calls, huge allocations). See DECISIONS.md ADR-008.
 PER_CASE_TIMEOUT_SECONDS = 2
+
+# ADR-014: an infrastructure failuire is retried once, after a short pause
+# that gives a briefly overloaded or restarting Docker daemon time to recover.
+# If the retry fails too, run_tests raises instead of returning a score.
+INFRA_RETRY_DELAY_SECONDS = 1.0
+
+
+class SandboxInfraError(RuntimeError):
+    """The sandbox failed twice in a row, so the program never ran (ADR-014).
+
+    Raised instead of returning a score. An infrastructure failure says nothing
+    about the program, and scoring it 0.0 would push the policy away from code
+    that may be correct. Training stops loudly instead.
+    """
+
 
 # A copy of _compare as TEXT, embedded verbatim into every generated harness.
 # It must be stdlib-only (the sandbox has no access to our package), so it uses
@@ -93,6 +112,10 @@ class TestResult:
     total: int
     timed_out: bool
     crashed: bool  # True when no valid result line came back (e.g. syntax error)
+
+    # How many retries an infrastructure failure needed before this result came
+    # back (0 or 1). Not evidence about the program: training logs it as a metric.
+    infra_retries: int = 0
 
     @property
     def fraction(self) -> float:
@@ -215,15 +238,6 @@ def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) ->
     for args, expected in tests:
         lines.append(f"    ({_to_source(tuple(args))}, {_to_source(expected)}),")
     lines.append("]")
-    # lines.append(f"_fn = {entry_point}")
-    # lines.append("_passed = 0")
-    # lines.append("for _args, _expected in _cases:")
-    # lines.append("    try:")
-    # lines.append("        _result = _fn(*_args)")
-    # lines.append("        if _compare(_result, _expected, _atol):")
-    # lines.append("            _passed += 1")
-    # lines.append("    except Exception:")
-    # lines.append("        pass")  # a raising test counts as a failure; keep going
     lines.append(f"_fn = {entry_point}")
     lines.append(f"_budget = {PER_CASE_TIMEOUT_SECONDS}")
     lines.append("_passed = 0")
@@ -259,19 +273,52 @@ def _parse_result(stdout: str, total: int) -> tuple[int, bool]:
     return 0, True  # no valid sentinel found: the harness never reported
 
 
-def run_tests(code: str, entry_point: str, tests: TestCases, atol: float) -> TestResult:
-    """Run `code` against `tests` in the Phase 1 sandbox and return a TestResult."""
+def _run_with_one_retry(harness: str) -> tuple[RawResult, int]:
+    """Run `harness` in the sandbox, retrying once on an infra failure (ADR-014).
+
+    Returns the raw result and how many retries it took (0 or 1). A program failure
+    (wrong answer, crash, timeout) is never retried: it is evidence about the program,
+    and rerunning it would only double the cost of a wrong answer.
+    """
+
+    raw = run_code(harness)
+    if not raw.infra_error:
+        return raw, 0
+    logger.warning("sandbox infrastructure failure, retrying once: %s", raw.stderr.strip()[:200])
+    time.sleep(INFRA_RETRY_DELAY_SECONDS)
+    raw = run_code(harness)
+    if raw.infra_error:
+        raise SandboxInfraError(
+            f"sandbox failed twice in a row; the program never ran: {raw.stderr.strip()[:500]}"
+        )
+    return raw, 1
+
+
+def run_tests(
+    code: str,
+    entry_point: str,
+    tests: TestCases,
+    atol: float,
+) -> TestResult:
+    """Run `code` against `tests` in the Phase 1 sandbox and return a TestResult.
+
+    Raises SandboxInfraError if the sandbox fails twice in a row: an infrastructure
+    failure is never turned into a score (ADR-014).
+    """
     total = len(tests)
     if total == 0:
-        # No tests to run. Not a crash, not a timeout — just empty.
+        # No tests to run. Not a crash, not a timeout - just empty.
         return TestResult(passed=0, total=0, timed_out=False, crashed=False)
 
     harness = build_harness(code, entry_point, tests, atol)
-    raw = run_code(harness)  # the real Phase 1 sandbox
+    raw, retries = _run_with_one_retry(harness)
 
     if raw.timed_out:
-        # Suite didn't complete -> no evidence of correctness -> 0. (Decision c.)
-        return TestResult(passed=0, total=total, timed_out=True, crashed=False)
-
+        # Suite did not complete -> no evidence of correctness -> 0.
+        return TestResult(
+            passed=0, total=total, timed_out=True, crashed=False, infra_retries=retries
+        )
     passed, crashed = _parse_result(raw.stdout, total)
-    return TestResult(passed=passed, total=total, timed_out=False, crashed=crashed)
+    return TestResult(
+        passed=passed, total=total, timed_out=False, crashed=crashed, infra_retries=retries
+    )
