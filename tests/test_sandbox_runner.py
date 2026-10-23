@@ -7,6 +7,7 @@ failure.
 
 import pytest
 
+from codeexec.sandbox import runner
 from codeexec.sandbox.runner import RawResult, run_code
 
 pytestmark = pytest.mark.integration
@@ -59,7 +60,7 @@ def test_network_access_is_blocked() -> None:
         "print('REACHED NETWORK')\n"
     )
     result = run_code(code)
-
+    assert result.infra_error is False  # the program really ran
     assert result.returncode != 0
     assert "REACHED NETWORK" not in result.stdout
 
@@ -91,6 +92,7 @@ def test_write_inside_scratch_succeeds() -> None:
     )
     result = run_code(code)
 
+    assert result.infra_error is False  # the program really ran
     assert result.returncode == 0
     assert "WROTE INSIDE SCRATCH" in result.stdout
 
@@ -105,6 +107,7 @@ def test_memory_limit_stops_allocation() -> None:
     code = "x = [0] * (10 ** 10)\nprint('ALLOCATED HUGE')\n"
     result = run_code(code)
 
+    assert result.infra_error is False  # the program really ran
     assert result.returncode != 0
     assert "ALLOCATED HUGE" not in result.stdout
 
@@ -114,6 +117,7 @@ def test_process_limit_stops_fork_bomb() -> None:
     code = "import os\nfor _ in range(500):\n    os.fork()\nprint('FORKED MANY')\n"
     result = run_code(code)
 
+    assert result.infra_error is False  # the program really ran
     assert result.returncode != 0
     assert "FORKED MANY" not in result.stdout
 
@@ -124,3 +128,41 @@ def test_infinite_loop_times_out() -> None:
 
     assert result.timed_out is True
     assert result.returncode != 0
+
+
+def test_normal_run_is_not_infra_and_stderr_is_clean() -> None:
+    """The start marker reaches stderr from the real image, and is stripped before return."""
+    result = run_code("print('hi')")
+
+    assert result.infra_error is False
+    assert result.stderr == ""
+
+
+def test_program_exit_127_is_not_infra() -> None:
+    """A program's own sys.exit(127) is a program failure, not an infrastructure one."""
+    result = run_code("import sys\nsys.exit(127)")
+
+    assert result.infra_error is False
+    assert result.returncode == 127
+    assert result.infra_error is False
+
+
+def test_missing_image_is_infra(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A missing image fails at once (`--pull never`, exit 125): the program never ran."""
+    monkeypatch.setattr(runner, "IMAGE", "codeexec-sandbox-does-not-exist")
+    result = run_code("print('never runs')")
+
+    assert result.returncode == 125
+    assert result.infra_error is True
+
+
+def test_bad_timeout_command_line_is_infra(monkeypatch: pytest.MonkeyPatch) -> None:
+    """If `timeout` rejects its own command line, the program never ran.
+
+    -1 parses as an unknown option, so `timeout` exits 125 before the marker.
+    """
+    monkeypatch.setattr(runner, "TIMEOUT_SECONDS", -1)
+    result = run_code("print('never runs')")
+
+    assert result.returncode == 125
+    assert result.infra_error is True
