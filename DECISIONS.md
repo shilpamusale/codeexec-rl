@@ -17,6 +17,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [011](#adr-011) | GRPO via TRL GRPOTrainer + vLLM colocate, pinned | Accepted |
 | [012](#adr-012) | Environment: thin stateless plain-Python env, no Gymnasium | Accepted |
 | [013](#adr-013) | Held-out split: V0 rewards on A, B is the measurement | Accepted |
+| [014](#adr-014) | H1 reward is r_sparse; outcome-to-reward mapping | Accepted |
 ---
 
 ## ADR-001
@@ -326,3 +327,31 @@ Split rule: for a problem with n held-out tests, rank test indices 0..n-1 by `sh
 **What would reverse it.** The dynamic-range rule above. Separately, if A and B turned out to differ systematically in difficulty, the split would be redrawn under a new seed string (`heldout-split-v2`) and the reason recorded.
 
 **Status update — re-baselined on split B (pre-registered rule applied).** Graded through the Docker sandbox from the saved frozen-100 completions (scripts/rebaseline_split_b.py; analysis/g_baseline_split_b.json). The consistency check passed: the full held-out suite reproduces the Phase 3 record problem by problem (visible 65/100, plus 55/100) and its CI exactly ([+5.0, +16.0] pp). On split B: visible 65/100, plus 55/100, **G_baseline = +10.0 pp, bootstrap 95% CI [+5.0, +16.0] pp**. The CI's lower bound is above zero, so under the pre-registered rule **the 50/50 split stands** and the two-thirds fallback was not needed. No problem's result differs between the full suite and split B: every base-model completion that fails the full held-out suite also fails at least one split-B test, so halving the measurement cost no detection at the base model. That equivalence is a property of the untrained model, not a guarantee during training, which is why the full-suite number keeps being reported for the baseline and V1. The generation-engine re-measurement on the training box (ADR-004 status update) is taken on split B.
+
+---
+
+## ADR-014
+
+### H1 reward is r_sparse; every outcome has a fixed score, and infrastructure failures are never scored
+
+**Context.** H1 is defined on a binary terminal reward (THESIS), and `r_sparse` and `r_shaped` were built and validated in Phase 2. Before training, every way a reward call can end must map to exactly one score, fixed in advance, so no outcome is scored by accident. Laying the outcomes out exposed one gap: when the sandbox itself fails (the Docker daemon is down, the image is missing, the `docker` CLI errors), no result line comes back, so `run_tests` reports a crash and the reward is 0.0. A correct program would be punished for an infrastructure fault, silently.
+
+**Decision.** H1 uses `r_sparse` in both arms: 1.0 if every test in the arm's reward suite passes, else 0.0. V1's reward suite is the visible tests; V0's is the visible tests plus held-out split A (ADR-013), graded in one execution. `r_shaped` is kept for H2 only. Every outcome maps as follows:
+
+| Outcome | Score |
+|---|---|
+| All reward-suite tests pass | 1.0 |
+| Any test fails (wrong answer) | 0.0 |
+| A test case exceeds its per-case budget (ADR-008) | 0.0 (that case fails) |
+| The run exceeds the sandbox wall-clock limit | 0.0 |
+| The program crashes, exits early, exceeds the memory limit, or raises on a blocked action (network, filesystem) | 0.0 |
+| Malformed completion (does not extract into a function named `entry_point`) | 0.0, never sent to the sandbox; the malformed rate is logged per training step |
+| Sandbox infrastructure failure (`docker run` exits 125/126/127, or the runtime outlives its own wall-clock limit and the backstop fires) | **never scored**: retried once; if it fails again, the reward call raises and the training step stops |
+
+**Consequences.**
+- The reward stays a pure pass indicator in {0, 1}. Format is handled by the prompt and parser (ADR-006), not by shaping, so H1's reward is not partly an H2 reward.
+- A format collapse during training is visible directly in the logged malformed rate, not only indirectly as falling reward.
+- No reward is ever computed from an infrastructure fault. A failed run is loud and recoverable; silently corrupted rewards would be neither. This requires the sandbox runner to report infrastructure failure separately from a program crash, which is implemented with the reward function (Section B).
+- Infrastructure retries are counted and logged, so a degrading sandbox shows up before it stops a run.
+
+**What would reverse it.** If the malformed rate rises and stays high during training (well above the base model's 2%), format is revisited per ADR-006 (an SFT warm-start first) and recorded here, rather than by adding a format penalty to H1's reward. If infrastructure failures stop runs often enough to matter, the fix is in the sandbox (ADR-005's warm pool, daemon health), never in scoring them.
