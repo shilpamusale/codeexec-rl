@@ -68,3 +68,24 @@ unaffected (both arms were graded identically); only the label is clarified.
 ```
 
 Raw per-problem results: `analysis/g_baseline_results.json`.
+
+## Addendum: re-baselined on held-out split B (ADR-013)
+
+ADR-013 moved the measurement to held-out split B, which no arm's reward ever
+sees, and pre-registered how G_baseline is re-derived on it. Same frozen-100
+completions, graded through the Docker sandbox, same bootstrap (seed 0, 20,000
+resamples):
+
+| Suite | visible | plus | G_baseline | 95% CI |
+|---|---|---|---|---|
+| Full held-out (Phase 3 record, reproduced exactly) | 65/100 | 55/100 | +10.0 pp | [+5.0, +16.0] |
+| Held-out split B (the H1 measurement) | 65/100 | 55/100 | +10.0 pp | [+5.0, +16.0] |
+
+The lower bound is above zero, so the 50/50 split stands. No problem changes
+result between the two suites: all 10 base-model gap cases fail at least one
+split-B test. This holds for the untrained model; whether B stays as strict as
+the full suite during training is checked by also reporting the full-suite
+number for the baseline and V1.
+
+Raw per-problem results: `analysis/g_baseline_split_b.json`.
+Reproduce: `python scripts/rebaseline_split_b.py`.

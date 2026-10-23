@@ -1,0 +1,833 @@
+{
+  "meta": {
+    "split_version": "heldout-split-v1",
+    "bootstrap_seed": 0,
+    "bootstrap_resamples": 20000,
+    "grader": "docker run_tests",
+    "completions": "analysis/completions_frozen100.json",
+    "consistent_with_phase3": true
+  },
+  "verdict": "split B = 1/2 STANDS (CI lower bound +5.0 pp > 0)",
+  "full_suite": {
+    "visible": 65,
+    "plus": 55,
+    "G_pp": 10.0,
+    "ci_pp": [
+      5.0,
+      16.0
+    ],
+    "per_problem": {
+      "Mbpp/436": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/460": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/63": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/271": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/593": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/577": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/451": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/300": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/569": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/419": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/644": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/244": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/590": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/127": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/284": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/792": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/96": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/742": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/267": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/607": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/731": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/131": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/306": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/98": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/85": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/394": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/566": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/626": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/99": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/415": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/472": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/310": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/736": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/755": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/234": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/620": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/800": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/476": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/600": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/272": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/75": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/618": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/12": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/95": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/447": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/748": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/3": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/739": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/583": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/395": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/262": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/390": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/77": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/223": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/632": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/247": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/260": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/128": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/615": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/479": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/94": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/89": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/312": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/592": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/580": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/103": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/299": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/763": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/292": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/116": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/765": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/745": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/612": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/764": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/798": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/287": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/477": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/784": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/809": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/311": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/261": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/290": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/171": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/222": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/172": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/58": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/758": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/568": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/82": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/93": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/120": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/132": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/62": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/730": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/440": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/603": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/281": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/602": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/257": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/242": {
+        "visible_pass": true,
+        "plus_pass": true
+      }
+    }
+  },
+  "split B (1/2)": {
+    "visible": 65,
+    "plus": 55,
+    "G_pp": 10.0,
+    "ci_pp": [
+      5.0,
+      16.0
+    ],
+    "per_problem": {
+      "Mbpp/436": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/460": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/63": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/271": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/593": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/577": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/451": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/300": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/569": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/419": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/644": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/244": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/590": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/127": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/284": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/792": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/96": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/742": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/267": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/607": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/731": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/131": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/306": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/98": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/85": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/394": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/566": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/626": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/99": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/415": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/472": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/310": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/736": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/755": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/234": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/620": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/800": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/476": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/600": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/272": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/75": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/618": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/12": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/95": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/447": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/748": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/3": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/739": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/583": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/395": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/262": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/390": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/77": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/223": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/632": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/247": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/260": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/128": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/615": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/479": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/94": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/89": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/312": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/592": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/580": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/103": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/299": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/763": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/292": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/116": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/765": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/745": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/612": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/764": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/798": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/287": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/477": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/784": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/809": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/311": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/261": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/290": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/171": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/222": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/172": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/58": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/758": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/568": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/82": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/93": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/120": {
+        "visible_pass": true,
+        "plus_pass": false
+      },
+      "Mbpp/132": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/62": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/730": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/440": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/603": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/281": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/602": {
+        "visible_pass": false,
+        "plus_pass": false
+      },
+      "Mbpp/257": {
+        "visible_pass": true,
+        "plus_pass": true
+      },
+      "Mbpp/242": {
+        "visible_pass": true,
+        "plus_pass": true
+      }
+    }
+  }
+}
