@@ -8,7 +8,7 @@ classify outcomes into the full status enum (that builds on this).
 
 It does tell one thing apart, because nothing above it can: whether the program
 ran at all. When Docker or the container runtime fails, the result says nothing
-about the program, so it is flagged `infra_error` and must neveb be scored (ADR-014).
+about the program, so it is flagged `infra_error` and must never be scored (ADR-014).
 """
 
 import logging
@@ -42,11 +42,6 @@ TIMEOUT_EXIT_CODE = 124
 # from the image, is a fixed image bug the integration tests catch on any run.)
 STARTED_MARKER = "CODEEXEC_STARTED_7c1e"
 
-# `timeout` exits 126/127 when it can not start python, and says so on stderr.
-# A program's own sys.exit(126) or sys.exit(127) prints on such line.
-EXEC_FAILURE_EXIT_CODES = (126, 127)
-EXEC_FAILURE_MARKER = "timeout: failed to run command"
-# Cleanup must never hang the caller, even if the Docker Daemon does.
 CLEANUP_TIMEOUT_SECONDS = 10
 
 
@@ -69,17 +64,16 @@ def is_infra_failure(stderr: str) -> bool:
 
 
 def run_code(code: str) -> RawResult:
-    """Run `code` inside a freah, isolated container and return its raw output.
+    """Run `code` inside a fresh, isolated container and return its raw output.
 
     The code is delivered over stdin, not as a command-line argument, so a multi-line
     program with quotes and special characters arrives intact. The container is
-    network-isolated,runs on a read-only filesystem with a small writable scratch mount,
+    network-isolated, runs on a read-only filesystem with a small writable scratch mount,
     and is bounded in memory, process count, and wall-clock time. The time limit is enforced
-    inside the container by `timeout`, with a subprocess-level backdrop with a subprocess-level
-    backstop. Inside `timeout`, a shell prints STARTED_MARKER and then `exec`s the program,
-    so exit codes are the program's own. `--pull never` means a missing image fails
-    at once instead of being fetched. The container is always removed, whether
-    it exits, errors, or times out.
+    inside the container by `timeout`, with a subprocess-level backdrop.Inside `timeout`, 
+    a shell prints STARTED_MARKER and then `exec`s the program, so exit codes are the program's own.
+    `--pull never` means a missing image fails at once instead of being fetched. 
+    The container is always removed, whether it exits, errors, or times out.
     """
     container_name = f"codeexec-{uuid.uuid4().hex}"
     start_then_run = f"echo '{STARTED_MARKER}' >&2; exec python"
@@ -142,7 +136,7 @@ def run_code(code: str) -> RawResult:
 def _cleanup(container_name: str) -> None:
     """Deterministic teardown that can never hang the caller.
 
-    In the normal case the conatiner has already exited on its own
+    In the normal case the container has already exited on its own
     (`timeout` + `--rm`) and both commands are quick no-ops. In the
     backstop case it is still running, so it is killed and removed. Each command
     has its own timeout: if the Docker daemon itself hangs, the leak is logged
@@ -154,4 +148,4 @@ def _cleanup(container_name: str) -> None:
                 command, capture_output=True, check=False, timeout=CLEANUP_TIMEOUT_SECONDS
             )
         except subprocess.TimeoutExpired:
-            logger.warning("sandbix cleanup timed out: %s", " ".join(command))
+            logger.warning("sandbox cleanup timed out: %s", " ".join(command))
