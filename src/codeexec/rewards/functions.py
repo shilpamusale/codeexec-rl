@@ -10,7 +10,17 @@ Design(locked):
 
 from __future__ import annotations
 
-from codeexec.rewards.harness import TestCases, run_tests
+from codeexec.rewards.harness import TestCases, TestResult, run_tests
+
+
+def sparse_score(result: TestResult) -> float:
+    """The H1 scoring rule (ADR-014): 1.0 iff every test passed, else 0.0.
+
+    A timeout or crash is never all_passed, so it scores 0.0. Kept separate
+    from r_sparse so the environment, which needs the TestResult itself (for logging),
+    scores with exactly the same rule.
+    """
+    return 1.0 if result.all_passed else 0.0
 
 
 def r_sparse(code: str, entry_point: str, tests: TestCases, atol: float) -> float:
@@ -20,8 +30,7 @@ def r_sparse(code: str, entry_point: str, tests: TestCases, atol: float) -> floa
     which test set the caller passes as `tests`. A timeout or crash yields 0.0
     because TestResult.all_passed is False in those cases.
     """
-    result = run_tests(code, entry_point, tests, atol)
-    return 1.0 if result.all_passed else 0.0
+    return sparse_score(run_tests(code, entry_point, tests, atol))
 
 
 def r_shaped(
