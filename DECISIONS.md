@@ -285,6 +285,10 @@ Alternatives considered:
 
 **What would reverse it.** If a stable GRPO configuration cannot be reached because of TRL itself (a trainer bug, or an unfixable interaction between vLLM colocate and the 40 GB memory budget), as distinct from ordinary hyperparameter instability, move generation to TRL's in-process transformers path first, then to another implementation, and record which failure forced it.
 
+**Status update — experiment tracking added (Section B, B6).**
+
+`wandb==0.30.0` joins the `train` extra for training curves (the spec's Phase 4 gate). The lock was re-resolved with the same `uv pip compile` command, which keeps existing pins as preferences: two packages were added (`wandb 0.30.0` and its dependency `platformdirs 4.13.5`), and no existing pin changed (233 packages).The newest release, `0.31.0` (2026-10-16), was passed over because it pins a beta dependency (`cwevals 0.0.1b1`); `0.30.0` (2026-09-09) has none.
+
 ---
 
 ## ADR-012
