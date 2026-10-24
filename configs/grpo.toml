@@ -1,0 +1,58 @@
+# GRPO training configuration, shared by every arm and seed (B6).
+#
+# THESIS: the arms differ only in their reward. So this one file holds every 
+# setting the runs share, and only the arm, the seed the output directory
+# come from the command line. The loader rejects those keys here, so no can 
+# quietly diverge from this file. [grpo] keys are GRPOConfig arguments (TRL 1.16.0, 
+# ADR-011), passed through unchanged. Values marked provisional are Section C's to
+# tune; each change is recorded in DECISIONS.md.
+
+[model]
+name = "Qwen/Qwen2.5-Coder-1.5B"  # the base model (ADR-001)
+revision = "df3ce67c0e24480f20468b6ef2894622d69eb73b"  # pinned commit: the weights never float
+
+[grpo]
+# The reward contract. The loader enforces these two; changing them breaks the study.
+remove_unused_columns = false # Keep task_id: TRL passes it to the reward (ADR-011)
+max_completion_length = 256 # = the baseline's max_new_tokens, so delta-G compares like with like
+
+# Group and batch: 4 x 32 = 128 completions per step = 16 prompts x 8 samples.
+num_generations = 8
+per_device_train_batch_size = 4 # sets peak training memory
+gradient_accumulation_steps = 32 # sets prompts per step, not memory
+
+# Optimizer (provisional).
+learning_rate = 1e-6
+lr_scheduler_type = "constant"  # the rate at step k never depends on the planned run length
+max_grad_norm = 1.0
+beta = 0.0 # KL penalty off; Section C decides (ADR-011)
+loss_type = "dapo" # TRL defaults, written out so an upgrade cannot change them silently
+scale_rewards = "group"
+num_iterations = 1 # one optimizer step per generation batch: fully on-policy
+
+# Sampling (provisional)
+temperature = 1.0
+top_p = 1.0
+mask_truncated_completions = false # check completions/clipped_ratio first 
+
+# Generation engine (ADR-011): vLLM inside the trainer, sharing the GPU.
+use_vllm = true
+vllm_mode = "colocate"
+vllm_gpu_memory_utilization = 0.25 # ~3 GB weights + ~7 GB KV cache on a 40 GB card
+vllm_enable_sleep_mode = false # first fallback if memory runs short
+vllm_max_model_length = 1024
+
+# Precision and memory: fp32 master weights, bf16 compute.
+bf16 = true
+gradient_checkpointing = true
+
+# Run length, logging, checkpoints (provisional)
+max_steps = 200
+logging_steps = 1
+save_strategy = "steps"
+save_steps = 50
+report_to = "wandb"
+
+
+
+
