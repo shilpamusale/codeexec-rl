@@ -113,6 +113,14 @@ The original design generated property-based tests with Hypothesis for each prob
 
 **Status update — grader parity (Section A, training box).** The saved frozen-100 completions (analysis/completions_frozen100.json, regenerated on Colab with the Phase 3 setup and confirmed to reproduce the Phase 3 per-problem record exactly) were graded on the training box by the Phase 3 subprocess grader (host Python 3.11.17, 30 s timeout) and by the Docker sandbox (`python:3.11-slim@sha256:cce12316475d7d56d605f76e1d811d0dc4e7227f2d4afd29951521264f504ff8`; 10 s, 256 MB, no network, read-only filesystem). **Parity holds:** both graders give visible 65/100 and plus 55/100, with 0 disagreements and 0 differences from the committed G_baseline record on all 100 problems; the sandbox's tighter limits changed no outcome on this set. The Docker grader therefore measures the same G_baseline (+10.0 pp) as the Colab grader. The one remaining difference in the evaluation path is the generation engine, which is re-measured once the Section B training library is chosen. See analysis/grader_parity.json and scripts/grader_parity.py.
 
+**Status update — box measurement plan (pre-registered before it runs, Section B, B7).**
+G_baseline is re-measured on the training box through vLLM, TRL's generation engine (ADR-011): greedy decoding (temperature 0), at most 256 new tokens, stopping only at end-of-sequence, in bf16, from the pinned model revision `df3ce67c0e24480f20468b6ef2894622d69eb73b` (`configs/grpo.toml`; `main` since 2024-11-18, so the same files every earlier baseline loaded).
+Completions are extracted as in Phase 3 and graded by the Docker sandbox on the visible tests, on visible plus held-out split B (the headline), and on visible plus the full held-out suite (the citable MBPP+ number, kept for the baseline and V1 per ADR-013).
+**The ΔG reference is this measurement over all 369 training problems**, not the frozen 100: generation and grading on the box take minutes, and n = 369 roughly halves the confidence interval's width, which ΔG needs to stand out from seed variance.
+The CI is computed exactly as in `analysis/g_baseline.md` (paired per-problem differences, numpy `default_rng(0)`, 20,000 resamples, 2.5/97.5 percentiles).
+The frozen-100 subset is reported alongside, for continuity with the Phase 3 record and as the engine check: its per-problem results are compared with `analysis/g_baseline_split_b.json`, and any differences are reported with their cause, not resolved away.
+If the 369-problem CI includes zero, training does not start until the instrument is revisited under this ADR's reversal condition.
+Every training checkpoint is measured by the same command, so ΔG is a subtraction on one instrument. pass@10 and the HumanEval+ baseline are deferred to Phase 5's evaluator.
 ---
 
 ## ADR-005

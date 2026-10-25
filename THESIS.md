@@ -22,6 +22,8 @@ Fixed before any run. Changing these after seeing results invalidates the compar
 
 *Amended 2026-10-21, before any training run: `heldout_pass` is measured on a held-out split that no arm's reward ever sees (ADR-013).*
 
+*Amended 2026-10-24, before any training run: `visible_pass`, `heldout_pass` and `G` are measured over all 369 training problems on the training box's evaluation path; the frozen-100 subset is reported alongside (ADR-004 status update).*
+
 All pass-rates are pass@1, greedy decode, temperature 0 unless stated otherwise.
 
 | Symbol | Definition |
