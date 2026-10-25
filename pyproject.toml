@@ -23,7 +23,7 @@ dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
     "mypy>=1.8",
-    "ruff>=0.4",    
+    "ruff>=0.4",
 ]
 train = [
     "trl[vllm]==1.16.0",
@@ -52,13 +52,16 @@ strict = true
 warn_unreachable = true
 files = ["src", "tests"]
 
+# Libraries with no type information in CI: evalplus ships none, and the
+# training stack (torch, TRL, datasets) is untyped or installed only on the
+# training box. Treat them as untyped; only our use of them is checked.
+[[tool.mypy.overrides]]
+module = ["evalplus.*", "torch", "torch.*", "trl", "trl.*", "datasets", "datasets.*"]
+ignore_missing_imports = true
+
 # matplotlib (for the throughput chart) pulls in numpy, whose current stubs use
 # Python 3.12+ syntax that trips mypy's 3.11 target. Skip type-checking these
 # third-party libraries; only our use of them at the boundary is checked.
-[[tool.mypy.overrides]]
-module = ["evalplus.*","torch", "torch.*"]
-ignore_missing_imports = true
-
 [[tool.mypy.overrides]]
 module = ["matplotlib.*", "numpy.*"]
 follow_imports = "skip"
