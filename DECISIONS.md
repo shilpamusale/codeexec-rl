@@ -10,7 +10,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [004](#adr-004) | EvalPlus as the held-out layer, not generated property tests | Accepted |
 | [005](#adr-005) | Container isolation from day one | Accepted |
 | [006](#adr-006) | Policy variant: Qwen2.5-Coder-1.5B base, measured fallback | Accepted |
-| [007](#adr-007) | Strict reward comparison; drop order-unstable problems | Accepted |
+| [007](#adr-007) | Strict reward comparison; drop order-unstable problems | Partly superseded by [015](#adr-015) |
 | [008](#adr-008) | Per-case timeout in the test harness | Accepted |
 | [009](#adr-009) | Exclude ungradeable / corrupt-held-out MBPP problems | Accepted |
 | [010](#adr-010) | Training box: Lambda on-demand, 1x A100 40GB | Accepted |
@@ -18,6 +18,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [012](#adr-012) | Environment: thin stateless plain-Python env, no Gymnasium | Accepted |
 | [013](#adr-013) | Held-out split: V0 rewards on A, B is the measurement | Accepted |
 | [014](#adr-014) | H1 reward is r_sparse; outcome-to-reward mapping | Accepted |
+| [015](#adr-015) | Test comparison matches EvalPlus's own grader | Accepted |
 ---
 
 ## ADR-001
@@ -188,6 +189,8 @@ Validating the instrument against ground truth — running every canonical solut
 - The rejected alternative — an order-insensitive (multiset) comparison — would make `[1,2,3]` match `[3,2,1]` for *every* problem, including sorting problems where order is correctness. That trades a 0.8% false-negative for a systematic false-*positive* risk across the whole dataset, which is the loose-instrument failure the study is about. Not taken.
 
 **What would reverse it.** If a *large* fraction of the training distribution turned out to be order-unstable, dropping would bias the distribution and the fix would shift to canonicalizing unordered outputs at load time (sorting the stored `expected` for genuinely-unordered return types, per problem) while keeping the comparison strict. At 0.8% that cost is not warranted. Loosening the comparison itself is not a reversal path — it is ruled out by the thesis.
+
+**Status update — superseded in part by ADR-015.** The comparison semantics above are replaced by EvalPlus's own grader: float tolerance, Python equality for exact match (so `True == 1`), and EvalPlus's special oracles. The premise that the EvalPlus held-out suite is strict on floats was wrong; ADR-015 records the evidence. The three order-unstable exclusions stand.
 
 ---
 
@@ -370,3 +373,33 @@ Split rule: for a problem with n held-out tests, rank test indices 0..n-1 by `sh
 
 
 **Status update — infrastructure-failure detection and retry, as built (Section B, B5).** Correction to the table above: exit codes cannot identify an infrastructure failure. With the daemon unreachable, the Docker 29 CLI (checked on 29.9.1) exits 1, the same code an uncaught Python exception produces, and a program's own `sys.exit(125)`, `sys.exit(126)` or `sys.exit(127)` reuses the others. Detection therefore uses positive evidence. The container runs `timeout 10 sh -c "echo <start marker> >&2; exec python"`: the marker is written to stderr from inside `timeout`, immediately before the program starts, and `exec` preserves the program's exit code and `timeout`'s 124. No marker means the program never started (daemon unreachable, image missing, since `docker run --pull never` fails at once instead of fetching, or a rejected command line), so the run is an infrastructure failure whatever its exit code; expiry of the 15 s backstop remains one too. With the marker present, the outcome is the program's and is scored by the table. A program cannot remove a marker written before it started, so no completion can fake an infrastructure failure and stop a run. Two cases remain unseparated and are accepted: Python missing from the image after the marker (a fixed image fault that every integration run catches), and the daemon failing mid-run after the marker. `run_tests` retries an infrastructure failure once, after a 1 s pause, and raises `SandboxInfraError` if it recurs; program failures (wrong answer, crash, timeout) are never retried. `TestResult.infra_retries` carries the count, and the TRL reward adapter logs `codeexec/infra_retries`, `codeexec/malformed_rate` and `codeexec/grading_seconds` per batch, the last for ADR-005's warm-pool rule. The marker was first placed before `timeout`, which attributed a mistyped `timeout` command line to the program; an integration run caught this and also showed four isolation tests passing without the program having run. The marker moved inside `timeout`, and those tests now assert that the program ran. See src/codeexec/sandbox/runner.py, src/codeexec/rewards/harness.py and src/codeexec/train/reward.py.
+
+---
+
+## ADR-015
+
+### Test comparison matches EvalPlus's own grader
+
+**Context.** ADR-007 made the comparison strict and called that "consistent with the strict EvalPlus held-out suite (ADR-004)". The engine check of the box baseline (Section B, B7) showed the premise is wrong for floating-point outputs. In Mbpp/234 (`volume_cube`, atol 0, canonical `l ** 3`), a completion returning `l*l*l` fails 22 of 101 held-out tests because the two expressions differ in a float's last digit (5.527548510985869 against 5.52754851098587). EvalPlus 0.3.1's evaluator (`evalplus/eval/__init__.py`, `unsafe_execute`) passes it: when atol is 0 and the expected output is a float or a list or tuple of floats, it raises atol to 1e-6 and compares with `np.allclose(..., rtol=1e-7)`. Read in full, the evaluator differs from `_compare` in four ways:
+- float outputs, as above: 50 of the 369 problems have atol 0 and float expected outputs in their held-out tests, 17 in their visible tests;
+- the 13 problems with atol above 0: EvalPlus adds a relative tolerance of 1e-7;
+- exact match is Python equality, so `True == 1` and `1 == 1.0` (ADR-007 made bool and int distinct);
+- seven problems in this set have special oracles: set equality (Mbpp/7, Mbpp/111, Mbpp/140, Mbpp/232), "not None" (Mbpp/787), and recomputation by a reference function (Mbpp/558, Mbpp/581).
+
+A failure caused only by these differences is not overfitting, yet it has the gap's signature: visible tests with integer outputs pass and held-out tests with float outputs fail. It inflates G with cases unrelated to H1, penalizes correct programs in the reward on 17 problems, and means the full-suite number is not the citable MBPP+ number ADR-004 and ADR-013 call it. Regrading the frozen 100 with EvalPlus's float rule changes exactly one result, Mbpp/234, which is also the only disagreement in the engine check.
+
+**Decision.** A test passes exactly when EvalPlus 0.3.1's evaluator would pass it, in the reward and the measurement alike: exact match by Python equality, then the MBPP special oracles, then the float tolerance with its type and length checks. The comparison lives in one stdlib-only module, embedded verbatim into every sandboxed harness; the sandbox has no numpy, so `np.allclose`'s element-wise rule is written out. ADR-008's per-case and per-program time limits are unchanged: they are the sandbox's limits, not the definition of correct. ADR-007's three order-unstable exclusions (Mbpp/2, Mbpp/579, Mbpp/769, which are three of EvalPlus's set-equality tasks) stay excluded, so the problem set remains the pre-registered 369. HumanEval's special oracle is added when HumanEval+ is measured in Phase 5.
+
+**Validation and regrade, pre-registered before either runs.**
+1. Every canonical solution passes all of its own tests under the new comparison.
+2. Parity with EvalPlus's own evaluator: the saved completions (the frozen 100 from Colab, analysis/completions_frozen100.json, and the 369 from the box, analysis/g_baseline_box.json) are graded both ways, and per-problem visible and full-suite results must agree. Any disagreement is reported with its cause; the two systems' different time limits are the only expected source.
+3. G_baseline is then re-derived from the box's saved 369 completions under the new comparison, without regenerating, with the same CI method and the same stop rule as the ADR-004 status update. That figure is the delta-G reference.
+
+Results graded under ADR-007's comparison (the Phase 3 G_baseline, the split-B re-baseline, H0, and the first grading of the box completions) stay on the record, labelled with the comparison they used.
+
+**Consequences.**
+- "Correct" means what the benchmark means: the full-suite MBPP+ number is citable, and no rounding artifact enters G or the reward.
+- The comparison is looser than ADR-007's in exactly EvalPlus's ways and no others. The loosening ADR-007 ruled out, order-insensitive comparison for every problem, stays ruled out: set equality applies only to the four problems EvalPlus names.
+- One copy of the comparison replaces two that a test kept in sync.
+
+**What would reverse it.** If the parity check finds disagreements that time limits do not explain, the port is wrong and is fixed before any training run. The decision itself would be revisited only if EvalPlus's evaluator were found to accept wrong answers on this problem set, which would be a finding about the benchmark and reported as one.
