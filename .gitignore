@@ -17,3 +17,7 @@ poetry.lock
 # OS / editor noise
 .DS_Store
 .vscode/
+
+# Training outputs (checkpoints are gigabytes) and W&B's local run files
+runs/
+wandb/
