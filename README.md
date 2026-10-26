@@ -14,15 +14,15 @@ The research question is whether that reward is Goodhartable: does optimizing ag
 
 ## Status
 
-**Phase 0 — Frame: complete.** Repository skeleton, CI, and research framing are in place, with CI green on the skeleton. Phase 1 (the sandbox) is where the build begins.
+**Phase 4 — Training loop: in progress.** The sandbox, the task layer and the base-model measurements are complete. The RL environment, the TRL reward adapter, the shared training config, the launcher and the G measurement are built and tested; next is the first training step on the training GPU, and the baseline re-measured there over all 369 problems.
 
 | Phase | State |
 |---|---|
 | 0 · Frame | Done |
-| 1 · Sandbox | Not started |
-| 2 · Task and test layer | Not started |
-| 3 · Base-model measurement (H0, `G_baseline`) | Not started |
-| 4 · Training loop | Not started |
+| 1 · Sandbox | Done — Docker isolation (no network, read-only filesystem, memory, process and time limits) and a concurrent pool; throughput plateaus near 39 executions/s on the training box ([analysis/sandbox.md](analysis/sandbox.md)) |
+| 2 · Task and test layer | Done — MBPP+ (369 problems after exclusions), HumanEval+ held out, a perturbation generator, sparse and shaped rewards |
+| 3 · Base-model measurement (H0, `G_baseline`) | Done — H0 clean (perturbed drop +3.0 pp, McNemar p = 0.549; [analysis/h0.md](analysis/h0.md)); `G_baseline` = +10.0 pp, 95% CI [+5.0, +16.0] ([analysis/g_baseline.md](analysis/g_baseline.md)) |
+| 4 · Training loop | In progress |
 | 5 · H1 result | Not started |
 
 ---
@@ -49,18 +49,20 @@ Stated plainly, because scope creep is the main risk to a project like this:
 
 ---
 
-## Repository layout
-
 ```
 src/codeexec/
-  sandbox/     isolated execution: containers, limits, async pool
-  tasks/       MBPP + EvalPlus loading, visible/held-out partition, perturbations
-  reward/      execution reward, sparse and shaped variants
-  train/       GRPO loop and per-arm configs
-  detect/      AST-based degenerate-solution detection
-  eval/        pass-rate measurement, held-out and OOD
-tests/         unit tests, including the sandbox fixture suite
-analysis/      writeups: baseline, H1 result
+  sandbox/     isolated execution: Docker runner, limits, async pool
+  tasks/       MBPP+ / HumanEval+ loading, the held-out split (A/B)
+  perturb/     semantics-preserving perturbations for the H0 probe
+  rewards/     test harness and reward functions (sparse, shaped)
+  env.py       the RL environment: prompt in, completion out, reward back
+  train/       shared GRPO config, TRL reward adapter, training launcher
+  eval/        extraction, grading, and the G measurement
+  detect/      AST-based degenerate-solution detection (Phase 5)
+configs/       grpo.toml: the settings every training run shares
+scripts/       one-off measurement and verification scripts
+tests/         unit and integration tests, including the sandbox fixture suite
+analysis/      results and writeups: sandbox, H0, G_baseline
 ```
 
 Three documents carry the research signal:
@@ -71,11 +73,18 @@ Three documents carry the research signal:
 
 ---
 
-## Development
-
 ```bash
 pip install -e ".[dev]"
-make check      # ruff, mypy, pytest
+docker build -t codeexec-sandbox src/codeexec/sandbox/
+make check                  # ruff, mypy, unit tests: what CI runs
+pytest -q -m integration    # real containers; needs Docker running
+```
+
+Training runs on a single GPU box (ADR-010), with the training stack pinned in `requirements/train.lock`:
+
+```bash
+pip install -e ".[dev,train]" -c requirements/train.lock
+python -m codeexec.train.launch --arm V1 --seed 0
 ```
 
 CI runs the same checks on every commit.
