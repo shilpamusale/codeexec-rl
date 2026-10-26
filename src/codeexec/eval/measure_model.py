@@ -58,7 +58,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--max-workers", type=int, default=24, help="grading concurrency")
     parser.add_argument("--overwrite", action="store_true", help="replace an existing report")
     parser.add_argument("--allow-dirty", action="store_true", help="run with uncommitted changes")
-    parser.parse_args(argv)
+
     return parser.parse_args(argv)
 
 
@@ -87,7 +87,7 @@ def generate(
         seed=0,
     )
     params = SamplingParams(temperature=0.0, max_tokens=max_tokens, n=1)
-    outputs = llm.generate(list(prompts), SamplingParams=params, use_tqdm=True)
+    outputs = llm.generate(list(prompts), sampling_params=params, use_tqdm=True)
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     ids = [list(out.outputs[0].token_ids) for out in outputs]
     texts = tokenizer.batch_decode(ids, skip_special_tokens=True)
@@ -161,7 +161,7 @@ def main(argv: list[str] | None = None) -> int:
         "engine": f"vllm {version('vllm')}",
         "dtype": "bfloat16",
         "decoding": "greedy (temperature 0), stop at end-of-sequence only",
-        "max_new_tokens": config.grpo["max_xompletion_length"],
+        "max_new_tokens": config.grpo["max_completion_length"],
         "prompt": "zero-shot-plus-stub (build_prompt), as in training",
         "measurement_set": f"all {len(task_ids)} training problems; frozen-100 subset alongside",
         "grader": "docker run_tests",
@@ -179,7 +179,7 @@ def main(argv: list[str] | None = None) -> int:
         record=record,
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_yexy(json.dumps(report, indent=2) + "\n")
+    args.out.write_text(json.dumps(report, indent=2) + "\n")
 
     for name in ("all_problems", "frozen_100"):
         s = report[name]

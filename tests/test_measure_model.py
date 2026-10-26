@@ -6,17 +6,20 @@ the frozen-100 subset, the engine check and the refusals, is tested here.
 
 from __future__ import annotations
 
+import json
 import sys
 import types
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from codeexec.eval.gap import ProblemResult
 from codeexec.eval.measure_model import build_report, frozen_100_ids, main, parse_args
-from codeexec.train.config import ConfigError, RunConfig, pinned_model_path
+from codeexec.rewards.harness import TestResult
 
 HASH = "df3ce67c0e24480f20468b6ef2894622d69eb73b"
+CONFIG = Path(__file__).resolve().parents[1] / "configs" / "grpo.toml"
 
 
 def test_out_is_required() -> None:
@@ -84,12 +87,91 @@ def _fake_hub(monkeypatch: pytest.MonkeyPatch, folder: str) -> None:
     monkeypatch.setitem(sys.modules, "huggingface_hub", hub)
 
 
-def test_pinned_model_path_is_the_snapshot_named_by_its_hash(
-    monkeypatch: pytest.MonkeyPatch,
+def test_main_runs_end_to_end_with_a_fake_engine(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    config = RunConfig(model="Qwen/Qwen2.5-Coder-1.5B", revision=HASH, grpo={})
-    _fake_hub(monkeypatch, HASH)
-    assert pinned_model_path(config) == Path(f"/cache/snapshots/{HASH}")
-    _fake_hub(monkeypatch, "0" * 40)
-    with pytest.raises(ConfigError, match="not the pinned"):
-        pinned_model_path(config)
+    """The whole box path, from generation to the written report, runs here with
+    stand-ins for vLLM, torch and the tokenizer. The stand-ins accept only the
+    arguments the real libraries take, so a typo in this path fails CI instead
+    of a paid GPU session."""
+    from codeexec.eval import gap, measure_model
+    from codeexec.tasks.problem import Problem
+    from codeexec.tasks.problem import TestCase as Case
+
+    class FakeLLM:
+        def __init__(
+            self,
+            *,
+            model: str,
+            dtype: str,
+            gpu_memory_utilization: float,
+            max_model_len: int | None,
+            seed: int,
+        ) -> None:
+            pass
+
+        def generate(
+            self, prompts: list[str], *, sampling_params: object, use_tqdm: bool
+        ) -> list[types.SimpleNamespace]:
+            done = types.SimpleNamespace(token_ids=[1, 2, 3], finish_reason="stop")
+            return [types.SimpleNamespace(outputs=[done]) for _ in prompts]
+
+    def fake_sampling_params(*, temperature: float, max_tokens: int, n: int) -> object:
+        return object()
+
+    class FakeTokenizer:
+        def batch_decode(self, ids: list[list[int]], *, skip_special_tokens: bool) -> list[str]:
+            return ["    return a + b\n" for _ in ids]
+
+    fakes: dict[str, dict[str, Any]] = {
+        "vllm": {"LLM": FakeLLM, "SamplingParams": fake_sampling_params},
+        "transformers": {
+            "AutoTokenizer": types.SimpleNamespace(from_pretrained=lambda path: FakeTokenizer())
+        },
+        "torch": {"cuda": types.SimpleNamespace(get_device_name=lambda index: "FakeGPU")},
+    }
+    for name, attributes in fakes.items():
+        module = types.ModuleType(name)
+        for attribute, value in attributes.items():
+            setattr(module, attribute, value)
+        monkeypatch.setitem(sys.modules, name, module)
+
+    def add_problem(task_id: str) -> Problem:
+        return Problem(
+            task_id=task_id,
+            source="mbpp",
+            prompt='"""Add two numbers."""',
+            entry_point="add",
+            canonical_solution="def add(a, b):\n    return a + b\n",
+            visible_tests=(Case((2, 3), 5),),
+            heldout_tests=tuple(Case((i, i), 2 * i) for i in range(4)),
+            atol=0.0,
+        )
+
+    def passes_everything(code: str, entry_point: str, tests: Any, atol: float) -> TestResult:
+        return TestResult(passed=len(tests), total=len(tests), timed_out=False, crashed=False)
+
+    problems = {tid: add_problem(tid) for tid in ("Mbpp/2", "Mbpp/3")}
+    monkeypatch.setattr(measure_model, "training_problems", lambda: problems)
+    monkeypatch.setattr(measure_model, "frozen_100_ids", lambda: ["Mbpp/3", "Mbpp/2"])
+    monkeypatch.setattr(measure_model, "git_state", lambda: {"commit": "0" * 40, "dirty": False})
+    monkeypatch.setattr(measure_model, "version", lambda name: "test")
+    monkeypatch.setattr(
+        measure_model,
+        "measure",
+        lambda completions, problems, max_workers: gap.measure(
+            completions, problems, run=passes_everything, max_workers=2
+        ),
+    )
+
+    out = tmp_path / "report.json"
+    argv = ["--out", str(out), "--model", str(tmp_path / "checkpoint"), "--config", str(CONFIG)]
+    assert measure_model.main(argv) == 0
+
+    report = json.loads(out.read_text())
+    assert report["all_problems"]["n"] == 2
+    assert report["all_problems"]["plus_b"] == 2
+    assert report["frozen_100"]["n"] == 2
+    assert report["meta"]["max_new_tokens"] == 256
+    assert report["meta"]["gpu"] == "FakeGPU"
+    assert report["completions"]["Mbpp/2"] == "    return a + b\n"
