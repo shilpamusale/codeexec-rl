@@ -119,6 +119,20 @@ def _validate(config: RunConfig) -> None:
         raise ConfigError("; ".join(issues))
 
 
+def pinned_model_path(config: RunConfig) -> Path:
+    """Download the pinned revision (once; later calls hit the cache) and return its folder.
+    Snapshot folders are named by their commit hash, so the folder's name proves
+    which files are loaded. Every consumer loads this local copy: the policy, the tokenizer
+    and vLLM, in training and in measurement alike.
+    """
+    from huggingface_hub import snapshot_download  # only where models are loaded
+
+    path = Path(snapshot_download(config.model, revision=config.revision))
+    if path.name != config.revision:
+        raise ConfigError(f"downloaded {path.name}, not the pinned {config.revision}")
+    return path
+
+
 def grpo_kwargs(
     config: RunConfig,
     *,

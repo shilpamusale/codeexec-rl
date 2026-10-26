@@ -53,10 +53,12 @@ warn_unreachable = true
 files = ["src", "tests"]
 
 # Libraries with no type information in CI: evalplus ships none, and the
-# training stack (torch, TRL, datasets) is untyped or installed only on the
+# training stack (torch, TRL, datasets, vLLM) is untyped or installed only on the
 # training box. Treat them as untyped; only our use of them is checked.
 [[tool.mypy.overrides]]
-module = ["evalplus.*", "torch", "torch.*", "trl", "trl.*", "datasets", "datasets.*"]
+module = [
+    "evalplus.*", "torch", "torch.*", "trl", "trl.*", "datasets", "datasets.*", "vllm", "vllm.*",
+]
 ignore_missing_imports = true
 
 # matplotlib (for the throughput chart) pulls in numpy, whose current stubs use

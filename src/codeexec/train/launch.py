@@ -36,7 +36,7 @@ from typing import Any
 
 from codeexec.env import ARMS, Arm, CodeExecEnv
 from codeexec.tasks.datasets import training_problems
-from codeexec.train.config import DEFAULT_CONFIG, grpo_kwargs, load_config
+from codeexec.train.config import DEFAULT_CONFIG, grpo_kwargs, load_config, pinned_model_path
 from codeexec.train.dataset import training_records
 from codeexec.train.reward import CodeExecReward
 
@@ -136,14 +136,10 @@ def train(args: argparse.Namespace) -> None:
     # The training stack, only now that every cheap check has passed.
     import torch
     from datasets import Dataset
-    from huggingface_hub import snapshot_download
     from transformers import AutoTokenizer
     from trl import GRPOConfig, GRPOTrainer
 
-    # The pinned weights. A snapshot directory is named by its commit hash.
-    model_path = Path(snapshot_download(config.model, revision=config.revision))
-    if model_path.name != config.revision:
-        raise LaunchError(f"downloaded {model_path.name}, not the pinned {config.revision}")
+    model_path = pinned_model_path(config)
 
     problems = training_problems()
     records = training_records(problems)
