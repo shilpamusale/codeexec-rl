@@ -1,6 +1,10 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.11-slim
+# The base image, pinned by its multi-platform index digest, so every machine
+# builds the same Python and glibc: Linux is the platform of record, and
+# bit-exact float results depend on the math library (ADR-015). The tag is for
+# readers; Docker uses the digest. The Section A grader-parity check ran on it.
+FROM python:3.11-slim@sha256:cce12316475d7d56d605f76e1d811d0dc4e7227f2d4afd29951521264f504ff8
 
 # Don't write .pyc bytecode files (keeps the read-only filesystem happy later)
 # and don't buffer stdout/stderr (so we capture output reliably).

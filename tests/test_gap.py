@@ -2,8 +2,8 @@
 
 Unit tests grade with a stub that decides pass or fail from the code and
 the tests it is given, so they run in CI. The last test re-measures the saved
-Phase 3 completions in the real sandbox and must reproduce the committed split-B
-record exactly.
+Phase 3 completions in the real sandbox and must reproduce the committed split-B record,
+except where ADR-015's pass rule changed the verdict.
 """
 
 from __future__ import annotations
@@ -155,11 +155,18 @@ def test_bootstrap_matches_phase_3_on_its_own_record() -> None:
     assert np.isclose(s.gap_pp, s.gap_full_pp)
 
 
+# The committed record was graded under ADR-007's rule. ADR-015's (EvalPlus's)
+# changes exactly one frozen-100 verdict: Mbpp/234's `l*l*l` differs from `l**3`
+# in the last bit, so it failed split B and the full suite, and now passes both.
+ADR_015_CHANGES = ["Mbpp/234"]
+
+
 @pytest.mark.integration
 @pytest.mark.dataset
 def test_reproduce_the_split_b_rebaseline_from_saved_completions() -> None:
     """The instrument check: the Phase 3 completions, re-graded in the Docker
-    sandbox by this module, give the committed record problem by problem.
+    sandbox by this module, give the committed record problem by problem,
+    except where ADR-015's pass rule changed the verdict, from fail to pass.
     """
     from codeexec.tasks.datasets import training_problems
 
@@ -167,13 +174,20 @@ def test_reproduce_the_split_b_rebaseline_from_saved_completions() -> None:
     record = json.loads((ANALYSIS / "g_baseline_split_b.json").read_text())
     results = measure(completions, training_problems(), max_workers=4)
     s = summarize(results)
-    assert disagreements(results, record["split B (1/2)"]["per_problem"]) == []
+
+    assert disagreements(results, record["split B (1/2)"]["per_problem"]) == ADR_015_CHANGES
+
     full = {
         tid: {"visible_pass": r.visible_pass, "plus_pass": r.plus_full}
         for tid, r in results.items()
     }
 
-    assert [tid for tid in full if full[tid] != record["full_suite"]["per_problem"][tid]] == []
-    assert (s.visible, s.plus_b, s.plus_full) == (65, 55, 55)
-    assert tuple(round(x, 1) for x in s.ci_pp) == (5.0, 16.0)
-    assert tuple(round(x, 1) for x in s.ci_full_pp) == (5.0, 16.0)
+    assert [tid for tid in full if full[tid] != record["full_suite"]["per_problem"][tid]] == (
+        ADR_015_CHANGES
+    )
+    for tid in ADR_015_CHANGES:  # each was a fail in the record, and now passes
+        assert not record["split B (1/2)"]["per_problem"][tid]["plus_pass"]
+        assert results[tid].plus_b and results[tid].plus_full
+    assert (s.visible, s.plus_b, s.plus_full) == (65, 56, 56)
+    assert tuple(round(x, 1) for x in s.ci_pp) == (4.0, 15.0)
+    assert tuple(round(x, 1) for x in s.ci_full_pp) == (4.0, 15.0)
