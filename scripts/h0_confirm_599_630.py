@@ -1,5 +1,6 @@
 # scripts/h0_confirm_599_630.py
 """Confirm cause of Mbpp/599 & Mbpp/630 gate failures — minimal output."""
+
 from __future__ import annotations
 
 from codeexec.rewards.harness import run_tests
@@ -24,8 +25,9 @@ def main() -> None:
         tests = [(tc.args, tc.expected) for tc in (*p.visible_tests, *p.heldout_tests)]
         print(f"  n_tests={len(tests)} atol={p.atol}")
 
-        whole = [run_tests(p.canonical_solution, p.entry_point, tests, p.atol).passed
-                 for _ in range(3)]
+        whole = [
+            run_tests(p.canonical_solution, p.entry_point, tests, p.atol).passed for _ in range(3)
+        ]
         print(f"  whole-suite passed 3x (of {len(tests)}): {whole}")
 
         # find first failing idx only
@@ -39,13 +41,17 @@ def main() -> None:
             continue
 
         a, e = tests[first]
-        reruns = [run_tests(p.canonical_solution, p.entry_point, [(a, e)], p.atol).all_passed
-                  for _ in range(5)]
+        reruns = [
+            run_tests(p.canonical_solution, p.entry_point, [(a, e)], p.atol).all_passed
+            for _ in range(5)
+        ]
         print(f"  first FAIL idx={first} exp_type={type(e).__name__}")
         print(f"    expected={short(e)}")
         print(f"    args={short(a)}")
-        print(f"    rerun 5x: {reruns}  "
-              f"{'MIXED->order-unstable' if len(set(reruns)) > 1 else 'STABLE'}")
+        print(
+            f"    rerun 5x: {reruns}  "
+            f"{'MIXED->order-unstable' if len(set(reruns)) > 1 else 'STABLE'}"
+        )
     print("=" * 50)
 
 

@@ -6,15 +6,23 @@ on each input. Problems or test cases whose canonical solution can not
 produce an output are dropped and logged, so a Problem only ever contains tests
 it can be graded against.
 
+Expected outputs are computed exactly as EvalPlus 0.3.1 computes its own ground
+truth (evalplus/gen/util trusted_exec, ADR-015): the canonical runs on a deep
+copy of each input, so a canonical that sorts or empties its argument in place
+cannot change the stored test input; and for MBPP's "output is not None" tasks
+the expected value is whether the canonical returned something other than None.
+
 The canonical solutions run here are the dataset's own trusted reference solutions,
 executed once at the load time (not model output, and not in the training hot path),
 so they are run directly rather than through the sandbox.
 """
 
+import copy
 import logging
 
 from evalplus.data import get_human_eval_plus, get_mbpp_plus
 
+from codeexec.rewards.oracle import _MBPP_OUTPUT_NOT_NONE_TASKS
 from codeexec.tasks.problem import Problem, TestCase
 
 logger = logging.getLogger(__name__)
@@ -79,21 +87,28 @@ def _build_tests(
     inputs: list[list[object]],
     task_id: str,
     which: str,
+    output_not_none: bool = False,
 ) -> tuple[TestCase, ...]:
     """Run `fn` on each input to compute its expected output, building TestCases.
     Inputs whose execution raises are dropped and logged - a reference solution
     that errors on its own test input can not define an expected output.
+
+    `fn` gets a deep copy of the input, as in EvalPlus's ground truth: some
+    canonicals sort or empty their list argument in place, and the stored args
+    must stay the test's real input. With `output_not_none`, the expected value
+    is `output is not None`, as EvalPlus stores it for those tasks (ADR-015).
     """
     cases: list[TestCase] = []
     for raw_args in inputs:
         args = tuple(raw_args)
         try:
-            expected = fn(*args)  # type: ignore[operator]
+            output = fn(*copy.deepcopy(args))  # type: ignore[operator]
         except Exception as exc:
             logger.warning(
                 "dropping %s %s test: canonical raised %s", task_id, which, type(exc).__name__
             )
             continue
+        expected = output is not None if output_not_none else output
         cases.append(TestCase(args=args, expected=expected))
     return tuple(cases)
 
@@ -136,8 +151,10 @@ def _make_problem(record: dict[str, object], source: str) -> Problem | None:
     base_inputs: list[list[object]] = record["base_input"]  # type: ignore[assignment]
     plus_inputs: list[list[object]] = record["plus_input"]  # type: ignore[assignment]
 
-    visible = _build_tests(fn, base_inputs, task_id, "visible")
-    heldout = _build_tests(fn, plus_inputs, task_id, "heldout")
+    # EvalPlus applies the not-None rule to MBPP only (it passes no tasks for HumanEval).
+    output_not_none = source == "mbpp" and entry_point in _MBPP_OUTPUT_NOT_NONE_TASKS
+    visible = _build_tests(fn, base_inputs, task_id, "visible", output_not_none)
+    heldout = _build_tests(fn, plus_inputs, task_id, "heldout", output_not_none)
 
     if len(visible) < MIN_VISIBLE_TESTS_KEPT:
         logger.warning("dropping %s: no usable visible tests after validation", task_id)

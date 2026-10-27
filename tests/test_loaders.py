@@ -8,6 +8,7 @@ produce correct, self-contained problems.
 """
 
 import pytest
+from evalplus.data import get_human_eval_plus, get_mbpp_plus
 
 from codeexec.tasks.loaders import (
     CORRUPT_HELDOUT_TASK_IDS,
@@ -93,3 +94,27 @@ def test_precompute_produces_correct_expected_output(
     # The canonical must be complete (contains the def), not just the body.
     assert "def has_close_elements" in problem.canonical_solution
     assert len(problem.visible_tests) > 0
+
+
+def test_every_stored_input_is_evalplus_s_input(
+    mbpp: dict[str, Problem], humaneval: dict[str, Problem]
+) -> None:
+    """No canonical changed a stored test input (ADR-015). Some canonicals sort or
+    empty their argument in place (Mbpp/57, 64, 71, 428, 635, HumanEval/20); every
+    test must still hold EvalPlus's own input, in order. No test is dropped in
+    either dataset, so the stored tests line up one-to-one with EvalPlus's inputs."""
+    for problems, raw in ((mbpp, get_mbpp_plus()), (humaneval, get_human_eval_plus())):
+        for task_id, problem in problems.items():
+            for tests, key in (
+                (problem.visible_tests, "base_input"),
+                (problem.heldout_tests, "plus_input"),
+            ):
+                inputs = [tuple(args) for args in raw[task_id][key]]
+                assert [t.args for t in tests] == inputs, f"{task_id} {key}"
+
+
+def test_not_none_task_stores_bools(mbpp: dict[str, Problem]) -> None:
+    """Mbpp/787 stores `output is not None`, as EvalPlus does, not re.Match objects."""
+    problem = mbpp["Mbpp/787"]
+    expected = {t.expected for t in problem.visible_tests + problem.heldout_tests}
+    assert expected == {True, False}
