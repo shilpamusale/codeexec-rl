@@ -24,6 +24,8 @@ Fixed before any run. Changing these after seeing results invalidates the compar
 
 *Amended 2026-10-24, before any training run: `visible_pass`, `heldout_pass` and `G` are measured over all 369 training problems on the training box's evaluation path; the frozen-100 subset is reported alongside (ADR-004 status update).*
 
+*Amended 2026-10-26, before any training run: a test passes exactly when EvalPlus's own grader would pass it (ADR-015), and the training problems are 368, after Mbpp/255's exclusion (ADR-009 status update).*
+
 All pass-rates are pass@1, greedy decode, temperature 0 unless stated otherwise.
 
 | Symbol | Definition |

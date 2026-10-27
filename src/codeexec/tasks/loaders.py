@@ -47,7 +47,6 @@ ORDER_UNSTABLE_TASK_IDS = frozenset({"Mbpp/2", "Mbpp/579", "Mbpp/769"})
 # gate, perturbed or not). Distinct from ORDER_UNSTABLE (ADR-007, a comparison
 # issue) -- here the reference solution itself is ungradeable. Surfaced by the
 # Phase 3 H0 instrument-readiness check. See DECISIONS.md ADR-009.
-
 #   Mbpp/255: one held-out expected output (1,663,740 tuples of 77 strings) is
 #             ~1 GB as source text, four times the sandbox's memory, so no
 #             program can be graded on it. Surfaced by ADR-015's canonical check.
