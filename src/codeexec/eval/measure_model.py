@@ -7,7 +7,7 @@
 
 As pre-registered in ADR-004's status update: vLLM, greedy (temperature 0), at
 most max_completion_length new tolens (256, from the shared config), stopping only 
-at end-of-sequence, in bf16, over all 369 training problems with the training prompt.
+at end-of-sequence, in bf16, over all 368 training problems with the training prompt.
 Completions are decoded from their token ids exactly as TRL decodes them for the reward 
 (skip_special_toekns = True), and gap.py grades them.
 

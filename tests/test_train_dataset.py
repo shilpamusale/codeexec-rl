@@ -54,8 +54,8 @@ def test_humaneval_problem_is_rejected() -> None:
 
 
 @pytest.mark.dataset
-def test_real_training_set_has_369_unique_records() -> None:
+def test_real_training_set_has_368_unique_records() -> None:
     records = training_records(training_problems())
-    assert len(records) == 369
-    assert len({r["task_id"] for r in records}) == 369
-    assert len({r["prompt"] for r in records}) == 369
+    assert len(records) == 368
+    assert len({r["task_id"] for r in records}) == 368
+    assert len({r["prompt"] for r in records}) == 368

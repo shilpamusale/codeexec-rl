@@ -8,8 +8,8 @@ from codeexec.tasks.problem import Problem
 pytestmark = pytest.mark.dataset
 
 # MBPP+ ships 378; minus 1 zero-held-out and 3 order-unstable (ADR-007) = 374,
-# minus 5 whose canonical fails its own gate (ADR-009) = 369.
-EXPECTED_TRAINING_COUNT = 369
+# minus 6 whose canonical fails its own gate (ADR-009) = 368.
+EXPECTED_TRAINING_COUNT = 368
 EXPECTED_OOD_COUNT = 164  # HumanEval+
 
 

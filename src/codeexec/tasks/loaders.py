@@ -47,12 +47,21 @@ ORDER_UNSTABLE_TASK_IDS = frozenset({"Mbpp/2", "Mbpp/579", "Mbpp/769"})
 # gate, perturbed or not). Distinct from ORDER_UNSTABLE (ADR-007, a comparison
 # issue) -- here the reference solution itself is ungradeable. Surfaced by the
 # Phase 3 H0 instrument-readiness check. See DECISIONS.md ADR-009.
+
+#   Mbpp/255: one held-out expected output (1,663,740 tuples of 77 strings) is
+#             ~1 GB as source text, four times the sandbox's memory, so no
+#             program can be graded on it. Surfaced by ADR-015's canonical check.
 #   Mbpp/599: canonical too slow on its own stress input (sum(range(10**8)))
 #             -> exceeds the per-case + sandbox timeout (ADR-008).
 #   Mbpp/630: canonical returns a ~2 MB nested list -> harness cannot handle it.
-#   Mbpp/737: canonical returns a re.Match object -> no valid source representation.
-#   Mbpp/794: canonical returns a re.Match object -> no valid source representation.
-UNGRADEABLE_CANONICAL_TASK_IDS = frozenset({"Mbpp/599", "Mbpp/630", "Mbpp/737", "Mbpp/794"})
+#   Mbpp/737, Mbpp/794: excluded when the loader stored the canonical's re.Match
+#             object as the expected value. Since ADR-015 the loader stores
+#             `output is not None`, as EvalPlus does, so both would now grade;
+#             they stay excluded so the problem set stays within the 369 the
+#             B7 measurement generated completions for.
+UNGRADEABLE_CANONICAL_TASK_IDS = frozenset(
+    {"Mbpp/255", "Mbpp/599", "Mbpp/630", "Mbpp/737", "Mbpp/794"}
+)
 
 # MBPP problems whose canonical is correct but at least one held-out input is
 # itself invalid (no correct function could satisfy it), so a correct model

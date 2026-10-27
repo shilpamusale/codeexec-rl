@@ -96,7 +96,7 @@ def _prompt_example_args(problem: Problem) -> list[tuple[object, ...]]:
 
 @pytest.mark.dataset
 def test_real_problems_split_non_empty_and_prompts_never_reveal_split_b() -> None:
-    """On the real 369: both parts are non-empty, and no prompt's example input is
+    """On the real 368: both parts are non-empty, and no prompt's example input is
     a split-B test unless it is also a visible test (so B shows nothing new)."""
     for problem in training_problems().values():
         split = split_heldout(problem)
