@@ -1,8 +1,9 @@
-"""Tests for the reward bridge: _to_source, _compare, build_harness, run_tests.
+"""Tests for the reward bridge: _to_source, build_harness, run_tests.
 
-The pure functions (_to_source, _compare, build_harness, _parse_result) run with
-no sandbox and are always collected. The single run_tests test drives the real
-Docker sandbox and is marked `integration`, matching the Phase 1 convention.
+The pure functions (_to_source, build_harness, _parse_result) run with no sandbox
+and are always collected. Tests that drive the real Docker sandbox are marked
+`integration`, matching the Phase 1 convention; the one that writes every
+dataset problem into a harness is marked `dataset`.
 """
 
 from __future__ import annotations
@@ -11,6 +12,7 @@ import ast
 import contextlib
 import io
 import math
+import warnings
 from pathlib import Path
 
 import pytest
@@ -85,6 +87,21 @@ def test_to_source_nested_non_finite() -> None:
     assert math.isinf(back[2][0]) and back[2][0] < 0
 
 
+def test_to_source_writes_huge_ints_in_hex() -> None:
+    """repr() refuses ints of more than 4,300 digits in Python 3.11 (HumanEval/83,
+    HumanEval/139); hex has no limit and evaluates back to the same int."""
+    for value in (18 * 10**5000, -(7**9000)):
+        source = _to_source(value)
+        assert source.lstrip("-").startswith("0x")
+        assert eval(source) == value
+    assert _to_source([10**5000]) == f"[{hex(10**5000)}]"  # nested, too
+
+
+def test_to_source_keeps_ordinary_ints_decimal() -> None:
+    assert _to_source(-42) == "-42"
+    assert _to_source(10**3999) == repr(10**3999)  # 4,000 digits: still decimal
+
+
 # --------------------------------------------------------------------------- #
 # build_harness: must generate valid, runnable Python
 # --------------------------------------------------------------------------- #
@@ -145,6 +162,44 @@ def test_special_oracles_get_the_entry_point_and_the_arguments() -> None:
     assert _run_in_process(by_reference, "digit_distance_nums", tests, 0.0) == 1
 
 
+def test_huge_int_expected_output_is_graded() -> None:
+    """HumanEval/83's shape: an expected output thousands of digits long."""
+    code = "def starts_one_ends(n):\n    return 18 * 10 ** (n - 2)"
+    tests = [((5000,), 18 * 10**4998), ((2,), 18)]
+    assert _run_in_process(code, "starts_one_ends", tests, 0.0) == 2
+
+
+# Two HumanEval+ problems store expected outputs too large for the sandbox to run
+# at all: their harnesses are about 147 MB and 124 MB of source, and the sandbox
+# has 256 MB in all. They are decided when HumanEval+ is first measured (Phase 5);
+# here they are built but not compiled, which would take gigabytes. Every other
+# harness, MBPP's and HumanEval's, is under 10 MB.
+OVERSIZED_HARNESSES = frozenset({"HumanEval/15", "HumanEval/130"})
+MAX_HARNESS_BYTES = 16 * 2**20
+
+
+@pytest.mark.dataset
+def test_every_stored_test_can_be_written_into_a_harness() -> None:
+    """Every test of both datasets becomes harness source, the ints of more than
+    4,300 digits in HumanEval/83 and HumanEval/139 included, and every harness of
+    a runnable size compiles: _to_source never writes a value as invalid Python."""
+    from codeexec.tasks.datasets import ood_problems, training_problems
+
+    for task_id, p in {**training_problems(), **ood_problems()}.items():
+        tests = [(t.args, t.expected) for t in (*p.visible_tests, *p.heldout_tests)]
+        source = build_harness(p.canonical_solution, p.entry_point, tests, p.atol)
+        if task_id in OVERSIZED_HARNESSES:
+            assert len(source) > MAX_HARNESS_BYTES, f"{task_id} is no longer oversized"
+            continue
+        assert len(source) <= MAX_HARNESS_BYTES, f"{task_id}: {len(source):,} bytes"
+
+        # Some canonicals' regexes use invalid escapes (Mbpp/305, Mbpp/593): the
+        # dataset's, not ours to fix, and silenced as the loader silences them.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            compile(source, task_id, "exec")
+
+
 # --------------------------------------------------------------------------- #
 # _parse_result: sentinel extraction, including the adversarial cases
 # --------------------------------------------------------------------------- #
@@ -180,7 +235,7 @@ def test_parse_result_clamps_overcount() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# run_tests: the one test that drives the real Docker sandbox
+# run_tests: tests that drive the real Docker sandbox
 # --------------------------------------------------------------------------- #
 @pytest.mark.integration
 def test_run_tests_end_to_end() -> None:
@@ -247,3 +302,15 @@ def test_the_sandbox_applies_evalplus_s_rule() -> None:
         0.0,
     )
     assert any_order.all_passed
+
+
+@pytest.mark.integration
+def test_the_sandbox_grades_a_huge_int() -> None:
+    """The container's Python reads the hex literal back: HumanEval/83's shape."""
+    result = run_tests(
+        "def starts_one_ends(n):\n    return 18 * 10 ** (n - 2)",
+        "starts_one_ends",
+        [((5000,), 18 * 10**4998)],
+        0.0,
+    )
+    assert result.all_passed

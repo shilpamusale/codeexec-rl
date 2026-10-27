@@ -34,6 +34,13 @@ PER_CASE_TIMEOUT_SECONDS = 2
 # If the retry fails too, run_tests raises instead of returning a score.
 INFRA_RETRY_DELAY_SECONDS = 1.0
 
+# Python 3.11 refuses to convert an int of more than 4,300 decimal digits to or
+# from a decimal string, so repr() raises on the expected outputs of HumanEval/83
+# and HumanEval/139. Hexadecimal is exempt both ways and reads back exactly. The
+# threshold is fixed here, not read from the host's limit, so the sandbox can
+# always read what the host writes.
+HEX_INT_THRESHOLD = 10**4000
+
 
 class SandboxInfraError(RuntimeError):
     """The sandbox failed twice in a row, so the program never ran (ADR-014).
@@ -120,6 +127,10 @@ def _to_source(value: object) -> str:
             return "float('nan')"
         return repr(value)
 
+    # A huge int: written in hex, which no digit limit applies to.
+    if isinstance(value, int) and abs(value) >= HEX_INT_THRESHOLD:
+        return hex(value)
+
     # Containers: recurse, so a non-finite float nested inside still gets fixed.
     if isinstance(value, list):
         return "[" + ", ".join(_to_source(v) for v in value) + "]"
@@ -133,7 +144,7 @@ def _to_source(value: object) -> str:
         items = ", ".join(f"{_to_source(k)}:{_to_source(v)}" for k, v in value.items())
         return "{" + items + "}"
 
-    # str, int, complex, None and everthing else: repr is valid source.
+    # str, smaller ints, complex, None and everything else: repr is valid source.
     return repr(value)
 
 
