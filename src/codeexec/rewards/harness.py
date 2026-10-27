@@ -4,7 +4,9 @@ import math
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 
+from codeexec.rewards import oracle
 from codeexec.sandbox.runner import RawResult, run_code
 
 logger = logging.getLogger(__name__)
@@ -42,41 +44,15 @@ class SandboxInfraError(RuntimeError):
     """
 
 
-# A copy of _compare as TEXT, embedded verbatim into every generated harness.
-# It must be stdlib-only (the sandbox has no access to our package), so it uses
-# `import math as _math` and the underscore-prefixed names to avoid clashing with
-# anything in the model's code.
+# The pass rule (ADR-015), embedded verbatim: oracle.py's own source, so the
+# sandbox and the host run one copy of it. It must stay stdlib-only, and must
+# never gain a `from __future__` import, which is legal only at the very top of a
+# program; test_build_harness_parses would catch that.
+_ORACLE_SRC = Path(oracle.__file__).read_text()
 
-_HARNESS_COMPARE_SRC = """
-import math as _math
-def _compare(result, expected, atol):
-    if isinstance(expected, bool) or isinstance(result, bool):
-        return type(result) is type(expected) and result == expected
-    if isinstance(expected, (int, float)) and isinstance(result, (int, float)):
-        if isinstance(expected, float) or isinstance(result, float):
-            _r_nan = isinstance(result, float) and _math.isnan(result)
-            _e_nan = isinstance(expected, float) and _math.isnan(expected)
-            if _r_nan or _e_nan:
-                return False
-            if result == expected:
-                return True
-            return abs(result - expected) <= atol
-        return result == expected
-    if isinstance(expected, list) and isinstance(result, list):
-        if len(result) != len(expected):
-            return False
-        return all(_compare(r, e, atol) for r, e in zip(result, expected, strict=True))
-    if isinstance(expected, tuple) and isinstance(result, tuple):
-        if len(result) != len(expected):
-            return False
-        return all(_compare(r, e, atol) for r, e in zip(result, expected, strict=True))
-    if isinstance(expected, dict) and isinstance(result, dict):
-        if result.keys() != expected.keys():
-            return False
-        return all(_compare(result[k], expected[k], atol) for k in expected)
-    return result == expected
-    return result == expected
-
+# The per-case runner, embedded after the rule. Stdlib-only and
+# underscore-prefixed, like the rule, so the model's code cannot collide with it.
+_HARNESS_RUNNER_SRC = """
 import signal as _signal
 
 class _CaseTimeout(Exception):
@@ -87,16 +63,16 @@ def _alarm_handler(_signum, _frame):
 
 _signal.signal(_signal.SIGALRM, _alarm_handler)
 
-def _run_one_case(_fn, _args, _expected, _atol, _budget):
+def _run_one_case(_fn, _args, _expected, _atol, _entry_point, _budget):
     # Arm a per-case alarm; cancel it the instant the case returns so a fast
     # case never leaves a pending alarm to fire during the next one.
     _signal.alarm(_budget)
     try:
         _result = _fn(*_args)
-        return _compare(_result, _expected, _atol)
+        return _passes(_result, _expected, _atol, _entry_point, _args)
     except BaseException:
-        # Any failure (wrong answer, raise, or _CaseTimeout) = this case failed.
-        # BaseException so _CaseTimeout (if ever not an Exception subclass) is caught.
+        # Any failure (a raise, an incomparable output, or _CaseTimeout) fails
+        # this case only. BaseException so _CaseTimeout is always caught.
         return False
     finally:
         _signal.alarm(0)
@@ -161,56 +137,6 @@ def _to_source(value: object) -> str:
     return repr(value)
 
 
-def _compare(result: object, expected: object, atol: float) -> bool:
-    """True iff `result` matches `expected` under strict rules with float tolerance."""
-
-    # (1) bool FIRST. bool is a subclass of int, so True == 1 is True in Python.
-    # We decided True and 1 are DISTINCT, so catch bool before the numeric branch
-    # and require the types to match exactly.
-
-    if isinstance(expected, bool) or isinstance(result, bool):
-        return type(result) is type(expected) and result == expected
-
-    # (2) numeric leaf. If either. side is a float, use tolerance;
-    # int <-> float is allowed to match (we decided 4 and 4.0 should match)
-    if isinstance(expected, (int, float)) and isinstance(result, (int, float)):
-        if isinstance(expected, float) or isinstance(result, float):
-            # nan never matched anything, mirroring Python's nan != nan.
-            if (isinstance(result, float) and math.isnan(result)) or (
-                isinstance(expected, float) and math.isnan(expected)
-            ):
-                return False
-
-            # Exact equality FIRST: catches inf == inf and -inf == -inf, where
-            # abs(inf, -inf) is nan and would wrongly fail the tolerance test.
-            if result == expected:
-                return True
-            return abs(result - expected) <= atol
-        # both plain ints: exact equlaity
-        return result == expected
-
-    # (3) sequenes. list vs tuple are DISTINCT (we chose strict), so each type
-    # is handled separately. Length guard FIRST, or zip() would silently
-    # truncate to the shorter one and let [1, 2] "match" [1,2,3].
-    if isinstance(expected, list) and isinstance(result, list):
-        return len(result) == len(expected) and all(
-            _compare(r, e, atol) for r, e in zip(result, expected, strict=True)
-        )
-    if isinstance(expected, tuple) and isinstance(result, tuple):
-        return len(result) == len(expected) and all(
-            _compare(r, e, atol) for r, e in zip(result, expected, strict=True)
-        )
-
-    # (4) dict. Keys compared exactly (no tolerance on keys); values recurse.
-    if isinstance(expected, dict) and isinstance(result, dict):
-        if result.keys() != expected.keys():
-            return False
-        return all(_compare(result[k], expected[k], atol) for k in expected)
-
-    # (5) fallback: str, None, complex, and any mismatched types -> plain ==.
-    return result == expected
-
-
 def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) -> str:
     """Return a self-contained Python program that runs `code` against `tests`
     and prints one sentinel JSON line: {"passed": int, "total": int}.
@@ -225,7 +151,8 @@ def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) ->
     lines.append("_warnings.filterwarnings('ignore')")
 
     # --- section 2: the embedded grader ---
-    lines.append(_HARNESS_COMPARE_SRC)
+    lines.append(_ORACLE_SRC)
+    lines.append(_HARNESS_RUNNER_SRC)
 
     # --- section 3: the model's code (defines the entry_point function) ---
     lines.append("# --- model-generated code ---")
@@ -239,10 +166,11 @@ def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) ->
         lines.append(f"    ({_to_source(tuple(args))}, {_to_source(expected)}),")
     lines.append("]")
     lines.append(f"_fn = {entry_point}")
+    lines.append(f"_entry_point = {entry_point!r}")
     lines.append(f"_budget = {PER_CASE_TIMEOUT_SECONDS}")
     lines.append("_passed = 0")
     lines.append("for _args, _expected in _cases:")
-    lines.append("    if _run_one_case(_fn, _args, _expected, _atol, _budget):")
+    lines.append("    if _run_one_case(_fn, _args, _expected, _atol, _entry_point, _budget):")
     lines.append("        _passed += 1")
     lines.append(
         f"print('{RESULT_SENTINEL} ' + _json.dumps({{'passed': _passed, 'total': len(_cases)}}))"

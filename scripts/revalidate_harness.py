@@ -15,6 +15,7 @@ Expected after the fix:
 
 Run:  python scripts/revalidate_harness.py
 """
+
 from __future__ import annotations
 
 import json
@@ -49,24 +50,32 @@ def check_one(tid: str) -> dict:
     try:
         out = subprocess.run(
             [sys.executable, "-c", _CHILD, tid],
-            capture_output=True, text=True, timeout=PER_PROBLEM_WALLCLOCK,
+            capture_output=True,
+            text=True,
+            timeout=PER_PROBLEM_WALLCLOCK,
         )
     except subprocess.TimeoutExpired:
         return {"tid": tid, "status": "WALLCLOCK_TIMEOUT", "all": False}
     for line in out.stdout.splitlines():
         if line.startswith("###V###"):
-            d = json.loads(line[len("###V###"):])
+            d = json.loads(line[len("###V###") :])
             d["status"] = "ok"
             return d
     # child died without a verdict (OOM-killed, crash): returncode tells us
-    return {"tid": tid, "status": f"CHILD_DIED(rc={out.returncode})", "all": False,
-            "stderr_tail": out.stderr[-200:]}
+    return {
+        "tid": tid,
+        "status": f"CHILD_DIED(rc={out.returncode})",
+        "all": False,
+        "stderr_tail": out.stderr[-200:],
+    }
 
 
 def main() -> None:
     tids = list(training_problems().keys())
-    print(f"re-validating {len(tids)} problems, each in its own subprocess "
-          f"(cap {PER_PROBLEM_WALLCLOCK}s)...\n")
+    print(
+        f"re-validating {len(tids)} problems, each in its own subprocess "
+        f"(cap {PER_PROBLEM_WALLCLOCK}s)...\n"
+    )
 
     failures = []
     for i, tid in enumerate(tids):
@@ -81,8 +90,10 @@ def main() -> None:
     for v in sorted(failures, key=lambda d: d["tid"]):
         mark = "  <-- watched" if v["tid"] in WATCH else ""
         if v["status"] == "ok":
-            print(f"  {v['tid']}: {v['passed']}/{v['total']} "
-                  f"timed_out={v['timed_out']} crashed={v['crashed']}{mark}")
+            print(
+                f"  {v['tid']}: {v['passed']}/{v['total']} "
+                f"timed_out={v['timed_out']} crashed={v['crashed']}{mark}"
+            )
         else:
             print(f"  {v['tid']}: {v['status']}{mark}")
     print(f"{'=' * 60}")

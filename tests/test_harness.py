@@ -8,14 +8,18 @@ Docker sandbox and is marked `integration`, matching the Phase 1 convention.
 from __future__ import annotations
 
 import ast
+import contextlib
+import io
 import math
+from pathlib import Path
 
 import pytest
 
+from codeexec.rewards import oracle
 from codeexec.rewards.harness import (
     RESULT_SENTINEL,
     SandboxInfraError,
-    _compare,
+    TestCases,
     _parse_result,
     _to_source,
     build_harness,
@@ -82,73 +86,6 @@ def test_to_source_nested_non_finite() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# _compare: the locked decisions, each as its own assertion
-# --------------------------------------------------------------------------- #
-def test_compare_int_equality() -> None:
-    assert _compare(4, 4, 0.0)
-    assert not _compare(4, 5, 0.0)
-
-
-def test_compare_int_float_match_within_tolerance() -> None:
-    # decision (1): int vs float match when values agree
-    assert _compare(4, 4.0, 0.0)
-    assert _compare(4.0, 4, 0.0)
-
-
-def test_compare_float_tolerance() -> None:
-    assert _compare(0.1 + 0.2, 0.3, 1e-6)
-    assert not _compare(0.1 + 0.2, 0.3, 0.0)  # strict when no tolerance given
-    assert _compare(1.0, 1.5, 0.6)
-    assert not _compare(1.0, 1.5, 0.4)
-
-
-def test_compare_bool_distinct_from_int() -> None:
-    # decision (3): True is not 1, False is not 0
-    assert not _compare(True, 1, 0.0)
-    assert not _compare(1, True, 0.0)
-    assert not _compare(False, 0, 0.0)
-    assert _compare(True, True, 0.0)
-
-
-def test_compare_list_vs_tuple_distinct() -> None:
-    # decision (2): list and tuple never match each other
-    assert not _compare([1, 2, 3], (1, 2, 3), 0.0)
-    assert not _compare((1, 2, 3), [1, 2, 3], 0.0)
-    assert _compare([1, 2, 3], [1, 2, 3], 0.0)
-    assert _compare((1, 2, 3), (1, 2, 3), 0.0)
-
-
-def test_compare_length_guard() -> None:
-    # a shorter result must not "match" a longer expected via zip truncation
-    assert not _compare([1, 2], [1, 2, 3], 0.0)
-    assert not _compare([1, 2, 3], [1, 2], 0.0)
-
-
-def test_compare_tolerance_recurses_into_structures() -> None:
-    assert _compare([1.0, 2.0], [1.0000001, 2.0], 1e-5)
-    assert not _compare([1.0, 2.0], [1.1, 2.0], 1e-5)
-    assert _compare({"x": [1.0]}, {"x": [1.0000001]}, 1e-5)
-
-
-def test_compare_dict_keys_exact() -> None:
-    assert _compare({"a": 1, "b": 2}, {"a": 1, "b": 2}, 0.0)
-    assert not _compare({"a": 1}, {"a": 1, "b": 2}, 0.0)
-
-
-def test_compare_inf_equal_regression() -> None:
-    """Regression: inf == inf must be True. abs(inf-inf) is nan, which would
-    fail the tolerance check, so _compare tries exact equality first."""
-    assert _compare(float("inf"), float("inf"), 0.0001)
-    assert _compare(float("-inf"), float("-inf"), 0.0001)
-    assert not _compare(float("inf"), float("-inf"), 0.0001)
-
-
-def test_compare_nan_never_matches() -> None:
-    """nan never equals nan, mirroring Python semantics."""
-    assert not _compare(float("nan"), float("nan"), 1.0)
-
-
-# --------------------------------------------------------------------------- #
 # build_harness: must generate valid, runnable Python
 # --------------------------------------------------------------------------- #
 def test_build_harness_parses() -> None:
@@ -174,33 +111,38 @@ def test_build_harness_runs_and_reports() -> None:
     assert '"total": 2' in out
 
 
-def test_embedded_compare_matches_real_compare() -> None:
-    """The _compare copy embedded in the harness must agree with the real one.
-    Guards against the two drifting apart (the cost of embedding it as text)."""
-    cases = [
-        (4, 4.0, 0.0),
-        (True, 1, 0.0),
-        ([1, 2, 3], (1, 2, 3), 0.0),
-        ([1, 2], [1, 2, 3], 0.0),
-        (0.1 + 0.2, 0.3, 1e-6),
-        (float("inf"), float("inf"), 0.0001),
-    ]
-    # Build a harness whose "function" just echoes a stored result, so the
-    # embedded _compare is exercised on each case; compare its verdict to ours.
-    for result, expected, atol in cases:
-        code = f"def _f():\n    return {_to_source(result)}"
-        src = build_harness(code, "_f", [((), expected)], atol)
-        import contextlib
-        import io
+def _run_in_process(code: str, entry_point: str, tests: TestCases, atol: float) -> int:
+    """Run a generated harness here, without Docker, and return how many tests passed."""
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        exec(compile(build_harness(code, entry_point, tests, atol), "<harness>", "exec"), {})
+    passed, crashed = _parse_result(buf.getvalue(), len(tests))
+    assert not crashed
+    return passed
 
-        buf = io.StringIO()
-        with contextlib.redirect_stdout(buf):
-            exec(compile(src, "<h>", "exec"), {})
-        passed, crashed = _parse_result(buf.getvalue(), 1)
-        embedded_verdict = passed == 1 and not crashed
-        assert embedded_verdict == _compare(result, expected, atol), (
-            f"embedded _compare disagrees on ({result!r}, {expected!r}, {atol})"
-        )
+
+def test_the_embedded_rule_is_oracle_py() -> None:
+    """One copy of the pass rule (ADR-015): the sandbox runs oracle.py's own source."""
+    src = build_harness("def f(x):\n    return x", "f", [((1,), 1)], 0.0)
+    assert Path(oracle.__file__).read_text() in src
+
+
+def test_float_rounding_passes_as_in_evalplus() -> None:
+    """Mbpp/234: l*l*l differs from the expected l**3 in the last digit; EvalPlus passes it."""
+    code = "def volume_cube(l):\n    return l*l*l"
+    tests = [((1.768116407397588,), 5.527548510985869), ((3,), 27)]
+    assert _run_in_process(code, "volume_cube", tests, 0.0) == 2
+
+
+def test_special_oracles_get_the_entry_point_and_the_arguments() -> None:
+    """Set equality needs the entry point; a reference recomputation needs the args."""
+    reversed_order = "def find_char_long(text):\n    return ['quick', 'brown'][::-1]"
+    assert (
+        _run_in_process(reversed_order, "find_char_long", [(("x",), ["quick", "brown"])], 0.0) == 1
+    )
+    by_reference = "def digit_distance_nums(n1, n2):\n    return 7"
+    tests = [((123, 256), 999)]  # 7 is the reference answer for (123, 256), whatever is stored
+    assert _run_in_process(by_reference, "digit_distance_nums", tests, 0.0) == 1
 
 
 # --------------------------------------------------------------------------- #
@@ -286,3 +228,22 @@ def test_real_infra_failure_raises_instead_of_scoring(monkeypatch: pytest.Monkey
     monkeypatch.setattr(runner, "IMAGE", "codeexec-sandbox-does-not-exist")
     with pytest.raises(SandboxInfraError, match="No such image"):
         run_tests("def add(a, b):\n    return a + b", "add", [((2, 3), 5)], 0.0)
+
+
+@pytest.mark.integration
+def test_the_sandbox_applies_evalplus_s_rule() -> None:
+    """ADR-015 inside the real container: float rounding and a special oracle."""
+    rounding = run_tests(
+        "def volume_cube(l):\n    return l*l*l",
+        "volume_cube",
+        [((1.768116407397588,), 5.527548510985869)],
+        0.0,
+    )
+    assert rounding.all_passed
+    any_order = run_tests(
+        "def find_char_long(text):\n    return ['brown', 'quick']",
+        "find_char_long",
+        [(("the quick brown",), ["quick", "brown"])],
+        0.0,
+    )
+    assert any_order.all_passed

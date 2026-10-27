@@ -1,7 +1,7 @@
 """Re-derive G_baseline on held-out split B (ADR-013; Phase 4, Section B).
 
 Everything here was pre-registered in ADR-013 before it ran. The saved
-frozen-100 completions are graded by the Docker sandbox, and 
+frozen-100 completions are graded by the Docker sandbox, and
 
     G_B = visible_pass - plus_B     (plus_B = visible AND split B pass)
 
@@ -12,12 +12,12 @@ paired per-problem differences, numpy default_rng(0), 20,000 resamples,
     otherwise               move B to two-thirds and re-check once
     still includes zero     STOP: no training until the V0 design is revisited
 
-The full held-out suite is graded too, as a consistency check: it must 
+The full held-out suite is graded too, as a consistency check: it must
 reporduce the Phase 3 record problem by problem (visible 65, plus 55)
 and the Phase 3 CI [+5.0, +16.0], or the comparison is not like for like.
 
     python scripts/rebaseline_split_b.py
-    
+
 Exit code = 0 = a split (proceed); 1 = STOP or a consistency failure.
 """
 
@@ -41,25 +41,28 @@ from codeexec.tasks.split import B_FRACTION, SPLIT_VERSION, split_heldout
 COMPLETIONS = Path("analysis/completions_frozen100.json")
 RECORD = Path("analysis/g_baseline_results.json")
 OUT = Path("analysis/g_baseline_split_b.json")
-FALLBACK_B_FRACTION = Fraction(2, 3) # ADR-013's pre-registered fallback
-BOOTSTRAP_SEED = 0 # identical to analysis/g_baseline.md
+FALLBACK_B_FRACTION = Fraction(2, 3)  # ADR-013's pre-registered fallback
+BOOTSTRAP_SEED = 0  # identical to analysis/g_baseline.md
 BOOTSTRAP_RESAMPLES = 20_000
-GRADER: RunTestsFn = run_tests # the Docker sandbox
+GRADER: RunTestsFn = run_tests  # the Docker sandbox
 
 # Chooses the held-out tests for a problem; None means the full held-out suite.
 HeldoutChoice = Callable[[Problem], Sequence[TestCase] | None]
+
 
 def full_suite(problem: Problem) -> None:
     """Choose the full held-out suite (the standard MBPP+ plus)."""
     return None
 
+
 def split_b(fraction: Fraction) -> HeldoutChoice:
     """Return a chooser for help-out split B at `fraction` (ADR-013)"""
-    
+
     def choose(problem: Problem) -> Sequence[TestCase]:
         return split_heldout(problem, fraction).measurement
-    
+
     return choose
+
 
 def bootstrap_ci(diffs: np.ndarray) -> tuple[float, float]:
     """95% percentile CI in pp, with the same RNG, draws and order as Phase 3."""
@@ -69,21 +72,19 @@ def bootstrap_ci(diffs: np.ndarray) -> tuple[float, float]:
     lo, hi = np.percentile(boot, [2.5, 97.5]) * 100
     return float(lo), float(hi)
 
+
 def measure(
-    label: str, 
-    choose: HeldoutChoice, 
-    codes: dict[str, str | None], 
-    pool: dict[str, Problem]
+    label: str, choose: HeldoutChoice, codes: dict[str, str | None], pool: dict[str, Problem]
 ) -> dict[str, object]:
     """Grade every completiom on visible and on visible + chosen held-out tests."""
     per_problem: dict[str, dict[str, bool]] = {}
-    for i, (task_id, code) in enumerate(codes.items(), start = 1):
+    for i, (task_id, code) in enumerate(codes.items(), start=1):
         if code is None:
             per_problem[task_id] = {"visible_pass": False, "plus_pass": False}
             continue
         problem = pool[task_id]
         grade = grade_two_suites(code, problem, run=GRADER, heldout=choose(problem))
-        per_problem[task_id] = {"visible_pass":grade.visible_pass, "plus_pass": grade.plus_pass}
+        per_problem[task_id] = {"visible_pass": grade.visible_pass, "plus_pass": grade.plus_pass}
         if i % 20 == 0:
             print(f" [{label}] graded {i}/{len(codes)}")
     vis = np.array([int(r["visible_pass"]) for r in per_problem.values()])
@@ -102,13 +103,14 @@ def measure(
         "per_problem": per_problem,
     }
 
+
 def main() -> int:
     completions: dict[str, str] = json.loads(COMPLETIONS.read_text())["completions"]
     record: dict[str, dict[str, bool]] = json.loads(RECORD.read_text())
     pool = training_problems()
     codes = {tid: extract_function(c, pool[tid]) for tid, c in completions.items()}
     print(f"{len(codes)} completions, {sum(c is None for c in codes.values())} malformed")
-    
+
     # 1. Consistency: the full held-out suite must reproduce the Phase 3 record.
     full = measure("full suite", full_suite, codes, pool)
     full_pp = full["per_problem"]
@@ -124,7 +126,7 @@ def main() -> int:
         f"consistency with Phase 3 record: {'OK' if consistent else 'FAILED'}"
         f"({len(mismatches)} per-problem mismatches, CI {full['ci_pp']})"
     )
-    
+
     # 2. The pre-registered measurement on split B, with the dynamic-range rule.
     results: dict[str, object] = {"full_suite": full}
     verdict = "STOP"
@@ -135,10 +137,10 @@ def main() -> int:
         ci = result["ci_pp"]
         assert isinstance(ci, list)
         if ci[0] > 0:
-            verdict= f"split B = {fraction} STANDS (CI lower bound {ci[0]:+.1f} pp > 0)"
+            verdict = f"split B = {fraction} STANDS (CI lower bound {ci[0]:+.1f} pp > 0)"
             break
         print(f"    CI includes zero at B = {fraction}; applying pre-registered fallback")
-    
+
     print(f"\n VERDICT: {verdict}")
     OUT.write_text(
         json.dumps(
@@ -149,18 +151,17 @@ def main() -> int:
                     "bootstrap_resamples": BOOTSTRAP_RESAMPLES,
                     "grader": "docker run_tests",
                     "completions": str(COMPLETIONS),
-                    "consistent_with_phase3": consistent                    
+                    "consistent_with_phase3": consistent,
                 },
                 "verdict": verdict,
-                **results
+                **results,
             },
             indent=2,
         )
     )
     print(f"wrote   {OUT}")
-    return 0 if consistent and verdict !="STOP" else 1
+    return 0 if consistent and verdict != "STOP" else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
-
-

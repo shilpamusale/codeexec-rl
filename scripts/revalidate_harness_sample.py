@@ -8,6 +8,7 @@ shows each flagged problem's post-fix status. Avoids the full-374 load cliff.
 
 Run:  python scripts/revalidate_harness_sample.py
 """
+
 from __future__ import annotations
 
 import random
@@ -53,8 +54,10 @@ def main() -> None:
             continue
         passed, total, to, cr = gate(problems[tid])
         ok = total > 0 and passed == total
-        print(f"  {tid}: {passed}/{total} timed_out={to} crashed={cr}  "
-              f"{'PASS' if ok else 'FAIL -> exclude'}")
+        print(
+            f"  {tid}: {passed}/{total} timed_out={to} crashed={cr}  "
+            f"{'PASS' if ok else 'FAIL -> exclude'}"
+        )
 
     print("\nVerdict: normal-sample all-pass => fix is safe to keep.")
     print("Watched FAILs => honest exclusions for the documented reasons.")
