@@ -1,0 +1,8 @@
+date: 2026-10-28T03:40:09Z
+commit: 1f2b8fb2b50e5e8e87014152ef79532186c57956
+os: Ubuntu 22.04.5 LTS, kernel 6.8.0-1046-nvidia, 30 vCPUs
+host: Python 3.11.18, ldd (Ubuntu GLIBC 2.35-0ubuntu3.13) 2.35
+sandbox: FROM python:3.11-slim@sha256:cce12316475d7d56d605f76e1d811d0dc4e7227f2d4afd29951521264f504ff8
+sandbox: Python and glibc 3.11.17 ('glibc', '2.41')
+docker: Docker version 29.2.1, build a5c7197
+evalplus: 0.3.1

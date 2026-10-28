@@ -1,0 +1,3023 @@
+{
+  "meta": {
+    "regraded_from": "analysis/g_baseline_box.json",
+    "set_aside": [
+      "Mbpp/255"
+    ],
+    "measurement_set": "all 368 training problems; frozen-100 subset alongside",
+    "grader": "docker run_tests, EvalPlus's pass rule (ADR-015)",
+    "git": {
+      "commit": "1f2b8fb2b50e5e8e87014152ef79532186c57956",
+      "dirty": false
+    },
+    "compared_with": "analysis/g_baseline_split_b.json",
+    "created_at": "2026-10-28T03:58:18.938600+00:00",
+    "generation": {
+      "model": "Qwen/Qwen2.5-Coder-1.5B",
+      "revision": "df3ce67c0e24480f20468b6ef2894622d69eb73b",
+      "engine": "vllm 0.31.0",
+      "dtype": "bfloat16",
+      "decoding": "greedy (temperature 0), stop at end-of-sequence only",
+      "max_new_tokens": 256,
+      "prompt": "zero-shot-plus-stub (build_prompt), as in training",
+      "measurement_set": "all 369 training problems; frozen-100 subset alongside",
+      "grader": "docker run_tests",
+      "gpu": "NVIDIA A100-SXM4-40GB",
+      "git": {
+        "commit": "b0623e1bd422e7b36d4c4e8f07dcf78b70aa401d",
+        "dirty": false
+      },
+      "compared_with": "analysis/g_baseline_split_b.json",
+      "created_at": "2026-10-26T22:15:24.660798+00:00"
+    }
+  },
+  "all_problems": {
+    "n": 368,
+    "malformed": 2,
+    "visible": 251,
+    "plus_b": 207,
+    "plus_full": 206,
+    "gap_pp": 11.956521739130435,
+    "ci_pp": [
+      8.695652173913043,
+      15.489130434782608
+    ],
+    "gap_full_pp": 12.228260869565217,
+    "ci_full_pp": [
+      8.967391304347826,
+      15.760869565217392
+    ],
+    "truncated": 14
+  },
+  "frozen_100": {
+    "n": 100,
+    "malformed": 1,
+    "visible": 65,
+    "plus_b": 56,
+    "plus_full": 56,
+    "gap_pp": 9.0,
+    "ci_pp": [
+      4.0,
+      15.0
+    ],
+    "gap_full_pp": 9.0,
+    "ci_full_pp": [
+      4.0,
+      15.0
+    ]
+  },
+  "engine_check": {
+    "compared": 100,
+    "disagreements": [
+      "Mbpp/234"
+    ]
+  },
+  "per_problem": {
+    "Mbpp/100": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/101": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/102": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/103": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/104": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/105": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/106": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/108": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/109": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/11": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/111": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/113": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/116": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/118": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/119": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/12": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/120": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/123": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/124": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/125": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/126": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/127": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/128": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/129": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/130": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/131": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/132": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/133": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/135": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/137": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/138": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/139": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/14": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/140": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/141": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/142": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/145": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/16": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/160": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/161": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/162": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "length"
+    },
+    "Mbpp/165": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/166": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/167": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/168": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/17": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/170": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/171": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/172": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/18": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/19": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/20": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/222": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "length"
+    },
+    "Mbpp/223": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/224": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/226": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/227": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/230": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/232": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/233": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/234": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/235": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/237": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/238": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/239": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/240": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/242": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/244": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/245": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/247": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/250": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/251": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/252": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/253": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/256": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/257": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/259": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/260": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/261": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/262": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/264": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/265": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/266": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/267": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/268": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/269": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/270": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/271": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/272": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/273": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/274": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/276": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/277": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/278": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/279": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/280": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/281": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/282": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/283": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/284": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/285": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/286": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/287": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/290": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/292": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/293": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/294": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/296": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/297": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/299": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/3": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/300": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/301": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/305": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/306": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/308": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/309": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/310": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/311": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/312": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/388": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/389": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/390": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/391": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/392": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/394": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/395": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/397": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/398": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/4": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/404": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/405": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/406": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/409": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/410": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/412": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/413": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/414": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/415": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/418": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/419": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/420": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/421": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/422": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/424": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/425": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/426": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/427": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/428": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/429": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/430": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/432": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/433": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/435": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/436": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/437": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/439": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/440": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/441": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/445": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/446": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/447": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/448": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/450": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/451": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/453": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/454": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/455": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/456": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/457": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/458": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/459": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/460": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/462": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/463": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/465": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/468": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/470": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/471": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/472": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/473": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/474": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/475": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/476": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/477": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/478": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/479": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/554": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/555": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/556": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/557": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/558": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/559": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/56": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/560": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/562": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/563": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/564": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/565": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/566": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/567": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/568": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/569": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/57": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/572": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/573": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/576": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/577": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/578": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/58": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/580": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/581": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/583": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/585": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/586": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/587": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/588": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/589": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/59": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/590": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/591": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/592": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/593": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/594": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/596": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/597": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/598": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/6": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/600": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "length"
+    },
+    "Mbpp/602": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/603": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/604": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/605": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/606": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/607": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/608": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/61": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/610": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/611": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/612": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/614": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/615": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/616": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/618": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/619": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/62": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/620": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/622": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/623": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/624": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/626": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/628": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/629": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/63": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/631": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/632": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/633": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/635": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/637": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "length"
+    },
+    "Mbpp/638": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/639": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/64": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/641": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/643": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/644": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/65": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/66": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/67": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/68": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/69": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/7": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/70": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/71": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/72": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/720": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/721": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/722": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/723": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/724": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/725": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/726": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/728": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/730": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/731": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/732": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/733": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "length"
+    },
+    "Mbpp/735": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/736": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/739": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/74": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/740": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/741": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/742": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/743": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/744": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/745": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/748": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/749": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/75": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/750": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/751": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/752": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/753": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/754": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/755": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/757": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/758": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/759": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/760": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/762": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/763": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/764": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/765": {
+      "malformed": true,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/766": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/767": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/77": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/770": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/771": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/772": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/773": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/775": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/777": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/778": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/780": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/781": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/782": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/784": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/785": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/786": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/787": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/788": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/79": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/790": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/791": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/792": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/796": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/797": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/798": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/799": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/8": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/80": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/800": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/801": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/803": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/804": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/805": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/806": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/807": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/808": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/809": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/82": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/84": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/85": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/86": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/87": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/88": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/89": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/9": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/90": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/91": {
+      "malformed": false,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    },
+    "Mbpp/92": {
+      "malformed": true,
+      "visible_pass": false,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "length"
+    },
+    "Mbpp/93": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/94": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/95": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/96": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/97": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/98": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": true,
+      "plus_full": true,
+      "finish_reason": "stop"
+    },
+    "Mbpp/99": {
+      "malformed": false,
+      "visible_pass": true,
+      "plus_b": false,
+      "plus_full": false,
+      "finish_reason": "stop"
+    }
+  },
+  "completions": {
+    "Mbpp/100": "    # Convert the number to a string\n    num_str = str(num)\n    \n    # Find the next palindrome by incrementing the last digit\n    for i in range(len(num_str) - 1, -1, -1):\n        if num_str[i] != '9':\n            num_str = num_str[:i] + str(int(num_str[i]) + 1) + num_str[i+1:]\n            break\n    else:\n        # If all digits are 9, append a 1 to the end\n        num_str = num_str + '1'\n    \n    # Convert the string back to an integer\n    next_palindrome = int(num_str)\n    \n    return next_palindrome\n\n# Test the function\nprint(next_smallest_palindrome(99))  # Output: 101\nprint(next_smallest_palindrome(123))  # Output: 131\nprint(next_smallest_palindrome(999))  # Output: 1001",
+    "Mbpp/101": "    return arr[k-1]",
+    "Mbpp/102": "    word = word.split('_')\n    word = [word[0]] + [i.capitalize() for i in word[1:]]\n    return ''.join(word)\n\nprint(snake_to_camel('python_program'))",
+    "Mbpp/103": "    if n == 0:\n        return 1\n    if m == 0:\n        return 0\n    if m == n:\n        return 1\n    if m > n:\n        return 0\n    return eulerian_num(n - 1, m - 1) + (n - m) * eulerian_num(n - 1, m)",
+    "Mbpp/104": "    return [sorted(sublist) for sublist in input_list]\n\n\nprint(sort_sublists(([\"green\", \"orange\"], [\"black\", \"white\"], [\"white\", \"black\", \"orange\"])))",
+    "Mbpp/105": "    count = 0\n    for i in lst:\n        if i == True:\n            count += 1\n    return count\n\nprint(count([True,False,True]))",
+    "Mbpp/106": "    test_list.extend(test_tup)\n    return test_list\n\nprint(add_lists([5, 6, 7], (9, 10)))",
+    "Mbpp/108": "    num1.extend(num2)\n    num1.extend(num3)\n    num1.sort()\n    return num1\n\nprint(merge_sorted_list([25, 24, 15, 4, 5, 29, 110],[19, 20, 11, 56, 25, 233, 154],[24, 26, 54, 48]))",
+    "Mbpp/109": "    count = 0\n    for i in range(n):\n        s = s[1:] + s[0]\n        if int(s, 2) % 2 == 1:\n            count += 1\n    return count\n\nprint(odd_Equivalent(\"011001\",6))",
+    "Mbpp/11": "    s = s.replace(ch, \"\", 1)\n    s = s.replace(ch, \"\", 1)\n    return s\n\nprint(remove_Occ(\"hello\",\"l\"))",
+    "Mbpp/111": "    common = set(nestedlist[0])\n    for i in nestedlist[1:]:\n        common = common.intersection(set(i))\n    return common\n\nassert set(common_in_nested_lists([[12, 18, 23, 25, 45], [7, 12, 18, 24, 28], [1, 5, 8, 12, 15, 16, 18]]))==set([18, 12])",
+    "Mbpp/113": "    try:\n        int(text)\n        return True\n    except ValueError:\n        return False\n\nprint(check_integer(\"python\"))",
+    "Mbpp/116": "    return int(''.join(str(i) for i in nums))\n\nprint(tuple_to_int((1,2,3)))",
+    "Mbpp/118": "    return string.split(\" \")\n\nprint(string_to_list(\"python programming\"))",
+    "Mbpp/119": "    if len(arr) == 1:\n        return arr[0]\n    if arr[0] != arr[1]:\n        return arr[0]\n    if arr[-1] != arr[-2]:\n        return arr[-1]\n    for i in range(1, len(arr)-1):\n        if arr[i] != arr[i-1] and arr[i] != arr[i+1]:\n            return arr[i]\n\n\nprint(search([1,1,2,2,3]))",
+    "Mbpp/12": "    return sorted(M, key=sum)",
+    "Mbpp/120": "    max_product = 0\n    for i in list1:\n        product = i[0] * i[1]\n        if product > max_product:\n            max_product = product\n    return max_product\n\nprint(max_product_tuple([(2, 7), (2, 6), (1, 8), (4, 9)]))",
+    "Mbpp/123": "    def sum_of_divisors(n):\n        return sum([i for i in range(1, n) if n % i == 0])\n\n    amicable_numbers = []\n    for i in range(1, limit + 1):\n        if i == sum_of_divisors(sum_of_divisors(i)) and i != sum_of_divisors(i):\n            amicable_numbers.append(i)\n\n    return sum(amicable_numbers)",
+    "Mbpp/124": "    return math.atan2(b, a)",
+    "Mbpp/125": "    # Write your code here\n    max_diff = 0\n    count_0 = 0\n    count_1 = 0\n    for i in range(len(string)):\n        if string[i] == '0':\n            count_0 += 1\n        else:\n            count_1 += 1\n        max_diff = max(max_diff, abs(count_0 - count_1))\n    return max_diff",
+    "Mbpp/126": "    sum = 0\n    for i in range(1, min(a, b) + 1):\n        if a % i == 0 and b % i == 0:\n            sum += i\n    return sum\n\nprint(sum(10,15))",
+    "Mbpp/127": "    return x * y\n\nassert multiply_int(10, 20) == 200",
+    "Mbpp/128": "    words = s.split()\n    long_words = []\n    for word in words:\n        if len(word) > n:\n            long_words.append(word)\n    return long_words\n\nprint(long_words(3,\"python is a programming language\"))",
+    "Mbpp/129": "    # check if the matrix is square\n    if len(my_matrix) != len(my_matrix[0]):\n        return False\n    # check if the matrix is a magic square\n    for i in range(len(my_matrix)):\n        for j in range(len(my_matrix[i])):\n            if my_matrix[i][j] != my_matrix[j][i]:\n                return False\n    return True\n\nprint(magic_square_test([[7, 12, 1, 14], [2, 13, 8, 11], [16, 3, 10, 5], [9, 6, 15, 4]]))",
+    "Mbpp/130": "    max_count = 0\n    max_item = None\n    for num in nums:\n        count = nums.count(num)\n        if count > max_count:\n            max_count = count\n            max_item = num\n    return max_item\n\nassert max_occurrences([2,3,8,4,7,9,8,2,6,5,1,6,1,2,3,2,4,6,9,1,2])==2",
+    "Mbpp/131": "    str2 = \"\"\n    for i in str1:\n        if i in \"aeiouAEIOU\":\n            str2 += i\n    str2 = str2[::-1]\n    str3 = \"\"\n    j = 0\n    for i in str1:\n        if i in \"aeiouAEIOU\":\n            str3 += str2[j]\n            j += 1\n        else:\n            str3 += i\n    return str3\n\nprint(reverse_vowels(\"Python\"))",
+    "Mbpp/132": "    str1 = \"\"\n    for i in tup1:\n        str1 += i\n    return str1\n\ntup1 = ('e', 'x', 'e', 'r', 'c', 'i', 's', 'e', 's')\nprint(tup_string(tup1))",
+    "Mbpp/133": "    sum = 0\n    for num in nums:\n        if num < 0:\n            sum += num\n    return sum\n\nprint(sum_negativenum([2, 4, -6, -9, 11, -12, 14, -5, 17]))",
+    "Mbpp/135": "    return n * (2 * n - 1)\n\nprint(hexagonal_num(10))",
+    "Mbpp/137": "    zero_count = 0\n    non_zero_count = 0\n    for num in nums:\n        if num == 0:\n            zero_count += 1\n        else:\n            non_zero_count += 1\n    return zero_count / non_zero_count\n\nprint(zero_count([0, 1, 2, -1, -5, 6, 0, -3, -2, 3, 4, 6, 8]))",
+    "Mbpp/138": "    if n == 0:\n        return False\n    while n > 0:\n        if n & 1 == 0:\n            n = n >> 1\n        else:\n            return False\n    return True\n\nprint(is_Sum_Of_Powers_Of_Two(10))",
+    "Mbpp/139": "    return 2 * 3.14 * r",
+    "Mbpp/14": "    return l*b*h\n\nprint(find_Volume(10,8,6))",
+    "Mbpp/140": "    \"\"\"\n    :param test_list: list of lists\n    :return: set of numbers\n    \"\"\"\n    return set([item for sublist in test_list for item in sublist])",
+    "Mbpp/141": "    for i in range(len(nums) - 1, 0, -1):\n        max_index = 0\n        for j in range(1, i + 1):\n            if nums[j] > nums[max_index]:\n                max_index = j\n        if max_index != i:\n            nums[:max_index + 1] = reversed(nums[:max_index + 1])\n            nums[:i + 1] = reversed(nums[:i + 1])\n    return nums",
+    "Mbpp/142": "    count = 0\n    for i in range(len(list1)):\n        if list1[i] == list2[i] == list3[i]:\n            count += 1\n    return count\n\nprint(count_samepair([1,2,3,4,5,6,7,8],[2,2,3,1,2,6,7,9],[2,1,3,1,2,6,7,9]))",
+    "Mbpp/145": "    max_diff = 0\n    for i in range(len(arr)):\n        for j in range(i+1, len(arr)):\n            if abs(arr[i] - arr[j]) > max_diff:\n                max_diff = abs(arr[i] - arr[j])\n    return max_diff\n\nprint(max_Abs_Diff((2,1,5,3)))",
+    "Mbpp/16": "    return text.islower() and '_' in text\n\nprint(text_lowercase_underscore(\"aab_cbbbc\"))",
+    "Mbpp/160": "    for x in range(n):\n        for y in range(n):\n            if a * x + b * y == n:\n                return x, y\n    return None\n\nprint(find_solution(2, 3, 7))",
+    "Mbpp/161": "    return [x for x in list1 if x not in list2]",
+    "Mbpp/162": "    sum = 0\n    for i in range(0, n // 2 + 1):\n        sum += (n - 2 * i)\n    return sum\n\nassert sum_series(6) == 12\nassert sum_series(10) == 30\nassert sum_series(12) == 48\nassert sum_series(14) == 70\nassert sum_series(16) == 96\nassert sum_series(18) == 120\nassert sum_series(20) == 140\nassert sum_series(22) == 162\nassert sum_series(24) == 186\nassert sum_series(26) == 210\nassert sum_series(28) == 234\nassert sum_series(30) == 258\nassert sum_series(32) == 282\nassert sum_series(34) == 306\nassert sum_series(36) == 330\nassert sum_series(38) == 354\nassert sum_series(40) == 378\nassert sum_series(",
+    "Mbpp/165": "    count = 0\n    for i in range(len(str1)):\n        if str1[i].lower() == chr(65 + i):\n            count += 1\n    return count\n\nprint(count_char_position(\"xbcefg\"))",
+    "Mbpp/166": "    count = 0\n    for i in range(len(A)):\n        for j in range(i+1, len(A)):\n            if (A[i] ^ A[j]) % 2 == 0:\n                count += 1\n    return count\n\nprint(find_even_pair([5, 4, 7, 2, 1]))",
+    "Mbpp/167": "    \"\"\"\n    Return the next power of 2 greater than or equal to n.\n    \"\"\"\n    if n == 0:\n        return 1\n    else:\n        return 2 ** (n - 1).bit_length()\n\n# Test the function\nprint(next_power_of_2(0))  # Output: 1\nprint(next_power_of_2(1))  # Output: 2\nprint(next_power_of_2(5))  # Output: 8\nprint(next_power_of_2(16)) # Output: 16",
+    "Mbpp/168": "    count = 0\n    for i in a:\n        if i == x:\n            count += 1\n    return count\n\nprint(frequency([1,2,3], 4))",
+    "Mbpp/17": "    return 4*a\n\nassert square_perimeter(10)==40",
+    "Mbpp/170": "    sum = 0\n    for i in range(m, n+1):\n        sum += list1[i]\n    return sum\n\nprint(sum_range_list([2,1,5,6,8,3,4,9,10,11,8,12], 8, 10))",
+    "Mbpp/171": "    return 5*a",
+    "Mbpp/172": "    return s.count(\"std\")\n\nassert count_occurance(\"letstdlenstdporstd\") == 3",
+    "Mbpp/18": "    for char in second_string:\n        string = string.replace(char, '')\n    return string\n\nprint(remove_dirty_chars(\"probasscurve\", \"pros\"))",
+    "Mbpp/19": "    for i in range(len(arraynums)):\n        for j in range(i+1,len(arraynums)):\n            if arraynums[i]==arraynums[j]:\n                return True\n    return False\n\nprint(test_duplicate(([1,2,3,4,5])))",
+    "Mbpp/20": "    if x == 1:\n        return True\n    if x < 1:\n        return False\n    if x % 2 == 0:\n        return False\n    if x % 3 == 0:\n        return False\n    if x % 5 == 0:\n        return False\n    if x % 7 == 0:\n        return False\n    if x % 11 == 0:\n        return False\n    if x % 13 == 0:\n        return False\n    if x % 17 == 0:\n        return False\n    if x % 19 == 0:\n        return False\n    if x % 23 == 0:\n        return False\n    if x % 29 == 0:\n        return False\n    if x % 31 == 0:\n        return False\n    if x % 37 == 0:\n        return False\n    if x % 41 == 0:\n        return False\n    if x % 43 == 0:\n        return False\n    if x % 47 == 0:\n        return False\n    if x % 53 == 0:\n        return",
+    "Mbpp/222": "    \"\"\"\n    Check if all the elements in tuple have same data type or not.\n    :param test_tuple: tuple\n    :return: bool\n    \"\"\"\n    return all(type(test_tuple[0]) == type(i) for i in test_tuple)\n\nif __name__ == \"__main__\":\n    assert check_type((5, 6, 7, 3, 5, 6)) == True\n    assert check_type((5, 6, 7, 3, 5, 6.0)) == False\n    assert check_type((5, 6, 7, 3, 5, \"6\")) == False\n    assert check_type((5, 6, 7, 3, 5, 6, 7, 3, 5, 6, 7, 3, 5, 6, 7, 3, 5, 6, 7, 3, 5, 6, 7, 3, 5, 6, 7, 3, 5, 6, 7, 3, 5, 6, 7, 3, 5, 6, ",
+    "Mbpp/223": "    count = 0\n    for i in range(n):\n        if arr[i] == x:\n            count += 1\n    if count > n/2:\n        return True\n    else:\n        return False\n\nprint(is_majority([1, 2, 3, 3, 3, 3, 10], 7, 3))",
+    "Mbpp/224": "    count = 0\n    while n:\n        count += n & 1\n        n >>= 1\n    return count\n\nprint(count_Set_Bits(2))",
+    "Mbpp/226": "    str2 = \"\"\n    for i in range(len(str1)):\n        if i % 2 == 0:\n            str2 = str2 + str1[i]\n    return str2\n\nprint(odd_values_string('abcdef'))",
+    "Mbpp/227": "    if a < b and a < c:\n        return a\n    elif b < a and b < c:\n        return b\n    else:\n        return c\n\nassert min_of_three(10,20,0)==0",
+    "Mbpp/230": "    str2 = str1.replace(\" \", char)\n    return str2\n\nprint(replace_blank(\"hello people\", \"@\"))",
+    "Mbpp/232": "    list1.sort()\n    return list1[-n:]\n\nprint(larg_nnum([10, 20, 50, 70, 90, 20, 50, 40, 60, 80, 100],2))",
+    "Mbpp/233": "    return 2 * math.pi * r * h",
+    "Mbpp/234": "    return l**3\n\nassert volume_cube(3)==27",
+    "Mbpp/235": "    return n | (n >> 1)\n\nprint(even_bit_set_number(10))",
+    "Mbpp/237": "    # create an empty dictionary\n    dict = {}\n    # iterate through the list\n    for i in test_list:\n        # check if the tuple is already in the dictionary\n        if i in dict:\n            # if it is, increment the count by 1\n            dict[i] += 1\n        else:\n            # if it is not, add the tuple to the dictionary with a count of 1\n            dict[i] = 1\n    # return the dictionary\n    return dict\n\n# test the function\nprint(check_occurences([(3, 1), (1, 3), (2, 5), (5, 2), (6, 3)]))",
+    "Mbpp/238": "    count = 0\n    for i in range(len(str1)):\n        for j in range(i+1,len(str1)+1):\n            count += 1\n    return count\n\nprint(number_of_substrings(\"abc\"))",
+    "Mbpp/239": "    if n == 1:\n        return 1\n    if m == 1:\n        return 0\n    if n == 0:\n        return 1\n    return get_total_number_of_sequences(m, n - 1) + get_total_number_of_sequences(m // 2, n - 1)",
+    "Mbpp/240": "    list1[-1:] = list2\n    return list1",
+    "Mbpp/242": "    count = 0\n    for i in str1:\n        count += 1\n    return count\nprint(count_charac(\"python programming\"))",
+    "Mbpp/244": "    return (N+1)**2 if (N+1)**2 > N else (N+2)**2\n\nprint(next_Perfect_Square(35))",
+    "Mbpp/245": "    n = len(arr)\n    dp = [[0 for _ in range(n)] for _ in range(n)]\n    for i in range(n):\n        dp[i][i] = arr[i]\n    for i in range(n-1):\n        if arr[i] < arr[i+1]:\n            dp[i][i+1] = arr[i] + arr[i+1]\n    for i in range(n-2):\n        for j in range(i+2, n):\n            if arr[i] < arr[j]:\n                dp[i][j] = max(dp[i][j-1], dp[i+1][j] + arr[i])\n    return max([max(row) for row in dp])\n\nprint(max_sum([1, 15, 51, 45, 33, 100, 12, 18, 9]))",
+    "Mbpp/247": "    n = len(str1)\n    dp = [[0 for i in range(n)] for j in range(n)]\n    for i in range(n):\n        dp[i][i] = 1\n    for i in range(n-1):\n        if str1[i] == str1[i+1]:\n            dp[i][i+1] = 2\n    for i in range(n-3, -1, -1):\n        for j in range(i+2, n):\n            if str1[i] == str1[j]:\n                dp[i][j] = dp[i+1][j-1] + 2\n            else:\n                dp[i][j] = max(dp[i+1][j], dp[i][j-1])\n    return dp[0][n-1]\n\nprint(lps(\"TENS FOR TENS\"))",
+    "Mbpp/250": "    count = 0\n    for i in tup:\n        if i == x:\n            count += 1\n    return count\n\nprint(count_X((10, 8, 5, 2, 10, 15, 10, 8, 5, 8, 8, 2),4))",
+    "Mbpp/251": "    list2 = []\n    for i in list1:\n        list2.append(element)\n        list2.append(i)\n    return list2\n\nprint(insert_element(['Red', 'Green', 'Black'], 'c'))",
+    "Mbpp/252": "    return complex(numbers).conjugate()\n\nprint(convert(1))",
+    "Mbpp/253": "    count = 0\n    for i in list1:\n        if type(i) == int:\n            count += 1\n    return count\n\nprint(count_integer([1,2,'abc',1.2]))",
+    "Mbpp/256": "    if n < 2:\n        return 0\n    prime = [True for i in range(n+1)]\n    p = 2\n    while (p * p <= n):\n        if (prime[p] == True):\n            for i in range(p * p, n+1, p):\n                prime[i] = False\n        p += 1\n    prime[0] = False\n    prime[1] = False\n    count = 0\n    for p in range(n+1):\n        if prime[p]:\n            count += 1\n    return count\n\nprint(count_Primes_nums(5))",
+    "Mbpp/257": "    return b, a\n\nassert swap_numbers(10,20)==(20,10)",
+    "Mbpp/259": "    \"\"\"\n    Function to maximize the given two tuples.\n    \"\"\"\n    # Sorting the tuples\n    test_tup1.sort()\n    test_tup2.sort()\n\n    # Creating a new list\n    res = []\n\n    # Iterating the tuples\n    for i in range(len(test_tup1)):\n        # Appending the elements\n        res.append(test_tup1[i])\n        res.append(test_tup2[i])\n\n    # Returning the result\n    return tuple(res)\n\n# Driver Code\ntest_tup1 = ((1, 3), (4, 5), (2, 9), (1, 10))\ntest_tup2 = ((6, 7), (3, 9), (1, 1), (7, 3))\n\n# Printing the original tuples\nprint(\"The original tuple 1 : \" + str(test_tup1))\nprint(\"The original tuple 2 : \" + str(test_tup2))\n\n# Calling the function\nprint(\"The modified tuple : \" + str(maximize_elements(test_tup1, test_tup2)))",
+    "Mbpp/260": "    \"\"\"\n    Returns the nth Newman\u2013Shanks\u2013Williams prime number.\n    \"\"\"\n    pass",
+    "Mbpp/261": "    # Write your code here\n    return tuple([i/j for i,j in zip(test_tup1, test_tup2)])",
+    "Mbpp/262": "    return (list1[:L], list1[L:])",
+    "Mbpp/264": "    if h_age <= 2:\n        return h_age * 10.5\n    else:\n        return 21 + (h_age - 2) * 4\n\nprint(dog_age(12))",
+    "Mbpp/265": "    return [S[i::step] for i in range(step)]",
+    "Mbpp/266": "    return 4*l*l\n\nprint(lateralsurface_cube(5))",
+    "Mbpp/267": "    sum = 0\n    for i in range(1, n+1):\n        sum += i**2\n    return sum\n\nprint(square_Sum(2))",
+    "Mbpp/268": "    return n**2 + 2*n + 1\n\nprint(find_star_num(3))",
+    "Mbpp/269": "    return ord(k)\n\nprint(ascii_value('A'))",
+    "Mbpp/270": "    sum = 0\n    for i in range(0, len(arr), 2):\n        if arr[i] % 2 == 0:\n            sum += arr[i]\n    return sum\n\nprint(sum_even_and_even_index([5, 6, 12, 1, 18, 8]))",
+    "Mbpp/271": "    sum = 0\n    for i in range(1, n+1):\n        sum += (2*i)**5\n    return sum\n\nprint(even_Power_Sum(2))",
+    "Mbpp/272": "    return [i[2] for i in test_list]",
+    "Mbpp/273": "    # Write your code here\n    return tuple([i - j for i, j in zip(test_tup1, test_tup2)])",
+    "Mbpp/274": "    binomial_coefficients = [1] * (n + 1)\n    for i in range(1, n + 1):\n        for j in range(i, 0, -1):\n            binomial_coefficients[j] = binomial_coefficients[j] + binomial_coefficients[j - 1]\n    return sum(binomial_coefficients[2::2])\n\nprint(even_binomial_Coeff_Sum(4))",
+    "Mbpp/276": "    return math.pi * r**2 * h",
+    "Mbpp/277": "    return {k:v for k,v in dict1.items() if v >= n}\n\nprint(dict_filter({'Cierra Vega': 175, 'Alden Cantrell': 180, 'Kierra Gentry': 165, 'Pierre Cox': 190},170))",
+    "Mbpp/278": "    count = 0\n    for i in test_tup:\n        if type(i) == tuple:\n            break\n        count += 1\n    return count\n\ntest_tup = (1, 5, 7, (4, 6), 10)\nprint(count_first_elements(test_tup))",
+    "Mbpp/279": "    if n < 0:\n        return False\n    else:\n        return (1 + (1 + 40 * n)**0.5) % 10 == 0\n\ndef decagonal_number(n):\n    if is_num_decagonal(n):\n        return n * (21 + 10 * n)\n    else:\n        return False\n\nprint(decagonal_number(3))",
+    "Mbpp/280": "    found = False\n    position = 0\n    while position < len(dlist) and not found:\n        if dlist[position] == item:\n            found = True\n        else:\n            position += 1\n    return (found, position)",
+    "Mbpp/281": "    for i in test_list:\n        if test_list.count(i) > 1:\n            return False\n    return True\n\nprint(all_unique([1,2,3]))",
+    "Mbpp/282": "    return [x - y for x, y in zip(nums1, nums2)]",
+    "Mbpp/283": "    n = str(n)\n    for i in n:\n        if int(i) > len(n):\n            return False\n    return True",
+    "Mbpp/284": "    for i in list1:\n        if i != element:\n            return False\n    return True\n\nprint(check_element([\"green\", \"orange\", \"black\", \"white\"],'blue'))",
+    "Mbpp/285": "    return \"ab\" in text or \"abbb\" in text\n\nprint(text_match_two_three(\"ac\"))",
+    "Mbpp/286": "    max_sum = 0\n    for i in range(n):\n        max_sum += a[i]\n    max_sum = max_sum * k\n    return max_sum\n\nprint(max_sub_array_sum_repeated([10, 20, -30, -1], 4, 3))",
+    "Mbpp/287": "    sum = 0\n    for i in range(1, n+1):\n        sum += i**2\n    return sum\n\nprint(square_Sum(2))",
+    "Mbpp/290": "    max_len = 0\n    max_list = []\n    for i in list1:\n        if len(i) > max_len:\n            max_len = len(i)\n            max_list = i\n    return max_len, max_list\n\nprint(max_length([[0], [1, 3], [5, 7], [9, 11], [13, 15, 17]]))",
+    "Mbpp/292": "    return int(n/m)",
+    "Mbpp/293": "    return (w**2 + h**2)**0.5\n\nassert otherside_rightangle(7,8)==10.63014581273465",
+    "Mbpp/294": "    max = 0\n    for i in listval:\n        if type(i) == int:\n            if i > max:\n                max = i\n        elif type(i) == str:\n            if i.isnumeric():\n                if int(i) > max:\n                    max = int(i)\n    return max\n\nprint(max_val(['Python', 3, 2, 4, 5, 'version']))",
+    "Mbpp/296": "    count = 0\n    for i in range(len(arr)):\n        for j in range(i+1, len(arr)):\n            if arr[i] > arr[j]:\n                count += 1\n    return count\n\nprint(get_Inv_Count([1,20,6,4,5]))",
+    "Mbpp/297": "    list2 = []\n    for i in list1:\n        if type(i) == list:\n            for j in i:\n                list2.append(j)\n        else:\n            list2.append(i)\n    return list2\n\nprint(flatten_list([0, 10, [20, 30], 40, 50, [60, 70, 80], [90, 100, 110, 120]]))",
+    "Mbpp/299": "    max_aggr = 0\n    max_name = ''\n    for name, aggr in stdata:\n        if aggr > max_aggr:\n            max_aggr = aggr\n            max_name = name\n    return max_name, max_aggr\n\nprint(max_aggregate([('Juan Whelan',90),('Sabah Colley',88),('Peter Nichols',7),('Juan Whelan',122),('Sabah Colley',84)]))",
+    "Mbpp/3": "    if n == 1:\n        return False\n    for i in range(2, n):\n        if n % i == 0:\n            return True\n    return False\n\nassert is_not_prime(2) == False\nassert is_not_prime(3) == False\nassert is_not_prime(4) == True\nassert is_not_prime(5) == False\nassert is_not_prime(6) == True\nassert is_not_prime(7) == False\nassert is_not_prime(8) == True\nassert is_not_prime(9) == True\nassert is_not_prime(10) == True\nassert is_not_prime(11) == False\nassert is_not_prime(12) == True\nassert is_not_prime(13) == False\nassert is_not_prime(14) == True\nassert is_not_prime(15) == True\nassert is_not_prime(16) == True\nassert is_not_prime(17) == False\nassert is_not_prime(18) == True\nassert is_not_prime(19) == False\nassert is_not_prime(20) == True\nassert is_not_prime(21) == True\nassert is_not_prime(2",
+    "Mbpp/300": "    \"\"\"\n    :param n: int\n    :return: int\n    \"\"\"\n    return 2 ** (2 * n - 1)\n\n\nif __name__ == '__main__':\n    print(count_binary_seq(1))",
+    "Mbpp/301": "    if isinstance(d, dict):\n        return 1 + max(dict_depth(v) for v in d.values()) if d else 0\n    return 0",
+    "Mbpp/305": "    for word in words:\n        if word[0] == 'P' or word[0] == 'p':\n            return word.split()\n    return None\n\nprint(start_withp([\"Python PHP\", \"Java JavaScript\", \"c c++\"]))",
+    "Mbpp/306": "    if index == n:\n        return 0\n    if index > k:\n        return 0\n    if index == k:\n        return a[index]\n    return max(max_sum_increasing_subseq(a, n, index + 1, k), a[index] + max_sum_increasing_subseq(a, n, index + 1, k + 1))\n\nprint(max_sum_increasing_subseq([1, 101, 2, 3, 100, 4, 5 ], 7, 0, 0))",
+    "Mbpp/308": "    # your code here\n    return [x*y for x in nums1 for y in nums2 if x*y > 0][:N]",
+    "Mbpp/309": "    if a > b:\n        return a\n    else:\n        return b\n\nprint(maximum(5,10))",
+    "Mbpp/310": "    return tuple(str1)\n\nprint(string_to_tuple(\"python 3.0\"))",
+    "Mbpp/311": "    return n | (n+1)\n\nprint(set_left_most_unset_bit(10))",
+    "Mbpp/312": "    return (1/3) * math.pi * r**2 * h",
+    "Mbpp/388": "    \"\"\"\n    Find the highest power of 2 that is less than or equal to n.\n\n    Args:\n        n (int): The input number.\n\n    Returns:\n        int: The highest power of 2 that is less than or equal to n.\n    \"\"\"\n    power = 0\n    while (1 << power) <= n:\n        power += 1\n    return (1 << (power - 1))\n\n# Test the function\nn = 10\nresult = highest_Power_of_2(n)\nprint(result)",
+    "Mbpp/389": "    if n == 0:\n        return 2\n    elif n == 1:\n        return 1\n    else:\n        return find_lucas(n-1) + find_lucas(n-2)",
+    "Mbpp/390": "    return [string.format(i) for i in list_]\n\nprint(add_string([1,2,3,4],'temp{0}'))",
+    "Mbpp/391": "    d = {}\n    for i in range(len(l1)):\n        d[l1[i]] = {l2[i]: l3[i]}\n    return [d]\n\nprint(convert_list_dictionary([\"S001\", \"S002\", \"S003\", \"S004\"],[\"Adina Park\", \"Leyton Marsh\", \"Duncan Boyle\", \"Saim Richards\"] ,[85, 98, 89, 92]))",
+    "Mbpp/392": "    if n == 1:\n        return 1\n    return max(get_max_sum(n/2) + get_max_sum(n/3) + get_max_sum(n/4) + get_max_sum(n/5), n)\n\nprint(get_max_sum(60))",
+    "Mbpp/394": "    return len(test_tup) == len(set(test_tup))\n\nprint(check_distinct((1, 4, 5, 6, 1, 4)))",
+    "Mbpp/395": "    char_order = []\n    count = {}\n    for char in str1:\n        if char in count:\n            count[char] += 1\n        else:\n            count[char] = 1\n            char_order.append(char)\n    for char in char_order:\n        if count[char] == 1:\n            return char\n    return None\n\nprint(first_non_repeating_character(\"abcabc\"))",
+    "Mbpp/397": "    if a > b:\n        if a > c:\n            if b > c:\n                return b\n            else:\n                return c\n        else:\n            return a\n    else:\n        if b > c:\n            if a > c:\n                return a\n            else:\n                return c\n        else:\n            return b\n\nprint(median_numbers(25,55,65))",
+    "Mbpp/398": "    sum = 0\n    for i in nums:\n        sum += sum_of_digits(i)\n    return sum\n\ndef sum_of_digits(nums):\n    sum = 0\n    for i in nums:\n        sum += sum_of_digits(i)\n    return sum\n\ndef sum_of_digits(nums):\n    sum = 0\n    for i in nums:\n        sum += sum_of_digits(i)\n    return sum\n\ndef sum_of_digits(nums):\n    sum = 0\n    for i in nums:\n        sum += sum_of_digits(i)\n    return sum\n\ndef sum_of_digits(nums):\n    sum = 0\n    for i in nums:\n        sum += sum_of_digits(i)\n    return sum\n\ndef sum_of_digits(nums):\n    sum = 0\n    for i in nums:\n        sum += sum_of_digits(i)\n    return sum\n\ndef sum_of_digits(nums):\n    sum = 0\n    for i in nums:\n        sum += sum_of_digits(i)\n    return sum\n\ndef sum_of_digits(nums):\n    sum = 0\n    for i in nums:\n        sum += sum_of_digits(i)\n    return sum\n\ndef sum_of_digits(nums):\n    sum = 0\n    for i in nums:\n        sum += sum",
+    "Mbpp/4": "    import heapq\n    return heapq.nlargest(n, nums)\n\nprint(heap_queue_largest([25, 35, 22, 85, 14, 65, 75, 22, 58],3))",
+    "Mbpp/404": "    if a < b:\n        return a\n    else:\n        return b\n\nprint(minimum(1,2))",
+    "Mbpp/405": "    if element in tuplex:\n        return True\n    else:\n        return False\n\nprint(check_tuplex((\"w\", 3, \"r\", \"e\", \"s\", \"o\", \"u\", \"r\", \"c\", \"e\"),'r'))",
+    "Mbpp/406": "    count = 0\n    while x:\n        count += x & 1\n        x >>= 1\n    return count % 2 == 1\n\nprint(find_Parity(12))",
+    "Mbpp/409": "    min_product = list1[0][0] * list1[0][1]\n    for i in range(1, len(list1)):\n        product = list1[i][0] * list1[i][1]\n        if product < min_product:\n            min_product = product\n    return min_product\n\nprint(min_product_tuple([(2, 7), (2, 6), (1, 8), (4, 9)]))",
+    "Mbpp/410": "    min = listval[0]\n    for i in listval:\n        if i < min:\n            min = i\n    return min\n\nprint(min_val(['Python', 3, 2, 4, 5, 'version']))",
+    "Mbpp/412": "    return [i for i in l if i%2==0]\n\nprint(remove_odd([1,2,3]))",
+    "Mbpp/413": "    return [i[n] for i in list1]\n\n\nprint(extract_nth_element([('Greyson Fulton', 98, 99), ('Brady Kent', 97, 96), ('Wyatt Knott', 91, 94), ('Beau Turnbull', 94, 98)], 0))",
+    "Mbpp/414": "    for i in list1:\n        for j in list2:\n            if i == j:\n                return True\n    return False\n\nprint(overlapping([1,2,3,4,5],[6,7,8,9]))",
+    "Mbpp/415": "    max1 = max(arr)\n    arr.remove(max1)\n    max2 = max(arr)\n    return (max1, max2)\n\nprint(max_Product([1,2,3,4,7,0,8,4]))",
+    "Mbpp/418": "    max_len = 0\n    max_list = []\n    for i in lst:\n        if len(i) > max_len:\n            max_len = len(i)\n            max_list = i\n    return max_list\n\nprint(Find_Max([['A'],['A','B'],['A','B','C']]))",
+    "Mbpp/419": "    sum = 0\n    for i in list1:\n        sum += round(i)\n    return sum * len(list1)\n\nprint(round_and_sum([22.4, 4.0, -16.22, -9.10, 11.00, -12.22, 14.20, -5.20, 17.50]))",
+    "Mbpp/420": "    sum = 0\n    for i in range(1, n+1):\n        sum += (2*i)**3\n    return sum\n\nprint(cube_Sum(2))",
+    "Mbpp/421": "    res = \"\"\n    for ele in test_tup:\n        res += str(ele)\n    return res\n\ntest_tup = (\"ID\", \"is\", 4, \"UTS\")\nprint(concatenate_tuple(test_tup))",
+    "Mbpp/422": "    sum = 0\n    for i in range(1, n+1):\n        sum += i**3\n    return sum/n\n\nprint(find_Average_Of_Cube(2))",
+    "Mbpp/424": "    return [i[-1] for i in test_tuple]\n\nprint(extract_rear(('Mers', 'for', 'Vers')))",
+    "Mbpp/425": "    count = 0\n    for i in list1:\n        if x in i:\n            count += 1\n    return count\n\nprint(count_element_in_list([[1, 3], [5, 7], [1, 11], [1, 15, 7]],1))",
+    "Mbpp/426": "    return [num for num in nums if num % 2 != 0]",
+    "Mbpp/427": "    return dt[8:10] + '-' + dt[5:7] + '-' + dt[:4]",
+    "Mbpp/428": "    n = len(my_list)\n    gap = n // 2\n    while gap > 0:\n        for i in range(gap, n):\n            temp = my_list[i]\n            j = i\n            while j >= gap and my_list[j - gap] > temp:\n                my_list[j] = my_list[j - gap]\n                j -= gap\n            my_list[j] = temp\n        gap //= 2\n    return my_list\n\nprint(shell_sort([12, 23, 4, 5, 3, 2, 12, 81, 56, 95]))",
+    "Mbpp/429": "    \"\"\"\n    Function to extract the elementwise and tuples from the given two tuples.\n    \"\"\"\n    res = []\n    for i in range(len(test_tup1)):\n        res.append(test_tup1[i] + test_tup2[i])\n    return tuple(res)\n\n# Driver Code\ntest_tup1 = (10, 4, 6, 9)\ntest_tup2 = (5, 2, 3, 3)\nprint(and_tuples(test_tup1, test_tup2))",
+    "Mbpp/430": "    return -1 * a * (b ** 2) / (4 * c)",
+    "Mbpp/432": "    return (base1 + base2) / 2\n\nassert median_trapezium(15,25,35)==20",
+    "Mbpp/433": "    for i in arr:\n        if i > number:\n            return False\n    return True\n\nprint(check_greater([1, 2, 3, 4, 5], 4))",
+    "Mbpp/435": "    return n%10\n\nprint(last_Digit(123))",
+    "Mbpp/436": "    list2 = []\n    for i in list1:\n        if i < 0:\n            list2.append(i)\n    return list2\n\nprint(neg_nos([-1,4,5,-6]))",
+    "Mbpp/437": "    str2 = \"\"\n    for i in range(len(str1)):\n        if i % 2 == 0:\n            str2 += str1[i]\n    return str2\n\nprint(remove_odd(\"python\"))",
+    "Mbpp/439": "    return int(''.join(map(str, L)))",
+    "Mbpp/440": "    adverb = \"\"\n    adverb_position = []\n    for i in range(len(text)):\n        if text[i] == \" \":\n            adverb = text[i-1:i+1]\n            adverb_position.append(i-1)\n    return adverb, adverb_position, adverb\n\nprint(find_adverb_position(\"clearly!! we can see the sky\"))",
+    "Mbpp/441": "    return 6*l*l",
+    "Mbpp/445": "    res = []\n    for i in range(len(test_tup1)):\n        res.append(tuple([x * y for x, y in zip(test_tup1[i], test_tup2[i])]))\n    return res\n\ntest_tup1 = ((1, 3), (4, 5), (2, 9), (1, 10))\ntest_tup2 = ((6, 7), (3, 9), (1, 1), (7, 3))\n\nprint(index_multiplication(test_tup1, test_tup2))",
+    "Mbpp/446": "    count = 0\n    for i in lst:\n        for j in tup:\n            if i == j:\n                count += 1\n    return count\n\nprint(count_Occurrence(('a', 'a', 'c', 'b', 'd'),['a', 'b']))",
+    "Mbpp/447": "    return [num**3 for num in nums]\n\nassert cube_nums([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])==[1, 8, 27, 64, 125, 216, 343, 512, 729, 1000]",
+    "Mbpp/448": "    if n == 0:\n        return 0\n    elif n == 1:\n        return 1\n    elif n == 2:\n        return 3\n    else:\n        return cal_sum(n-2) + cal_sum(n-3) + cal_sum(n-5)",
+    "Mbpp/450": "    return [i for i in str1 if len(i) == l]\n\nprint(extract_string(['Python', 'list', 'exercises', 'practice', 'solution'] ,8))",
+    "Mbpp/451": "    return text1.replace(\" \", \"\")\n\nprint(remove_whitespaces(' Google    Flutter '))",
+    "Mbpp/453": "    sum = 0\n    for i in range(1, n+1):\n        if n % i == 0 and i % 2 == 0:\n            sum += i\n    return sum\n\nprint(sumofFactors(18))",
+    "Mbpp/454": "    return text.endswith('z')",
+    "Mbpp/455": "    if monthnum2 in [1,3,5,7,8,10,12]:\n        return True\n    elif monthnum2 in [4,6,9,11]:\n        return False\n    else:\n        return \"Invalid month number\"\n\nmonthnum2=int(input(\"Enter the month number: \"))\nprint(check_monthnumb_number(monthnum2))",
+    "Mbpp/456": "    return [i[::-1] for i in stringlist]\n\nprint(reverse_string_list(['Red', 'Green', 'Blue', 'White', 'Black']))",
+    "Mbpp/457": "    min = len(lst[0])\n    for i in lst:\n        if len(i) < min:\n            min = len(i)\n    return min\n\nprint(Find_Min([[1],[1,2],[1,2,3]]))",
+    "Mbpp/458": "    return l*b\n\nassert rectangle_area(10,20)==200",
+    "Mbpp/459": "    str2 = \"\"\n    for i in str1:\n        if i.isupper():\n            str2 += i\n    return str2\n\nprint(remove_uppercase('cAstyoUrFavoRitETVshoWs'))",
+    "Mbpp/460": "    return [sub[0] for sub in lst]\n\nprint(Extract([[1, 2], [3, 4, 5], [6, 7, 8, 9]]))",
+    "Mbpp/462": "    if len(list1) == 0:\n        return [[]]\n    else:\n        combinations = []\n        for i in range(len(list1)):\n            element = list1[i]\n            remaining_elements = list1[:i] + list1[i+1:]\n            for combination in combinations_list(remaining_elements):\n                combinations.append([element] + combination)\n        return combinations\n\nprint(combinations_list(['orange', 'red', 'green', 'blue']))",
+    "Mbpp/463": "    if len(arr) == 0:\n        return 0\n    if len(arr) == 1:\n        return arr[0]\n    max_product = arr[0]\n    min_product = arr[0]\n    result = arr[0]\n    for i in range(1, len(arr)):\n        if arr[i] < 0:\n            max_product, min_product = min_product, max_product\n        max_product = max(arr[i], max_product * arr[i])\n        min_product = min(arr[i], min_product * arr[i])\n        result = max(result, max_product)\n    return result\n\nprint(max_subarray_product([1, -2, -3, 0, 7, -8, -2]))",
+    "Mbpp/465": "    dict2 = {}\n    for key, value in dict1.items():\n        if value is not None:\n            dict2[key] = value\n    return dict2\n\nprint(drop_empty({'c1': 'Red', 'c2': 'Green', 'c3':None}))",
+    "Mbpp/468": "    if len(arr) == 0:\n        return 0\n    if len(arr) == 1:\n        return arr[0]\n    max_product = arr[0]\n    for i in range(1, len(arr)):\n        for j in range(i):\n            if arr[i] > arr[j]:\n                max_product = max(max_product, arr[i] * arr[j])\n    return max_product\n\nprint(max_product([3, 100, 4, 5, 150, 6]))",
+    "Mbpp/470": "    \"\"\"\n    Function to find the pairwise addition of the neighboring elements of the given tuple.\n    \"\"\"\n    result = []\n    for i in range(len(test_tup) - 1):\n        result.append(test_tup[i] + test_tup[i + 1])\n    return tuple(result)\n\n# Driver Code\ntest_tup = (1, 5, 7, 8, 10)\nprint(add_pairwise(test_tup))",
+    "Mbpp/471": "    product = 1\n    for i in arr:\n        product = (product * i) % n\n    return product\n\nprint(find_remainder([ 100, 10, 5, 25, 35, 14 ],11))",
+    "Mbpp/472": "    l.sort()\n    for i in range(len(l)-1):\n        if l[i]+1 != l[i+1]:\n            return False\n    return True\n\nprint(check_Consecutive([1,2,3,4,5]))",
+    "Mbpp/473": "    res = set()\n    for i in test_list1:\n        for j in test_list2:\n            if i == j:\n                res.add(i)\n    return res\n\ntest_list1 = [(3, 4), (5, 6), (9, 10), (4, 5)]\ntest_list2 = [(5, 4), (3, 4), (6, 5), (9, 11)]\nprint(tuple_intersection(test_list1, test_list2))",
+    "Mbpp/474": "    return str1.replace(ch, newch)\n\nprint(replace_char(\"polygon\",'y','l'))",
+    "Mbpp/475": "    return sorted(dict1.items(), key=lambda x: x[1], reverse=True)\n\nprint(sort_counter({'Math':81, 'Physics':83, 'Chemistry':87}))",
+    "Mbpp/476": "    return max(nums) + min(nums)\n\nprint(big_sum([1,2,3]))",
+    "Mbpp/477": "    return string.lower()\n\nprint(is_lower(\"InValid\"))",
+    "Mbpp/478": "    str2 = \"\"\n    for i in str1:\n        if i.isupper():\n            str2 += i\n    return str2\n\nprint(remove_lowercase(\"PYTHon\"))",
+    "Mbpp/479": "    while n>=10:\n        n=n/10\n    return int(n)\n\nprint(first_Digit(123))",
+    "Mbpp/554": "    return [i for i in l if i%2 != 0]\n\nprint(Split([1,2,3,4,5,6]))",
+    "Mbpp/555": "    sum1 = 0\n    sum2 = 0\n    for i in range(1,n+1):\n        sum1 = sum1 + i**3\n        sum2 = sum2 + i\n    return sum1 - sum2**3\n\nprint(difference(3))",
+    "Mbpp/556": "    count = 0\n    for i in range(N):\n        for j in range(i+1,N):\n            if (A[i] ^ A[j]) % 2 != 0:\n                count += 1\n    return count\n\nprint(find_Odd_Pair([5,4,7,2,1],5))",
+    "Mbpp/557": "    return string.swapcase()\n\nprint(toggle_string(\"Python\"))",
+    "Mbpp/558": "    n1 = str(n1)\n    n2 = str(n2)\n    if len(n1) > len(n2):\n        n2 = n2.zfill(len(n1))\n    elif len(n2) > len(n1):\n        n1 = n1.zfill(len(n2))\n    return sum([abs(int(n1[i]) - int(n2[i])) for i in range(len(n1))])",
+    "Mbpp/559": "    max_so_far = 0\n    max_ending_here = 0\n    for i in range(0, size):\n        max_ending_here = max_ending_here + a[i]\n        if max_ending_here < 0:\n            max_ending_here = 0\n        elif (max_so_far < max_ending_here):\n            max_so_far = max_ending_here\n    return max_so_far\n\nprint(max_sub_array_sum([-2, -3, 4, -1, -2, 1, 5, -3], 8))",
+    "Mbpp/56": "    rev = 0\n    temp = n\n    while temp > 0:\n        rev = rev * 10 + temp % 10\n        temp = temp // 10\n    return n == 2 * rev - 1\n\nprint(check(70))",
+    "Mbpp/560": "    return sorted(set(test_tup1 + test_tup2))\n\n\nprint(union_elements((3, 4, 5, 6), (5, 7, 4, 10)))",
+    "Mbpp/562": "    max_len = 0\n    for i in lst:\n        if len(i) > max_len:\n            max_len = len(i)\n    return max_len\n\nprint(Find_Max_Length([[1],[1,4],[5,6,7,8]]))",
+    "Mbpp/563": "    return [i[1:-1] for i in text.split(',')]\n\nprint(extract_values('\"Python\", \"PHP\", \"Java\"'))",
+    "Mbpp/564": "    count = 0\n    for i in range(n):\n        for j in range(i+1,n):\n            if arr[i] != arr[j]:\n                count += 1\n    return count\n\nprint(count_Pairs([1,2,1],3))",
+    "Mbpp/565": "    return [char for char in word]\n\nprint(split('python'))",
+    "Mbpp/566": "    if n == 0:\n        return 0\n    else:\n        return n % 10 + sum_digits(n // 10)",
+    "Mbpp/567": "    for i in range(len(list1)-1):\n        if list1[i] > list1[i+1]:\n            return False\n    return True\n\nprint(issort_list([1,2,4,6,8,10,12,14,16,17]))",
+    "Mbpp/568": "    return [{} for i in range(length)]\n\nprint(empty_list(5))",
+    "Mbpp/569": "    for i in range(len(list1)):\n        list1[i].sort()\n    return list1\n\nprint(sort_sublists([['green', 'orange'], ['black', 'white'], ['white', 'black', 'orange']]))",
+    "Mbpp/57": "    arr.sort(reverse=True)\n    return int(\"\".join(map(str,arr)))\n\nprint(find_Max_Num([1,2,3]))",
+    "Mbpp/572": "    return list(set(nums))\n\nprint(two_unique_nums([1,2,3,2,3,4,5]))",
+    "Mbpp/573": "    product = 1\n    for i in list_data:\n        if list_data.count(i) == 1:\n            product *= i\n    return product\n\nprint(unique_product([10, 20, 30, 40, 20, 50, 60, 40]))",
+    "Mbpp/576": "    if len(A) > len(B):\n        return False\n    for i in range(len(B) - len(A) + 1):\n        if A == B[i:i+len(A)]:\n            return True\n    return False\n\nprint(is_Sub_Array([1,4,3,5],[1,2]))",
+    "Mbpp/577": "    if n == 0:\n        return 1\n    elif n == 1:\n        return 1\n    else:\n        return (n * last_Digit_Factorial(n-1)) % 10\n\nprint(last_Digit_Factorial(4))",
+    "Mbpp/578": "    return [x for pair in zip(list1, list2, list3) for x in pair]",
+    "Mbpp/58": "    if x * y < 0:\n        return True\n    else:\n        return False\n\nprint(opposite_Signs(1,-2))",
+    "Mbpp/580": "    \"\"\"\n    Remove uneven elements in the nested mixed tuple.\n    \"\"\"\n    result = []\n    for item in test_tuple:\n        if isinstance(item, tuple):\n            result.append(extract_even(item))\n        elif isinstance(item, int) and item % 2 == 0:\n            result.append(item)\n    return tuple(result)",
+    "Mbpp/581": "    return b**2 + 2*b*s\n\nprint(surface_Area(3,4))",
+    "Mbpp/583": "    if num==0 or num==1:\n        return 1\n    else:\n        return catalan_number(num-1)*(4*num-2)/(num+1)\n\nprint(catalan_number(10))",
+    "Mbpp/585": "    return sorted(items, key=lambda x: x['price'], reverse=True)[:n]",
+    "Mbpp/586": "    return l[n:] + l[:n]\n\nprint(split_Arr([12,10,5,6,52,36],2))",
+    "Mbpp/587": "    return tuple(listx)\n\nprint(list_tuple([5, 10, 7, 4, 15, 3]))",
+    "Mbpp/588": "    return max(nums) - min(nums)\n\nprint(big_diff([1,2,3,4]))",
+    "Mbpp/589": "    return [i for i in range(a, b+1) if i**0.5 == int(i**0.5)]\n\nassert perfect_squares(1,30)==[1, 4, 9, 16, 25]",
+    "Mbpp/59": "    return (1 + (1 + 4 * n) ** 0.5) % 2 == 0",
+    "Mbpp/590": "    \"\"\"Convert polar coordinates to rectangular coordinates.\"\"\"\n    return (x * math.cos(y), x * math.sin(y))",
+    "Mbpp/591": "    newList[0], newList[-1] = newList[-1], newList[0]\n    return newList\n\nprint(swap_List([12, 35, 9, 56, 24]))",
+    "Mbpp/592": "    sum = 0\n    for i in range(0, n+1):\n        sum += (i*(n-i))\n    return sum\n\nprint(sum_Of_product(3))",
+    "Mbpp/593": "    ip = ip.split('.')\n    for i in range(len(ip)):\n        ip[i] = str(int(ip[i]))\n    return '.'.join(ip)\n\nprint(removezero_ip(\"216.08.094.196\"))",
+    "Mbpp/594": "    even = 0\n    odd = 0\n    for i in list1:\n        if i % 2 == 0:\n            even = i\n            break\n    for i in list1:\n        if i % 2 != 0:\n            odd = i\n            break\n    return even - odd\n\nprint(diff_even_odd([1,3,5,7,4,1,6,8]))",
+    "Mbpp/596": "    return sys.getsizeof(tuple_list)\n\nimport sys\nassert tuple_size((\"A\", 1, \"B\", 2, \"C\", 3) ) == sys.getsizeof((\"A\", 1, \"B\", 2, \"C\", 3))",
+    "Mbpp/597": "    if len(arr1) == 0:\n        return arr2[k-1]\n    if len(arr2) == 0:\n        return arr1[k-1]\n    if k == 1:\n        return min(arr1[0], arr2[0])\n    if arr1[k//2-1] < arr2[k//2-1]:\n        return find_kth(arr1[k//2:], arr2, k-k//2)\n    else:\n        return find_kth(arr1, arr2[k//2:], k-k//2)",
+    "Mbpp/598": "    sum = 0\n    temp = number\n    while temp > 0:\n        digit = temp % 10\n        sum += digit ** 3\n        temp //= 10\n    if number == sum:\n        return True\n    else:\n        return False\n\nprint(armstrong_number(153))",
+    "Mbpp/6": "    \"\"\"\n    Check whether the two numbers differ at one bit position only or not.\n    :param a: int\n    :param b: int\n    :return: bool\n    \"\"\"\n    return bin(a ^ b).count('1') == 1\n\nassert differ_At_One_Bit_Pos(13,9) == True\nassert differ_At_One_Bit_Pos(13,13) == False\nassert differ_At_One_Bit_Pos(13,14) == True\nassert differ_At_One_Bit_Pos(13,15) == True\nassert differ_At_One_Bit_Pos(13,16) == False\nassert differ_At_One_Bit_Pos(13,17) == True\nassert differ_At_One_Bit_Pos(13,18) == True\nassert differ_At_One_Bit_Pos(13,19) == True\nassert differ_At_One_Bit_Pos(13,20) == False\nassert differ_At_One_Bit_Pos(13,21) == True\nassert differ_At_One_Bit_Pos(13,22) == True\nassert differ_At_One_Bit_Pos(13,23) == True",
+    "Mbpp/600": "    if n%2==0:\n        return True\n    else:\n        return False\n\nassert is_Even(1) == False\nassert is_Even(2) == True\nassert is_Even(3) == False\nassert is_Even(4) == True\nassert is_Even(5) == False\nassert is_Even(6) == True\nassert is_Even(7) == False\nassert is_Even(8) == True\nassert is_Even(9) == False\nassert is_Even(10) == True\nassert is_Even(11) == False\nassert is_Even(12) == True\nassert is_Even(13) == False\nassert is_Even(14) == True\nassert is_Even(15) == False\nassert is_Even(16) == True\nassert is_Even(17) == False\nassert is_Even(18) == True\nassert is_Even(19) == False\nassert is_Even(20) == True\nassert is_Even(21) == False\nassert is_Even(22) == True\nassert is_Even",
+    "Mbpp/602": "    for i in range(len(str1)):\n        if str1[i] in str1[:i]:\n            return str1[i]\n    return \"None\"\n\nprint(first_repeated_char(\"abcabc\"))",
+    "Mbpp/603": "    ludic = []\n    for i in range(1, n+1):\n        if i % 2 == 0 or i % 3 == 0 or i % 5 == 0 or i % 7 == 0:\n            continue\n        else:\n            ludic.append(i)\n    return ludic\n\nprint(get_ludic(10))",
+    "Mbpp/604": "    return \" \".join(s.split()[::-1])\n\nprint(reverse_words(\"python program\"))",
+    "Mbpp/605": "    if num > 1:\n        for i in range(2, num):\n            if (num % i) == 0:\n                return False\n        return True\n    else:\n        return False\n\nprint(prime_num(13))",
+    "Mbpp/606": "    return degree * 3.141592653589793 / 180\n\nprint(radian_degree(90))",
+    "Mbpp/607": "    import re\n    match = re.search(pattern, text)\n    if match:\n        return match.group(), match.start(), match.end()\n    else:\n        return None\n\nprint(find_literals('The quick brown fox jumps over the lazy dog.', 'fox'))",
+    "Mbpp/608": "    bell = [[0 for i in range(n+1)] for j in range(n+1)]\n    bell[0][0] = 1\n    for i in range(1, n+1):\n        bell[i][0] = bell[i-1][i-1]\n        for j in range(1, i+1):\n            bell[i][j] = bell[i-1][j-1] + bell[i][j-1]\n    return bell[n][0]\n\nprint(bell_Number(2))",
+    "Mbpp/61": "    count = 0\n    for i in range(len(s)):\n        for j in range(i, len(s)):\n            if sum(int(digit) for digit in s[i:j+1]) == len(s[i:j+1]):\n                count += 1\n    return count\n\nprint(count_Substrings('112112'))",
+    "Mbpp/610": "    list1.pop(k-1)\n    return list1\n\nprint(remove_kth_element([1,1,2,3,4,4,5,1],3))",
+    "Mbpp/611": "    max = test_list[0][N]\n    for i in range(1, len(test_list)):\n        if test_list[i][N] > max:\n            max = test_list[i][N]\n    return max\n\nprint(max_of_nth([[5, 6, 7], [1, 3, 5], [8, 9, 19]], 2))",
+    "Mbpp/612": "    return [lst[i][0] for i in range(len(lst))], [lst[i][1] for i in range(len(lst))]",
+    "Mbpp/614": "    result = 0\n    for i in test_list:\n        for j in i:\n            result += j\n    return result\n\nprint(cummulative_sum([(1, 3), (5, 6, 7), (2, 6)]))",
+    "Mbpp/615": "    return [sum(x)/len(x) for x in zip(*nums)]\n\nprint(average_tuple(((10, 10, 10, 12), (30, 45, 56, 45), (81, 80, 39, 32), (1, 2, 3, 4))))",
+    "Mbpp/616": "    \"\"\"\n    Function which takes two tuples of the same length and performs the element wise modulo.\n    \"\"\"\n    return tuple([x % y for x, y in zip(test_tup1, test_tup2)])",
+    "Mbpp/618": "    return [x / y for x, y in zip(nums1, nums2)]",
+    "Mbpp/619": "    # Initialize a list to store the numbers\n    num_list = []\n    # Initialize a list to store the non-numbers\n    non_num_list = []\n    # Iterate through the string\n    for char in test_str:\n        # If the character is a number, add it to the num_list\n        if char.isdigit():\n            num_list.append(char)\n        # If the character is not a number, add it to the non_num_list\n        else:\n            non_num_list.append(char)\n    # Join the num_list and non_num_list and return the result\n    return ''.join(num_list + non_num_list)\n\n# Test the function\nprint(move_num('I1love143you55three3000thousand'))",
+    "Mbpp/62": "    return min(xs)\n\nassert smallest_num([10, 20, 1, 45, 99]) == 1",
+    "Mbpp/620": "    a.sort()\n    n = len(a)\n    dp = [1] * n\n    for i in range(1, n):\n        for j in range(i):\n            if a[i] % a[j] == 0:\n                dp[i] = max(dp[i], dp[j] + 1)\n    return max(dp)",
+    "Mbpp/622": "    if n % 2 == 0:\n        return (get_kth(arr1, arr2, n//2) + get_kth(arr1, arr2, n//2 + 1)) / 2\n    else:\n        return get_kth(arr1, arr2, n//2 + 1)\n\ndef get_kth(arr1, arr2, k):\n    if len(arr1) == 0:\n        return arr2[k - 1]\n    if len(arr2) == 0:\n        return arr1[k - 1]\n    if k == 1:\n        return min(arr1[0], arr2[0])\n    i = min(len(arr1), k//2)\n    j = min(len(arr2), k//2)\n    if arr1[i - 1] < arr2[j - 1]:\n        return get_kth(arr1[i:], arr2, k - i)\n    else:\n        return get_kth(arr1, arr2[j:], k - j)\n\nif __name__ == \"__main__\":\n    print(get_median([1, 12, 15, 26, 38], [2, 13, 17,",
+    "Mbpp/623": "    return [num**n for num in nums]",
+    "Mbpp/624": "    return string.upper()\n\nprint(is_upper(\"person\"))",
+    "Mbpp/626": "    if r < 0:\n        return None\n    else:\n        return 0.25 * r * r * 3.14\n\nprint(triangle_area(-1))",
+    "Mbpp/628": "    return string.replace(\" \", \"%20\")\n\nprint(replace_spaces(\"My Name is Dawood\"))",
+    "Mbpp/629": "    l1 = []\n    for i in l:\n        if i%2 == 0:\n            l1.append(i)\n    return l1\n\nprint(Split([1,2,3,4,5]))",
+    "Mbpp/63": "    max_diff = 0\n    for i in range(len(test_list)):\n        for j in range(i+1, len(test_list)):\n            diff = abs(test_list[i][0] - test_list[j][0])\n            if diff > max_diff:\n                max_diff = diff\n    return max_diff\n\nprint(max_difference([(3, 5), (1, 7), (10, 3), (1, 2)]))",
+    "Mbpp/631": "    return text.replace(' ', '_').replace('_', ' ')",
+    "Mbpp/632": "    \"\"\"\n    Move all zeroes to the end of the given list.\n    :param num_list: list of numbers\n    :return: list of numbers\n    \"\"\"\n    for i in range(len(num_list)):\n        if num_list[i] == 0:\n            num_list.append(num_list.pop(i))\n    return num_list\n\ndef test_move_zero():\n    assert move_zero([1,0,2,0,3,4]) == [1,2,3,4,0,0]\n    assert move_zero([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,",
+    "Mbpp/633": "    xor_sum = 0\n    for i in range(n):\n        for j in range(i+1, n):\n            xor_sum += (arr[i] ^ arr[j])\n    return xor_sum\n\nprint(pair_xor_Sum([5,9,7,6],4))",
+    "Mbpp/635": "    # Your code here\n    pass",
+    "Mbpp/637": "    if actual_cost == sale_amount:\n        return True\n    else:\n        return False\n\nassert noprofit_noloss(1500,1200)==False\nassert noprofit_noloss(1500,1500)==True\nassert noprofit_noloss(1500,1501)==False\nassert noprofit_noloss(1500,1500.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "Mbpp/638": "    return round(13.12 + 0.6215 * t - 11.37 * v ** 0.16 + 0.3965 * t * v ** 0.16)",
+    "Mbpp/639": "    sum = 0\n    for name in sample_names:\n        if name[0].isupper():\n            sum += len(name)\n    return sum\n\nprint(sample_nam(['sally', 'Dylan', 'rebecca', 'Diana', 'Joanne', 'keith']))",
+    "Mbpp/64": "    subjectmarks.sort(key=lambda x:x[1])\n    return subjectmarks\n\nsubjectmarks=[('English', 88), ('Science', 90), ('Maths', 97), ('Social sciences', 82)]\nprint(subject_marks(subjectmarks))",
+    "Mbpp/641": "    \"\"\"\n    Returns True if n is a nonagonal number, False otherwise.\n    \"\"\"\n    if n < 1:\n        return False\n    else:\n        return (1 + (1 + 40 * n)**0.5) % 6 == 0\n\ndef nth_nonagonal(n):\n    \"\"\"\n    Returns the nth nonagonal number.\n    \"\"\"\n    if n < 1:\n        return None\n    else:\n        return (1 + (1 + 40 * n)**0.5) // 6\n\ndef test_is_nonagonal():\n    assert is_nonagonal(10) == True\n    assert is_nonagonal(11) == False\n    assert is_nonagonal(12) == True\n    assert is_nonagonal(13) == False\n    assert is_nonagonal(14) == True\n    assert is_nonagonal(15) == False\n    assert is_nonagonal(16) == True\n    assert is_nonagonal(17) == False\n    assert is_nonagonal(18) == True\n    assert is_nonagonal(19) == False\n    assert is_nonagonal(20) == True\n    assert is_nonagonal(2",
+    "Mbpp/643": "    if text[0] == \"z\" or text[-1] == \"z\":\n        return False\n    else:\n        return True\n\nprint(text_match_wordz_middle(\"pythonzabc.\"))",
+    "Mbpp/644": "    return input[:k][::-1] + input[k:]\n\nprint(reverse_Array_Upto_K([1, 2, 3, 4, 5, 6],4))",
+    "Mbpp/65": "    sum = 0\n    for item in data_list:\n        if type(item) == list:\n            sum += recursive_list_sum(item)\n        else:\n            sum += item\n    return sum\n\nprint(recursive_list_sum(([1, 2, [3,4],[5,6]])))",
+    "Mbpp/66": "    count = 0\n    for i in l:\n        if i > 0:\n            count += 1\n    return count\n\nprint(pos_count([1,-2,3,-4]))",
+    "Mbpp/67": "    if n==0:\n        return 1\n    else:\n        return sum([bell_number(n-i) for i in range(1,n+1)])\n\nprint(bell_number(2))",
+    "Mbpp/68": "    return (all(A[i] <= A[i + 1] for i in range(len(A) - 1)) or\n            all(A[i] >= A[i + 1] for i in range(len(A) - 1)))",
+    "Mbpp/69": "    if s in l:\n        return True\n    else:\n        return False\n\nprint(is_sublist([2,4,3,5,7],[3,7]))",
+    "Mbpp/7": "    return [word for word in text.split() if len(word) >= 4]",
+    "Mbpp/70": "    if len(Input) == 0:\n        return True\n    else:\n        return len(Input[0]) == len(Input[1]) and get_equal(Input[1:])\n\nprint(get_equal([(11, 22, 33), (44, 55, 66)]))",
+    "Mbpp/71": "    gap = len(nums)\n    shrink = 1.3\n    sorted = False\n    while not sorted:\n        gap = int(gap/shrink)\n        if gap > 1:\n            sorted = False\n        else:\n            gap = 1\n            sorted = True\n        i = 0\n        while i + gap < len(nums):\n            if nums[i] > nums[i + gap]:\n                nums[i], nums[i + gap] = nums[i + gap], nums[i]\n                sorted = False\n            i += 1\n    return nums\n\nprint(comb_sort([5, 15, 37, 25, 79]))",
+    "Mbpp/72": "    for i in range(1,n):\n        if i**2 + (n-i)**2 == n:\n            return True\n    return False\n\nprint(dif_Square(5))",
+    "Mbpp/720": "    return test_tup + (test_dict,)\n\nprint(add_dict_to_tuple((4, 5, 6), {\"MSAM\" : 1, \"is\" : 2, \"best\" : 3}))",
+    "Mbpp/721": "    n = len(cost)\n    dp = [[0 for _ in range(n)] for _ in range(n)]\n    dp[0][0] = cost[0][0]\n    for i in range(1, n):\n        dp[0][i] = dp[0][i-1] + cost[0][i]\n        dp[i][0] = dp[i-1][0] + cost[i][0]\n    for i in range(1, n):\n        for j in range(1, n):\n            dp[i][j] = max(dp[i-1][j], dp[i][j-1]) + cost[i][j]\n    return dp[n-1][n-1]/(n*n)",
+    "Mbpp/722": "    return {k: v for k, v in students.items() if v[0] > h and v[1] > w}\n\nprint(filter_data({'Cierra Vega': (6.2, 70), 'Alden Cantrell': (5.9, 65), 'Kierra Gentry': (6.0, 68), 'Pierre Cox': (5.8, 66)},6.0,70))",
+    "Mbpp/723": "    count = 0\n    for i in range(len(nums1)):\n        if nums1[i] == nums2[i]:\n            count += 1\n    return count",
+    "Mbpp/724": "    return sum([int(i) for i in str(base**power)])",
+    "Mbpp/725": "    text2 = text1.split('\"')\n    text3 = text2[1::2]\n    return text3\n\nprint(extract_quotation('Cortex \"A53\" Based \"multi\" tasking \"Processor\"'))",
+    "Mbpp/726": "    # your code here\n    return None",
+    "Mbpp/728": "    return [x + y for x, y in zip(lst1, lst2)]",
+    "Mbpp/730": "    if len(nums) == 0:\n        return []\n    result = [nums[0]]\n    for i in range(1, len(nums)):\n        if nums[i] != nums[i-1]:\n            result.append(nums[i])\n    return result\n\nprint(consecutive_duplicates([0, 0, 1, 2, 3, 4, 4, 5, 6, 6, 6, 7, 8, 9, 4, 4 ]))",
+    "Mbpp/731": "    return 2 * 3.14 * r * h\n\nprint(lateralsurface_cone(5,12))",
+    "Mbpp/732": "    return text.replace(' ', ':').replace(',', ':').replace('.', ':')\n\nprint(replace_specialchar('Python language, Programming language.'))",
+    "Mbpp/733": "    left = 0\n    right = len(A) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if A[mid] == x:\n            if mid == 0 or A[mid - 1] != x:\n                return mid\n            else:\n                right = mid - 1\n        elif A[mid] < x:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\nif __name__ == \"__main__\":\n    assert find_first_occurrence([2, 5, 5, 5, 6, 6, 8, 9, 9, 9], 5) == 1\n    assert find_first_occurrence([2, 5, 5, 5, 6, 6, 8, 9, 9, 9], 6) == 4\n    assert find_first_occurrence([2, 5, 5, 5, 6, 6, 8, 9, 9, 9], 7) == -1\n    assert find_first_occurrence([2, 5, 5",
+    "Mbpp/735": "    return n ^ (n >> 1) ^ 1\n\nprint(toggle_middle_bits(9))",
+    "Mbpp/736": "    for i in range(len(a)):\n        if a[i] >= x:\n            return i\n    return len(a)\n\nassert left_insertion([1,2,4,5],6)==4",
+    "Mbpp/739": "    i = 1\n    while True:\n        if i*(i+1)/2 >= 10**(n-1):\n            return i\n        i += 1\n\nprint(find_Index(2))",
+    "Mbpp/74": "    if len(colors) != len(patterns):\n        return False\n    for i in range(len(colors)):\n        if colors[i] != patterns[i]:\n            return False\n    return True",
+    "Mbpp/740": "    res = {}\n    for i in range(0, len(test_tup), 2):\n        res[test_tup[i]] = test_tup[i+1] if i+1 < len(test_tup) else None\n    return res\n\nprint(tuple_to_dict((1, 5, 7, 10, 13, 5)))",
+    "Mbpp/741": "    return len(set(s)) == 1\n\nprint(all_Characters_Same(\"python\"))",
+    "Mbpp/742": "    return (side**3 * (2**0.5))/12\n\nassert area_tetrahedron(3)==15.588457268119894",
+    "Mbpp/743": "    return l[m:] + l[:m]\n\nprint(rotate_right([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],3))",
+    "Mbpp/744": "    for i in test_tup:\n        if i is None:\n            return True\n    return False\n\nprint(check_none((10, 4, 5, 6, None)))",
+    "Mbpp/745": "    result = []\n    for i in range(startnum, endnum+1):\n        if all(int(digit) != 0 and i % int(digit) == 0 for digit in str(i)):\n            result.append(i)\n    return result\n\nprint(divisible_by_digits(1,22))",
+    "Mbpp/748": "    str2 = str1[0].upper()\n    for i in range(1, len(str1)):\n        if str1[i-1] == \" \":\n            str2 += str1[i].upper()\n        else:\n            str2 += str1[i]\n    return str2\n\nprint(capital_words_spaces(\"Python\"))",
+    "Mbpp/749": "    nums = [int(num) for num in nums_str]\n    nums.sort()\n    return nums\n\nassert sort_numeric_strings( ['4','12','45','7','0','100','200','-12','-500'])==[-500, -12, 0, 4, 7, 12, 45, 100, 200]",
+    "Mbpp/75": "    res = []\n    for i in test_list:\n        if all(i[j] % K == 0 for j in range(len(i))):\n            res.append(i)\n    return res\n\nprint(find_tuples([(6, 24, 12), (7, 9, 6), (12, 18, 21)], 6))",
+    "Mbpp/750": "    test_list.extend(test_tup)\n    return test_list\n\nassert add_tuple([5, 6, 7], (9, 10)) == [5, 6, 7, 9, 10]",
+    "Mbpp/751": "    n = len(arr)\n    for i in range(n):\n        if 2*i + 1 < n and arr[i] > arr[2*i + 1]:\n            return False\n        if 2*i + 2 < n and arr[i] > arr[2*i + 2]:\n            return False\n    return True\n\nprint(check_min_heap([1, 2, 3, 4, 5, 6]))",
+    "Mbpp/752": "    if n == 0:\n        return 0\n    elif n == 1:\n        return 1\n    else:\n        return jacobsthal_num(n-1) + 2*jacobsthal_num(n-2)",
+    "Mbpp/753": "    \"\"\"\n    :param test_list: list of tuples\n    :param K: number of records to be returned\n    :return: list of tuples\n    \"\"\"\n    return sorted(test_list, key=lambda x: x[1])[:K]\n\n\nif __name__ == '__main__':\n    test_list = [('Manjeet', 10), ('Akshat', 4), ('Akash', 2), ('Nikhil', 8)]\n    K = 2\n    print(min_k(test_list, K))",
+    "Mbpp/754": "    return [i for i in l1 if i in l2 and i in l3]",
+    "Mbpp/755": "    numbers.sort()\n    return numbers[1]\n\nprint(second_smallest([1, 2, -8, -2, 0, -2]))",
+    "Mbpp/757": "    count = 0\n    for i in range(len(test_list)):\n        for j in range(i+1, len(test_list)):\n            if test_list[i] == test_list[j][::-1]:\n                count += 1\n    return count\n\nprint(count_reverse_pairs([\"julia\", \"best\", \"tseb\", \"for\", \"ailuj\"]))",
+    "Mbpp/758": "    dict1 = {}\n    for i in list1:\n        if i not in dict1:\n            dict1[i] = 1\n        else:\n            dict1[i] += 1\n    return dict1\n\nprint(unique_sublists([[1, 3], [5, 7], [1, 3], [13, 15, 17], [5, 7], [9, 11]] ))",
+    "Mbpp/759": "    try:\n        float(num)\n        if len(num.split('.')[1]) == 2:\n            return True\n        else:\n            return False\n    except ValueError:\n        return False\n\nprint(is_decimal('123.11'))",
+    "Mbpp/760": "    if len(set(arr)) == 1:\n        return True\n    else:\n        return False\n\nprint(unique_Element([1,1,1]))",
+    "Mbpp/762": "    if monthnum3==4 or monthnum3==6 or monthnum3==9 or monthnum3==11:\n        return True\n    else:\n        return False\n\n\nmonthnum3=int(input(\"Enter the month number:\"))\nprint(check_monthnumber_number(monthnum3))",
+    "Mbpp/763": "    arr.sort()\n    min_diff = arr[1] - arr[0]\n    for i in range(1, n):\n        diff = arr[i] - arr[i-1]\n        if diff < min_diff:\n            min_diff = diff\n    return min_diff\n\nprint(find_min_diff((1,5,3,19,18,25),6))",
+    "Mbpp/764": "    count = 0\n    for i in s:\n        if i.isdigit():\n            count += 1\n    return count\n\nprint(number_ctr('program2bedone'))",
+    "Mbpp/765": "    if n == 1:\n        return 2\n    if n == 2:\n        return 4\n    if n == 3:\n        return 6\n    if n == 4:\n        return 8\n    if n == 5:\n        return 10\n    if n == 6:\n        return 12\n    if n == 7:\n        return 14\n    if n == 8:\n        return 16\n    if n == 9:\n        return 18\n    if n == 10:\n        return 20\n    if n == 11:\n        return 22\n    if n == 12:\n        return 24\n    if n == 13:\n        return 26\n    if n == 14:\n        return 28\n    if n == 15:\n        return 30\n    if n == 16:\n        return 32\n    if n == 17:\n        return 34\n    if n == 18:\n        return 36\n    if n == 19:\n        return 38\n    if n",
+    "Mbpp/766": "    l2 = []\n    for i in range(len(l1)-1):\n        l2.append((l1[i],l1[i+1]))\n    return l2\n\nprint(pair_wise([1,1,2,3,3,4,4,5]))",
+    "Mbpp/767": "    count = 0\n    for i in range(len(arr)):\n        for j in range(i+1, len(arr)):\n            if arr[i] + arr[j] == sum_:\n                count += 1\n    return count\n\nprint(get_pairs_count([1,1,1,1],2))",
+    "Mbpp/77": "    if n % 11 == 0:\n        return True\n    else:\n        return False\n\nprint(is_Diff(12345))",
+    "Mbpp/770": "    sum = 0\n    for i in range(1, n*2, 2):\n        sum += i**4\n    return sum\n\nprint(odd_num_sum(2))",
+    "Mbpp/771": "    stack = []\n    for i in exp:\n        if i in ['{', '[', '(']:\n            stack.append(i)\n        else:\n            if len(stack) == 0:\n                return False\n            if i == '}' and stack[-1] == '{':\n                stack.pop()\n            elif i == ']' and stack[-1] == '[':\n                stack.pop()\n            elif i == ')' and stack[-1] == '(':\n                stack.pop()\n            else:\n                return False\n    if len(stack) == 0:\n        return True\n    else:\n        return False\n\nprint(check_expression(\"{()}[{}]\"))",
+    "Mbpp/772": "    return ' '.join([word for word in test_str.split() if len(word) != K])\n\nprint(remove_length('The person is most value tet', 3))",
+    "Mbpp/773": "    if pattern in text:\n        return (pattern, text.index(pattern), text.index(pattern) + len(pattern))\n    else:\n        return None\n\nprint(occurance_substring('python programming, python language','python'))",
+    "Mbpp/775": "    for i in range(1, len(nums), 2):\n        if nums[i] % 2 == 0:\n            return False\n    return True\n\nprint(odd_position([2,1,4,3,6,7,6,3]))",
+    "Mbpp/777": "    sum = 0\n    for i in arr:\n        if arr.count(i) == 1:\n            sum += i\n    return sum\n\nprint(find_sum([1,2,3,1,1,4,5,6]))",
+    "Mbpp/778": "    list2 = []\n    for i in list1:\n        if i not in list2:\n            list2.append(i)\n        else:\n            list2[-1].append(i)\n    return list2\n\nprint(pack_consecutive_duplicates([0, 0, 1, 2, 3, 4, 4, 5, 6, 6, 6, 7, 8, 9, 4, 4]))",
+    "Mbpp/780": "    result = []\n    for i in range(len(test_list)):\n        for j in range(i+1, len(test_list)):\n            result.append((test_list[i][0] + test_list[j][0], test_list[i][1] + test_list[j][1]))\n    return result\n\nprint(find_combinations([(2, 4), (6, 7), (5, 1), (6, 10)]))",
+    "Mbpp/781": "    count = 0\n    for i in range(1, n+1):\n        if n % i == 0:\n            count += 1\n    return count\n\nprint(count_divisors(10))",
+    "Mbpp/782": "    sum = 0\n    for i in range(1, len(arr)+1, 2):\n        for j in range(len(arr)-i+1):\n            sum += sum_subarray(arr, j, i)\n    return sum\n\ndef sum_subarray(arr, start, length):\n    sum = 0\n    for i in range(start, start+length):\n        sum += arr[i]\n    return sum\n\nprint(odd_length_sum([1,2,4]))",
+    "Mbpp/784": "    even = 0\n    odd = 0\n    for i in list1:\n        if i % 2 == 0:\n            even = i\n        else:\n            odd = i\n    return even * odd\n\nprint(mul_even_odd([1,3,5,7,4,1,6,8]))",
+    "Mbpp/785": "    \"\"\"\n    Convert tuple string to integer tuple\n    :param test_str: tuple string\n    :return: integer tuple\n    \"\"\"\n    return tuple(int(i) for i in test_str[1:-1].split(','))\n\nif __name__ == '__main__':\n    assert tuple_str_int(\"(7, 8, 9)\") == (7, 8, 9)",
+    "Mbpp/786": "    for i in range(len(a)):\n        if a[i] > x:\n            return i\n    return len(a)\n\n\nprint(right_insertion([1,2,4,5],6))",
+    "Mbpp/787": "    return text.startswith('abbb')",
+    "Mbpp/788": "    return tuple(test_list + list(test_str))\n\n\nprint(new_tuple([\"WEB\", \"is\"], \"best\"))",
+    "Mbpp/79": "    if len(s)%2==0:\n        return False\n    else:\n        return True\nprint(word_len(\"Hadoop\"))",
+    "Mbpp/790": "    for i in range(0, len(nums), 2):\n        if nums[i] % 2 != 0:\n            return False\n    return True\n\nprint(even_position([3,2,1]))",
+    "Mbpp/791": "    res = []\n    for ele in test_tup:\n        if type(ele) == tuple:\n            res.append(ele)\n    return res\n\nprint(remove_nested((1, 5, 7, (4, 6), 10)))",
+    "Mbpp/792": "    count = 0\n    for i in input_list:\n        if type(i) == list:\n            count += 1\n    return count\n\nprint(count_list([[1, 3], [5, 7], [9, 11], [13, 15, 17]]))",
+    "Mbpp/796": "    return sum(d.values())",
+    "Mbpp/797": "    sum = 0\n    for i in range(l, r+1):\n        if i % 2 != 0:\n            sum += i\n    return sum\n\nprint(sum_in_range(2,5))",
+    "Mbpp/798": "    sum = 0\n    for i in arr:\n        sum += i\n    return sum\n\nprint(_sum([1, 2, 3]))",
+    "Mbpp/799": "    return (n << d) | (n >> (32 - d))",
+    "Mbpp/8": "    return [num ** 2 for num in nums]\n\nassert square_nums([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])==[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]",
+    "Mbpp/80": "    return n*(n+1)*(n+2)/6\n\nprint(tetrahedral_number(5))",
+    "Mbpp/800": "    return text.replace(\" \", \"\")\n\nprint(remove_all_spaces(\"python  program\"))",
+    "Mbpp/801": "    if x == y == z:\n        return 3\n    elif x == y or y == z or x == z:\n        return 2\n    else:\n        return 0\n\nprint(test_three_equal(1,1,1))",
+    "Mbpp/803": "    if n < 0:\n        return False\n    x = n\n    while x * x > n:\n        x = (x + n // x) // 2\n    return x * x == n\n\nprint(is_perfect_square(10))",
+    "Mbpp/804": "    product = 1\n    for i in arr:\n        product *= i\n    return product % 2 == 0\n\nprint(is_product_even([1,2,3]))",
+    "Mbpp/805": "    max_sum = 0\n    max_sum_list = []\n    for list in lists:\n        sum = 0\n        for element in list:\n            sum += element\n        if sum > max_sum:\n            max_sum = sum\n            max_sum_list = list\n    return max_sum_list\n\nprint(max_sum_list([[1,2,3], [4,5,6], [10,11,12], [7,8,9]]))",
+    "Mbpp/806": "    max_run = 0\n    current_run = 0\n    for i in test_str:\n        if i.isupper():\n            current_run += 1\n        else:\n            current_run = 0\n        if current_run > max_run:\n            max_run = current_run\n    return max_run\n\nprint(max_run_uppercase('GeMKSForGERksISBESt'))",
+    "Mbpp/807": "    for num in nums:\n        if num % 2 != 0:\n            return num\n    return None\n\nprint(first_odd([1,3,5]))",
+    "Mbpp/808": "    for i in test_tup:\n        if i == K:\n            return True\n    return False\n\nprint(check_K((10, 4, 5, 6, 8), 6))",
+    "Mbpp/809": "    return all(x < y for x, y in zip(test_tup1, test_tup2))\n\nprint(check_smaller((1, 2, 3), (2, 3, 4)))",
+    "Mbpp/82": "    return 4/3 * 3.14 * r**3",
+    "Mbpp/84": "    if n == 1:\n        return 1\n    elif n == 2:\n        return 1\n    else:\n        return sequence(sequence(n-1)) + sequence(n - sequence(n-1))",
+    "Mbpp/85": "    return 4 * 3.14 * r**2",
+    "Mbpp/86": "    return n * (2 * n - 1) + 1\n\nprint(centered_hexagonal_number(10))",
+    "Mbpp/87": "    return {**dict1, **dict2, **dict3}",
+    "Mbpp/88": "    dict1 = {}\n    for i in list1:\n        if i in dict1:\n            dict1[i] += 1\n        else:\n            dict1[i] = 1\n    return dict1\n\nprint(freq_count([10,10,10,10,20,20,20,20,40,40,50,50,30]))",
+    "Mbpp/89": "    if N == 0:\n        return 0\n    else:\n        return closest_num(N-1) - 1\n\nprint(closest_num(11))",
+    "Mbpp/9": "    if len(s) == 0:\n        return 0\n    else:\n        return 1 + find_Rotations(s[1:] + s[0])\n\nprint(find_Rotations(\"aaaa\"))",
+    "Mbpp/90": "    max = 0\n    for i in list1:\n        if len(i) > max:\n            max = len(i)\n    return max\n\nprint(len_log([\"python\",\"PHP\",\"bigdata\"]))",
+    "Mbpp/91": "    if sub_str in str1:\n        return True\n    else:\n        return False\n\nprint(find_substring([\"red\", \"black\", \"white\", \"green\", \"orange\"],\"ack\"))",
+    "Mbpp/92": "    \"\"\"\n    >>> is_undulating(1212121)\n    True\n    >>> is_undulating(1221)\n    False\n    >>> is_undulating(123123)\n    True\n    >>> is_undulating(123123123)\n    True\n    >>> is_undulating(123123123123)\n    True\n    >>> is_undulating(123123123123123)\n    True\n    >>> is_undulating(123123123123123123)\n    True\n    >>> is_undulating(123123123123123123123)\n    True\n    >>> is_undulating(123123123123123123123123)\n    True\n    >>> is_undulating(123123123123123123123123123)\n    True\n   ",
+    "Mbpp/93": "    return a**b\n\nassert power(3,4) == 81",
+    "Mbpp/94": "    min_val = min(test_list, key=lambda x: x[1])\n    return min_val[0]\n\nprint(index_minimum([('Rash', 143), ('Manjeet', 200), ('Varsha', 100)]))",
+    "Mbpp/95": "    return min(len(i) for i in lst)\n\nprint(Find_Min_Length([[1],[1,2]]))",
+    "Mbpp/96": "    count = 0\n    for i in range(1, n+1):\n        if n % i == 0:\n            count += 1\n    return count\n\nprint(divisor(15))",
+    "Mbpp/97": "    dict1 = {}\n    for i in list1:\n        for j in i:\n            if j in dict1:\n                dict1[j] += 1\n            else:\n                dict1[j] = 1\n    return dict1\n\nprint(frequency_lists([[1, 2, 3, 2], [4, 5, 6, 2], [7, 8, 9, 5]]))",
+    "Mbpp/98": "    product = 1\n    for num in numbers:\n        product *= num\n    return product / len(numbers)\n\nprint(multiply_num((8, 2, 3, -1, 7)))",
+    "Mbpp/99": "    return bin(n)[2:]"
+  }
+}
