@@ -90,7 +90,7 @@ def test_a_correct_solution_passes_both_ways() -> None:
     result = _compare({"Mbpp/9001": CORRECT})
     s = result["summary"]
     assert s["ours"] == s["evalplus"] == {"visible": 1, "full": 1}
-    assert s["agree"], s["parity_holds"] == (1, True)
+    assert (s["agree"], s["parity_holds"]) == (1, True)
     assert result["per_problem"]["Mbpp/9001"]["relaxed"] is None  # no re-check needed
 
 

@@ -16,10 +16,103 @@ import pytest
 
 from codeexec.eval.gap import ProblemResult
 from codeexec.eval.measure_model import build_report, frozen_100_ids, main, parse_args
-from codeexec.rewards.harness import TestResult
+from codeexec.rewards.harness import TestCases, TestResult
+from codeexec.tasks.problem import Problem
+from codeexec.tasks.problem import TestCase as Case
 
 HASH = "df3ce67c0e24480f20468b6ef2894622d69eb73b"
 CONFIG = Path(__file__).resolve().parents[1] / "configs" / "grpo.toml"
+
+
+# --------------------------------------------------------------------------- #
+# --completions: ADR-015's regrade of saved completions, with no model
+# --------------------------------------------------------------------------- #
+def _add_problem(task_id: str) -> Problem:
+    return Problem(
+        task_id=task_id,
+        source="mbpp",
+        prompt='"""Add two numbers."""',
+        entry_point="add",
+        canonical_solution="def add(a, b):\n    return a + b\n",
+        visible_tests=(Case((2, 3), 5),),
+        heldout_tests=tuple(Case((i, i), 2 * i) for i in range(4)),
+        atol=0.0,
+    )
+
+
+def _passes_everything(code: str, entry_point: str, tests: TestCases, atol: float) -> TestResult:
+    return TestResult(passed=len(tests), total=len(tests), timed_out=False, crashed=False)
+
+
+def _saved_report(path: Path) -> dict[str, Any]:
+    """An earlier report, as the B7 box run wrote it, including Mbpp/255."""
+    reasons = {"Mbpp/2": "stop", "Mbpp/3": "length", "Mbpp/255": "stop"}
+    report = {
+        "meta": {"engine": "vllm 0.31.0", "grader": "docker run_tests"},
+        "per_problem": {tid: {"finish_reason": reason} for tid, reason in reasons.items()},
+        "completions": dict.fromkeys(reasons, "    return a + b\n"),
+    }
+    path.write_text(json.dumps(report))
+    return report
+
+
+def test_regrade_grades_saved_completions_without_a_model(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The completions are graded again in their saved order, Mbpp/255 (no longer
+    in the set) is set aside, and no model is touched."""
+    from codeexec.eval import gap, measure_model
+
+    source = tmp_path / "box.json"
+    saved = _saved_report(source)
+
+    def no_model(*args: object, **kwargs: object) -> None:
+        raise AssertionError("the regrade must not load a model")
+
+    monkeypatch.setattr(measure_model, "generate", no_model)
+    monkeypatch.setattr(measure_model, "pinned_model_path", no_model)
+    problems = {tid: _add_problem(tid) for tid in ("Mbpp/2", "Mbpp/3")}
+    monkeypatch.setattr(measure_model, "training_problems", lambda: problems)
+    monkeypatch.setattr(measure_model, "frozen_100_ids", lambda: ["Mbpp/3", "Mbpp/2"])
+    monkeypatch.setattr(measure_model, "git_state", lambda: {"commit": "1" * 40, "dirty": False})
+    monkeypatch.setattr(
+        measure_model,
+        "measure",
+        lambda completions, problems, max_workers: gap.measure(
+            completions, problems, run=_passes_everything, max_workers=2
+        ),
+    )
+
+    out = tmp_path / "regrade.json"
+    assert main(["--completions", str(source), "--out", str(out)]) == 0
+    report = json.loads(out.read_text())
+    assert list(report["completions"]) == ["Mbpp/2", "Mbpp/3"]  # saved order, Mbpp/255 out
+    assert report["meta"]["set_aside"] == ["Mbpp/255"]
+    assert report["meta"]["generation"] == saved["meta"]
+    assert report["meta"]["regraded_from"] == str(source)
+    assert "ADR-015" in report["meta"]["grader"]
+    assert (report["all_problems"]["n"], report["frozen_100"]["n"]) == (2, 2)
+    assert report["all_problems"]["truncated"] == 1  # the saved finish reasons
+
+
+def test_regrade_refuses_a_file_that_is_not_a_report(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from codeexec.eval import measure_model
+
+    source = tmp_path / "completions_only.json"
+    source.write_text(json.dumps({"completions": {"Mbpp/2": "    return a + b\n"}}))
+    problems = {"Mbpp/2": _add_problem("Mbpp/2")}
+    monkeypatch.setattr(measure_model, "training_problems", lambda: problems)
+    monkeypatch.setattr(measure_model, "git_state", lambda: {"commit": "1" * 40, "dirty": False})
+    out = tmp_path / "regrade.json"
+    assert main(["--completions", str(source), "--out", str(out)]) == 2
+    assert not out.exists()
+
+
+def test_a_model_and_saved_completions_are_exclusive() -> None:
+    with pytest.raises(SystemExit):
+        parse_args(["--out", "x.json", "--model", "ckpt", "--completions", "box.json"])
 
 
 def test_out_is_required() -> None:
