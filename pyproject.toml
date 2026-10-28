@@ -24,6 +24,7 @@ dev = [
     "pytest-asyncio>=0.23",
     "mypy>=1.8",
     "ruff>=0.4",
+    "shellcheck-py==0.11.0.1",
 ]
 train = [
     "trl[vllm]==1.16.0",

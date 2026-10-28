@@ -5,6 +5,7 @@ check: lint type test
 lint:
 	ruff check src tests
 	ruff format --check src tests
+	shellcheck scripts/*.sh
 
 format:
 	ruff format src tests
