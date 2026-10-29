@@ -14,14 +14,14 @@ The research question is whether that reward is Goodhartable: does optimizing ag
 
 ## Status
 
-**Phase 4 — Training loop: in progress.** The sandbox, the task layer and the base-model measurements are complete. The RL environment, the TRL reward adapter, the shared training config, the launcher and the G measurement are built and tested, and a first training step has run on the training GPU. The test comparison now matches EvalPlus's own grader ([ADR-015](DECISIONS.md#adr-015)). Next, on the training box: the canonical check of record, parity with EvalPlus's evaluator, and the regrade that sets `G_baseline` over all 368 problems; then the first training run.
+**Phase 4 — Training loop: in progress.** The sandbox, the task layer and the base-model measurements are complete. The RL environment, the TRL reward adapter, the shared training config, the launcher and the G measurement are built and tested, and a first training step has run on the training GPU. The test comparison now matches EvalPlus's own grader ([ADR-015](DECISIONS.md#adr-015)). On the training box, the canonical check, parity with EvalPlus's own evaluator and the regrade all passed, and the ΔG reference is `G_baseline` = +12.0 pp, 95% CI [+8.7, +15.5], over all 368 problems ([ADR-004](DECISIONS.md#adr-004)). Next is Section C: the first training run.
 
 | Phase | State |
 |---|---|
 | 0 · Frame | Done |
 | 1 · Sandbox | Done — Docker isolation (no network, read-only filesystem, memory, process and time limits) and a concurrent pool; throughput plateaus near 39 executions/s on the training box ([analysis/sandbox.md](analysis/sandbox.md)) |
 | 2 · Task and test layer | Done — MBPP+ (368 problems after exclusions), HumanEval+ held out, a perturbation generator, sparse and shaped rewards |
-| 3 · Base-model measurement (H0, `G_baseline`) | Done — H0 clean (perturbed drop +3.0 pp, McNemar p = 0.549; [analysis/h0.md](analysis/h0.md)); `G_baseline` = +10.0 pp, 95% CI [+5.0, +16.0] on the frozen 100 under the original comparison ([analysis/g_baseline.md](analysis/g_baseline.md)); +9.0 pp, [+4.0, +15.0] under EvalPlus's ([ADR-015](DECISIONS.md#adr-015)) |
+| 3 · Base-model measurement (H0, `G_baseline`) | Done — H0 clean (perturbed drop +3.0 pp, McNemar p = 0.549; [analysis/h0.md](analysis/h0.md)); `G_baseline` = +10.0 pp, 95% CI [+5.0, +16.0] on the frozen 100 under the original comparison ([analysis/g_baseline.md](analysis/g_baseline.md)); +9.0 pp, [+4.0, +15.0] under EvalPlus's ([ADR-015](DECISIONS.md#adr-015)); over all 368 on the training box, the ΔG reference, +12.0 pp, [+8.7, +15.5]|
 | 4 · Training loop | In progress |
 | 5 · H1 result | Not started |
 

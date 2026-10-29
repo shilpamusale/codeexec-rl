@@ -19,6 +19,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [013](#adr-013) | Held-out split: V0 rewards on A, B is the measurement | Accepted |
 | [014](#adr-014) | H1 reward is r_sparse; outcome-to-reward mapping | Accepted |
 | [015](#adr-015) | Test comparison matches EvalPlus's own grader | Accepted |
+
 ---
 
 ## ADR-001
@@ -88,6 +89,7 @@ Each record states the context, the decision, the consequences accepted, and —
 **What would reverse it.** If GRPO proves unstable on this task at this scale in a way PPO does not, the default flips and the reasoning is recorded here. If the group-sampling cost turns out to dominate wall-clock — several completions per problem multiplies generation, and generation is expected to dominate — that is a throughput argument for revisiting, measured in Phase 3 rather than guessed at now.
 
 **Status update — PPO arm availability (Phase 4).** TRL removed `PPOTrainer` in v1.13.0 (Sep 2026), and GRPO runs on TRL 1.16.0 (ADR-011), so the optional Phase 6 PPO comparison arm cannot use the same library at the pinned version. If that arm is ever run, the options are a different PPO implementation or an older TRL pinned for that arm alone. Either way the comparison would differ in implementation as well as algorithm, and that confound is stated with the result. Phase 4 is unaffected.
+
 ---
 
 ## ADR-004
@@ -117,11 +119,13 @@ The original design generated property-based tests with Hypothesis for each prob
 **Status update — box measurement plan (pre-registered before it runs, Section B, B7).**
 G_baseline is re-measured on the training box through vLLM, TRL's generation engine (ADR-011): greedy decoding (temperature 0), at most 256 new tokens, stopping only at end-of-sequence, in bf16, from the pinned model revision `df3ce67c0e24480f20468b6ef2894622d69eb73b` (`configs/grpo.toml`; `main` since 2024-11-18, so the same files every earlier baseline loaded).
 Completions are extracted as in Phase 3 and graded by the Docker sandbox on the visible tests, on visible plus held-out split B (the headline), and on visible plus the full held-out suite (the citable MBPP+ number, kept for the baseline and V1 per ADR-013).
+
 **The ΔG reference is this measurement over all 369 training problems**, not the frozen 100: generation and grading on the box take minutes, and n = 369 roughly halves the confidence interval's width, which ΔG needs to stand out from seed variance.
 The CI is computed exactly as in `analysis/g_baseline.md` (paired per-problem differences, numpy `default_rng(0)`, 20,000 resamples, 2.5/97.5 percentiles).
 The frozen-100 subset is reported alongside, for continuity with the Phase 3 record and as the engine check: its per-problem results are compared with `analysis/g_baseline_split_b.json`, and any differences are reported with their cause, not resolved away.
 If the 369-problem CI includes zero, training does not start until the instrument is revisited under this ADR's reversal condition.
 Every training checkpoint is measured by the same command, so ΔG is a subtraction on one instrument. pass@10 and the HumanEval+ baseline are deferred to Phase 5's evaluator.
+
 ---
 
 ## ADR-005
@@ -416,3 +420,9 @@ Results graded under ADR-007's comparison (the Phase 3 G_baseline, the split-B r
 - *The frozen 100 under the new rule.* Exactly one verdict changes, Mbpp/234, from fail to pass: visible 65, plus 56, **G = +9.0 pp, 95% CI [+4.0, +15.0]**, on split B and the full suite alike (was +10.0, [+5.0, +16.0]), the same on macOS and Linux. analysis/g_baseline_split_b.json stays as the ADR-007-rule record; tests/test_gap.py pins the one change, and the engine check in `measure_model` will report Mbpp/234 against that record.
 - *Steps 2 and 3, amended before either runs.* Both run on the training box, over 368 problems: the box's completions for Mbpp/255 are set aside, and the count is reported.
 - *Found on the way.* HumanEval/83 and 139 cannot be graded yet: their expected values include integers of more than 4,300 digits, which Python 3.11's `repr` refuses, so the harness cannot write them. No measurement uses HumanEval+ yet; this is fixed before Phase 5.
+
+**Status update — the checks of record, on the training box (2026-10-28 UTC).** `scripts/box_adr015_gate.sh` ran all three checks on the Lambda A100 box at commit 1f2b8fb: Ubuntu 22.04.5, with glibc 2.35 and Python 3.11.18 on the host, and the pinned sandbox image with Python 3.11.17 and glibc 2.41 (analysis/adr015_box_environment.txt).
+- *Step 1.* Every canonical passes all of its own tests in the sandbox, strict on Linux and Mbpp/590 included; all 43 integration and dataset tests pass.
+- *Step 2.* Parity holds on both sets, with no unexplained disagreement (analysis/evalplus_parity_frozen100.json, analysis/evalplus_parity_box.json). The visible verdicts agree on every graded problem: 65 of the 98 graded in the frozen 100, 251 of the 366 graded from the box. The full-suite verdicts differ only where EvalPlus's time limits failed a correct, slow solution that ours passed, and EvalPlus with generous limits passed it too: Mbpp/566 in both sets and Mbpp/160 in the box set, so EvalPlus counts 55 and 205 where ours counts 56 and 207. EvalPlus ran 15 workers on the 30 vCPUs, its own default; in a preview with one worker, neither problem disagreed.
+- *Step 3.* The regrade: G_baseline = +12.0 pp, 95% CI [+8.7, +15.5], n = 368, the ΔG reference (ADR-004 status update).
+- *Our time limits make some verdicts depend on load too.* Mbpp/160's completion is correct but quadratic, about 0.9 s on each of five held-out inputs, close to ADR-008's 2 s per test and 10 s per program when 24 programs run at once. Graded twice by the sandbox on the box, minutes apart, its full suite passed in the parity run and failed in the regrade; split B passed both times. A verdict that depends on load is measurement noise, and a policy that learns slow solutions would add more of it. Section C settles how measurement handles it, for instance by regrading alone any program that ran out of time, before the first training run is measured.
