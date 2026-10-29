@@ -126,6 +126,12 @@ The frozen-100 subset is reported alongside, for continuity with the Phase 3 rec
 If the 369-problem CI includes zero, training does not start until the instrument is revisited under this ADR's reversal condition.
 Every training checkpoint is measured by the same command, so ΔG is a subtraction on one instrument. pass@10 and the HumanEval+ baseline are deferred to Phase 5's evaluator.
 
+**Status update — the box measurement, and the ΔG reference (Section B, B7; ADR-015).**
+- *As measured, under ADR-007's comparison (2026-10-26 UTC, commit b0623e1).* vLLM 0.31.0, bf16, on the A100. Over 369 problems: visible 249, plus 203 on split B and on the full suite, G = +12.5 pp, 95% CI [+9.2, +16.0]; 2 completions malformed, 14 stopped at 256 tokens. The frozen-100 subset: visible 65, plus 56, G = +9.0 pp, [+4.0, +15.0]. The engine check found one disagreement with the Phase 3 record, Mbpp/234, which led to ADR-015 (analysis/g_baseline_box.json).
+- *The ΔG reference: the same completions regraded under ADR-015, without regenerating, on the platform of record (2026-10-28 UTC, commit 1f2b8fb).* Over 368 problems, with Mbpp/255 (now excluded) set aside: visible 251, plus 207 on split B, **G_baseline = +12.0 pp, 95% CI [+8.7, +15.5]**; on the full suite, plus 206, G = +12.2 pp, [+9.0, +15.8] (analysis/g_baseline_box_adr015.json). Five results changed, all from fail to pass, each by a difference ADR-015 names: set equality (Mbpp/111, Mbpp/232), a reference oracle (Mbpp/558) and Python equality (Mbpp/167, Mbpp/294). Mbpp/255 had failed everything. Mbpp/160's full suite ran out of time in this grading (ADR-015 status update), so the full suite counts one fewer than split B.
+- *The engine check, again.* Against the Phase 3 record it still reports Mbpp/234. Against the Phase 3 completions regraded under ADR-015 (tests/test_gap.py) it reports none: vLLM and HF `generate` give the same verdict on all 100 problems. The frozen-100 subset is +9.0 pp, [+4.0, +15.0], under both comparisons.
+- *The stop rule.* The CI excludes zero, so training may start.
+
 ---
 
 ## ADR-005
