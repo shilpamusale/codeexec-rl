@@ -288,6 +288,17 @@ Alternatives considered:
 
 **Status update — first launch (Section A, 2026-10-21).** Launched `gpu_1x_a100_sxm4` in us-east-1 (Virginia) on the Lambda Stack 22.04 image. The box check (analysis/box_env_lambda_a100.txt) confirmed Ubuntu 22.04.5 LTS, 30 vCPUs, 216 GiB RAM, 472 GB free local disk, Docker 29.2.1 (runc, cgroup v2), and system Python 3.10.12; the repo runs on Python 3.11.17 installed with uv. `nvidia-smi` reported an A100-SXM4-80GB on this instance although the instance type is sold as 40GB. The memory budget stays planned for 40 GB, because the SKU does not guarantee the larger card on the next launch. Throughput measured on this box (ADR-005 status update) plateaus below the vCPU count, so the vCPU figures in the consequences above do not bound grading as assumed, and an instance with more vCPUs is not a remedy for the grading ceiling.
 
+**Status update — spend to date (Phase 4, through ADR-015's checks of record).** Three on-demand sessions of `gpu_1x_a100_sxm4` in us-east-1 (Virginia) at $1.99 per hour, as billed by Lambda before tax:
+
+| Session | Date (UTC) | Hours | Cost |
+|---|---|---|---|
+| Section A: box check, grader parity, throughput | 2026-10-21 | 2.82 | $5.61 |
+| Section B: the smoke step and the B7 measurement | 2026-10-26 | 1.25 | $2.48 |
+| ADR-015's checks of record | 2026-10-28 | 1.41 | $2.80 |
+| **Total** | | **5.48** | **$10.89** |
+
+That is about 6% of the low end of the 90-180 GPU-hour estimate, before any training run. The second and third launches got the 40 GB card the SKU names (Section A's had 80 GB). Each launch carries a fixed setup cost of roughly 15-20 minutes (clone, uv, the training stack, the sandbox image). The third session also spent time on two fixes made while the box waited, a shell-syntax error in the gate script and a mypy setting that differed between the box and CI; shellcheck in `make check` and the environment-independent mypy configuration now catch both before launch.
+
 ---
 
 ## ADR-011
@@ -314,6 +325,12 @@ Alternatives considered:
 **Status update — experiment tracking added (Section B, B6).**
 
 `wandb==0.30.0` joins the `train` extra for training curves (the spec's Phase 4 gate). The lock was re-resolved with the same `uv pip compile` command, which keeps existing pins as preferences: two packages were added (`wandb 0.30.0` and its dependency `platformdirs 4.13.5`), and no existing pin changed (233 packages).The newest release, `0.31.0` (2026-10-16), was passed over because it pins a beta dependency (`cwevals 0.0.1b1`); `0.30.0` (2026-09-09) has none.
+
+**Status update — the first GRPO step on the training box (Section B checkpoint, 2026-10-26 UTC).** One full step ran end to end with the shared configuration (`configs/grpo.toml`) and `--max-steps 1 --report-to none`: the pinned model loaded, vLLM started colocated, 16 prompts × 8 samples were generated, graded in the sandbox through `CodeExecEnv` (ADR-012) and scored by `r_sparse` (ADR-014), one optimizer update ran, and the model was saved. The launcher took 2 min 9 s from start to finish.
+- *Memory fits the 40 GB card.* Peak 33.76 GiB by PyTorch's count and 34.5 GiB by `nvidia-smi` (sampled every 2 s), of 40 GiB, with 4 completions per device and vLLM's 0.25 share, so none of ADR-010's memory levers is needed. The ~5.6 GB of headroom leaves little room to raise the per-device batch.
+- *First numbers.* Step time 19.0 s. Mean reward 0.359 (visible tests, sampled at temperature 1.0, below greedy decoding's 0.65 as expected). 2 of the 16 groups had no reward variance, so no learning signal (`frac_reward_zero_std` 0.125). Importance-sampling ratio 0.993, so vLLM's samples and the trainer's probabilities agree. No sandbox infrastructure retries.
+- *Three findings for Section C.* Grading took 8.1 s, 42% of the step, above ADR-005's 25% line. That rule is judged on the first stable run, and a few programs running into their time limits are the likely cause, which would point at the timeout budgets rather than a warm pool. The malformed rate equalled the truncation rate (6 of 128 each), suggesting the completions cut off at 256 tokens are the malformed ones; to be checked. And one step wrote 24 GB: the trainer's full checkpoint at the last step (fp32 weights and optimizer state, about 18 GB) plus the launcher's `final/` model (6 GB). At `save_steps` 50, 200 steps would write about 78 GB per run, and an instance's disk is wiped when it terminates, so a retention policy and ADR-010's persistent filesystem come first.
+- *A seed fact for Phase 5.* In colocate mode TRL 1.16.0 seeds vLLM with the process index (`trl/generation/vllm_generation.py`), which is 0 on one GPU, whatever the run's seed; the run's seed sets the dataset shuffle and the trainer's own randomness. Recorded for the limitations of the seed comparison.
 
 ---
 
