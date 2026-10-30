@@ -76,7 +76,7 @@ def test_logs_malformed_rate_infra_retries_and_grading_time() -> None:
 
 
 def test_logs_the_share_of_calls_in_which_a_time_limit_fired() -> None:
-    """ADR-008 status update: a test out of time under load still fails, and if logged."""
+    """ADR-008 status update: a test out of time under load still fails, and is logged."""
 
     def sometimes_slow(code: str, entry_point: str, tests: TestCases, atol: float) -> TestResult:
         if "# slow test" in code:  # one test ran out of its 2 s budget

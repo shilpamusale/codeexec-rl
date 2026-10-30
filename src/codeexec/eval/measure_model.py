@@ -15,7 +15,7 @@ reward (skip_special_tokens=True), and gap.py grades them.
 
 The frozen-100 subset is summarized separately, in its Phase 3 order. With
 --compare, its per-problem results are checked against an earlier record: the
-engine check. Differences are reported, never resolved away.So are regrades:
+engine check. Differences are reported, never resolved away. So are regrades:
 every problem graded again alone because a time limit fired under load (gap.py,
 ADR-008 status update) is listed, with the concurrent verdict it replaced.
 
