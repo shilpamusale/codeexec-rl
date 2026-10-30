@@ -75,6 +75,34 @@ def test_logs_malformed_rate_infra_retries_and_grading_time() -> None:
     assert logged["codeexec/grading_seconds"] >= 0.0
 
 
+def test_logs_the_share_of_calls_in_which_a_time_limit_fired() -> None:
+    """ADR-008 status update: a test out of time under load still fails, and if logged."""
+
+    def sometimes_slow(code: str, entry_point: str, tests: TestCases, atol: float) -> TestResult:
+        if "# slow test" in code:  # one test ran out of its 2 s budget
+            return TestResult(0, len(tests), timed_out=False, crashed=False, case_timeouts=1)
+        if "# slow program" in code:  # the 10 s program limit fired
+            return TestResult(0, len(tests), timed_out=True, crashed=False)
+        return _fake_sandbox(code, entry_point, tests, atol)
+
+    logged: dict[str, float] = {}
+    rewards = _call(
+        CodeExecReward(CodeExecEnv(PROBLEMS, "V1", run=sometimes_slow)),
+        ["Mbpp/2", "Mbpp/3", "Mbpp/2", "Mbpp/3"],
+        [
+            CORRECT,
+            "     return a + b  # slow test\n",
+            "     return a + b  # slow program\n",
+            MALFORMED,
+        ],
+        log_metric=logged.__setitem__,
+    )
+
+    assert rewards == [1.0, 0.0, 0.0, 0.0]
+    assert logged["codeexec/time_limited_rate"] == 0.5
+    assert logged["codeexec/malformed_rate"] == 0.25
+
+
 def test_accepts_trls_other_keyword_arguments() -> None:
     rewards = _call(
         CodeExecReward(ENV),

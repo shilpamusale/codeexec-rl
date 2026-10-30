@@ -12,8 +12,9 @@ about the trainer, not the task:
     batch is graded in a thread pool. Threads suffice: the work waits on Docker
     subprocesses, not on Python.
 -   Logging. Per batch, it logs the malformed rate (ADR-014), the sandbox infra
-    retries (ADR-014), and the grading wall time, which decides whether ADR-005's
-    warm pool is needed (adopt it if grading exceeds 25% of step time).
+    retries (ADR-014), the share of calls in which a time limit fired (ADR-008),
+    and the grading wall time, which decides whether ADR-005's warm pool is
+    needed (adopt it if grading exceeds 25% of step time).
 -   A guard. Each prompt TRL generated from must be the environment's prompt for
     that task_id; a mismatch would score completions against the wrong problem's
     stub, silently, so it raises instead.
@@ -70,7 +71,10 @@ class CodeExecReward:
         elapsed = time.perf_counter() - start
 
         if log_metric is not None:
+            # A malformed completion never ran, so no time limit fired in it.
+            time_limited = sum(s.result is not None and s.result.time_limited for s in steps)
             log_metric("codeexec/malformed_rate", sum(s.malformed for s in steps) / len(steps))
+            log_metric("codeexec/time_limited_rate", time_limited / len(steps))
             log_metric("codeexec/infra_retries", float(sum(s.infra_retries for s in steps)))
             log_metric("codeexec/grading_seconds", elapsed)
         return [s.reward for s in steps]
