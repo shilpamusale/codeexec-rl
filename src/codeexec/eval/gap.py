@@ -16,18 +16,24 @@ draws problems by position, so results keep the order of the completions they ca
 This module grades and computes; it does not generate. Completions from Colab, from vLLM on
 the box, or from a training checkpoint are all measured by the same code, so delta-G is a
 subtraction on one instrument.
+
+Problems are graded concurrently, and load can push a correct but slow program over
+ADR-008's time limits. Load only turns passes into fails, so a verdict in which a time
+limit fired is the only kind it can change: those problems are graded again alone, and
+the verdict recorded is that one, with the concurrent verdict kept beside it (ADR-008
+status update).
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import numpy as np
 
 from codeexec.eval.extract import extract_function
-from codeexec.eval.grade import RunTestsFn, grade_two_suites
+from codeexec.eval.grade import RunTestsFn, SuiteGrade, grade_two_suites
 from codeexec.rewards.harness import run_tests
 from codeexec.tasks.problem import Problem
 from codeexec.tasks.split import split_heldout
@@ -45,6 +51,11 @@ class ProblemResult:
     visible_pass: bool
     plus_b: bool  # visible AND split B: what heldout_pass counts
     plus_full: bool  # visible AND the full held-out suite
+    # A time limit fired in this grading (ADR-008): the one kind of verdict load can change.
+    time_limited: bool = False
+
+    # Set when the problem was graded again alone: the concurrent verdict it replaced.
+    concurrent: ProblemResult | None = None
 
 
 @dataclass(frozen=True)
@@ -74,7 +85,13 @@ def grade_problem(completion: str, problem: Problem, run: RunTestsFn = run_tests
         visible_pass=on_b.visible_pass,
         plus_b=on_b.plus_pass,
         plus_full=on_full.plus_pass,
+        time_limited=_time_limited(on_b) or _time_limited(on_full),
     )
+
+
+def _time_limited(grade: SuiteGrade) -> bool:
+    """Did a time limit fire in either of the suite's executions?"""
+    return grade.visible.time_limited or (grade.plus is not None and grade.plus.time_limited)
 
 
 def measure(
@@ -83,7 +100,9 @@ def measure(
     run: RunTestsFn = run_tests,
     max_workers: int = DEFAULT_MAX_WORKERS,
 ) -> dict[str, ProblemResult]:
-    """Grade every completion concurrently; results keep the completion's order."""
+    """Grade every completion concurrently; then grade again alone
+    each one whose grading hit a time limit (ARD-008 status update).
+    Results keep the completion's order."""
     task_ids = list(completions)
     unknown = [tid for tid in task_ids if tid not in problems]
 
@@ -94,7 +113,12 @@ def measure(
         return grade_problem(completions[tid], problems[tid], run)
 
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
-        return dict(zip(task_ids, pool.map(grade, task_ids), strict=True))
+        results = dict(zip(task_ids, pool.map(grade, task_ids), strict=True))
+
+    # The pool is closed: each regrade runs alone, here, with nothing else grading.
+    for tid in [tid for tid, result in results.items() if result.time_limited]:
+        results[tid] = replace(grade(tid), concurrent=results[tid])
+    return results
 
 
 def bootstrap_ci(diffs: np.ndarray) -> tuple[float, float]:

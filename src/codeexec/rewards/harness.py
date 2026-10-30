@@ -104,7 +104,7 @@ class TestResult:
     # back (0 or 1). Not evidence about the program: training logs it as a metric.
     infra_retries: int = 0
 
-    # How many test cases ran out of their per-case budget (ARD-008). Each
+    # How many test cases ran out of their per-case budget (ADR-008). Each
     # is also counted as failed; the count tells a slow failure from a wrong one.
     case_timeouts: int = 0
 
@@ -204,9 +204,9 @@ def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) ->
         "    _outcome = _run_one_case(_fn, _args, _expected, _atol, _entry_point, _budget)"
     )
     lines.append("    if _outcome == 'pass':")
-    lines.append("          _passed += 1")
+    lines.append("        _passed += 1")
     lines.append("    elif _outcome == 'timeout':")
-    lines.append("          _case_timeouts += 1")
+    lines.append("        _case_timeouts += 1")
     lines.append(
         f"print('{RESULT_SENTINEL} ' + _json.dumps("
         "{'passed': _passed, 'total': len(_cases), 'case_timeouts': _case_timeouts}))"
@@ -216,12 +216,14 @@ def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) ->
 
 
 def _parse_result(stdout: str, total: int) -> tuple[int, bool, int]:
-    """Find the sentinel line and extract `passed`. Returns (passed, crashed).
+    """Find the sentinel line. Returns (passed, crashed, case_timeouts).
 
     Scans from the LAST line backward, so trailing model noise can't shadow the
     real result, and skips any sentinel line whose payload won't parse — so a
     garbage line can't mask a valid result earlier in the stream. crashed=True
     means no valid result line was found at all -> treat as 0 passed.
+    A payload without `case_timeouts` reads as 0.
+
     """
     for line in reversed(stdout.splitlines()):
         line = line.strip()
@@ -229,7 +231,6 @@ def _parse_result(stdout: str, total: int) -> tuple[int, bool, int]:
             payload = line[len(RESULT_SENTINEL) :].strip()
             try:
                 data = json.loads(payload)
-                passed = int(data["passed"])
                 # clamp defensively: passed can never exceed total or go negative,
                 # and a timed-out case is a failed one, so at most total - passed
                 passed = min(max(int(data["passed"]), 0), total)

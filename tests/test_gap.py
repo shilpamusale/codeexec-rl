@@ -9,6 +9,7 @@ except where ADR-015's pass rule changed the verdict.
 from __future__ import annotations
 
 import json
+import threading
 from pathlib import Path
 from typing import cast
 
@@ -105,6 +106,51 @@ def test_results_keep_the_completions_order() -> None:
 def test_completion_for_an_unknown_problem_is_an_error() -> None:
     with pytest.raises(KeyError, match="Mbpp/999"):
         measure({"Mbpp/999": CORRECT}, {"Mbpp/3": _problem()})
+
+
+# A correct completion that is slow under load: graded inside measure's thread
+# pool it hits the per-case alarm, as Mbpp/160v did on the box; graded alone,
+# on the calling thread, it passes.
+SLOW = "        return a + b # slow\n"
+
+
+def _slow_under_load(code: str, entry_point: str, tests: TestCases, atol: float) -> TestResult:
+    if "slow" in code and threading.current_thread() is not threading.main_thread():
+        return TestResult(0, len(tests), timed_out=False, crashed=False, case_timeouts=1)
+    return _stub()(code, entry_point, tests, atol)
+
+
+def test_a_time_limited_verdict_is_graded_again_alone() -> None:
+    problems = {tid: _problem(tid) for tid in ("Mbpp/9", "Mbpp/3", "Mbpp/5")}
+    completions = {"Mbpp/9": SLOW, "Mbpp/3": OVERFIT, "Mbpp/5": CORRECT}
+    results = measure(completions, problems, run=_slow_under_load, max_workers=3)
+    assert list(results) == ["Mbpp/9", "Mbpp/3", "Mbpp/5"]  # the regrade keeps its place
+    assert results["Mbpp/9"] == ProblemResult(
+        malformed=False,
+        visible_pass=True,
+        plus_b=True,
+        plus_full=True,
+        concurrent=ProblemResult(False, False, False, False, time_limited=True),
+    )
+    # a wrong answer and a pass hit no time limit, so neither is graded again
+    assert results["Mbpp/3"].concurrent is None
+    assert results["Mbpp/5"].concurrent is None
+
+
+def test_a_program_slow_even_alone_stays_failed_and_says_so() -> None:
+    def always_slow(code: str, entry_point: str, tests: TestCases, atol: float) -> TestResult:
+        return TestResult(0, len(tests), timed_out=False, crashed=False, case_timeouts=1)
+
+    result = measure({"Mbpp/3": SLOW}, {"Mbpp/3": _problem()}, run=always_slow)["Mbpp/3"]
+    assert (result.visible_pass, result.time_limited) == (False, True)
+    assert result.concurrent is not None and result.concurrent.time_limited
+
+
+def test_a_program_timeout_counts_as_time_limited() -> None:
+    def times_out(code: str, entry_point: str, tests: TestCases, atol: float) -> TestResult:
+        return TestResult(0, len(tests), timed_out=True, crashed=False)
+
+    assert grade_problem(CORRECT, _problem(), run=times_out).time_limited
 
 
 def test_summary_counts_and_gap() -> None:
