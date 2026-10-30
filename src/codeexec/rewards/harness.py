@@ -24,9 +24,11 @@ TestCases = Sequence[tuple[tuple[object, ...], object]]
 RESULT_SENTINEL = "###CODEEXEC_RESULT_a3f9###"
 
 # Per-case wall-clock budget inside the harness. A single slow test case fails
-# only that case (SIGALRM -> TimeoutError -> counted as a failure), not the whole
-# suite. The outer sandbox timeout in run_code remains as a hard backstop for what
-# SIGALRM can't interrupt (C-level calls, huge allocations). See DECISIONS.md ADR-008.
+# only that case (SIGALRM -> _CaseTimeout -> counted as a failure), not the whole
+# suite, and the harness reports how many cases ran out of time, so a caller can
+# tell a slow failure from a wrong answer (ADR-008 status update). The outer
+# sandbox timeout in run_code remains as a hard backstop for what SIGALRM can't
+# interrupt (C-level calls, huge allocations). See DECISIONS.md ADR-008.
 PER_CASE_TIMEOUT_SECONDS = 2
 
 # ADR-014: an infrastructure failuire is retried once, after a short pause
@@ -76,11 +78,13 @@ def _run_one_case(_fn, _args, _expected, _atol, _entry_point, _budget):
     _signal.alarm(_budget)
     try:
         _result = _fn(*_args)
-        return _passes(_result, _expected, _atol, _entry_point, _args)
+        return "pass" if _passes(_result, _expected, _atol, _entry_point, _args) else "fail"
+    except _CaseTimeout:
+        # Out of time: a failure, reported apart from a wrong answer (ADR-008).
+        return "timeout"
     except BaseException:
-        # Any failure (a raise, an incomparable output, or _CaseTimeout) fails
-        # this case only. BaseException so _CaseTimeout is always caught.
-        return False
+        # Any other failure (a raise or an incomparable output) fails this case only.
+        return "fail"
     finally:
         _signal.alarm(0)
 """
@@ -99,6 +103,20 @@ class TestResult:
     # How many retries an infrastructure failure needed before this result came
     # back (0 or 1). Not evidence about the program: training logs it as a metric.
     infra_retries: int = 0
+
+    # How many test cases ran out of their per-case budget (ARD-008). Each
+    # is also counted as failed; the count tells a slow failure from a wrong one.
+    case_timeouts: int = 0
+
+    @property
+    def time_limited(self) -> bool:
+        """
+        A time limit fired: a case ran out of its budget, or the program timed out.
+
+        Load can push a correct but slow program over a limit, so these verdicts
+        are the only ones that can depend on load (ADR-008 status update).
+        """
+        return self.timed_out or self.case_timeouts > 0
 
     @property
     def fraction(self) -> float:
@@ -180,17 +198,24 @@ def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) ->
     lines.append(f"_entry_point = {entry_point!r}")
     lines.append(f"_budget = {PER_CASE_TIMEOUT_SECONDS}")
     lines.append("_passed = 0")
+    lines.append("_case_timeouts = 0")
     lines.append("for _args, _expected in _cases:")
-    lines.append("    if _run_one_case(_fn, _args, _expected, _atol, _entry_point, _budget):")
-    lines.append("        _passed += 1")
     lines.append(
-        f"print('{RESULT_SENTINEL} ' + _json.dumps({{'passed': _passed, 'total': len(_cases)}}))"
+        "    _outcome = _run_one_case(_fn, _args, _expected, _atol, _entry_point, _budget)"
+    )
+    lines.append("    if _outcome == 'pass':")
+    lines.append("          _passed += 1")
+    lines.append("    elif _outcome == 'timeout':")
+    lines.append("          _case_timeouts += 1")
+    lines.append(
+        f"print('{RESULT_SENTINEL} ' + _json.dumps("
+        "{'passed': _passed, 'total': len(_cases), 'case_timeouts': _case_timeouts}))"
     )
 
     return "\n".join(lines)
 
 
-def _parse_result(stdout: str, total: int) -> tuple[int, bool]:
+def _parse_result(stdout: str, total: int) -> tuple[int, bool, int]:
     """Find the sentinel line and extract `passed`. Returns (passed, crashed).
 
     Scans from the LAST line backward, so trailing model noise can't shadow the
@@ -205,11 +230,14 @@ def _parse_result(stdout: str, total: int) -> tuple[int, bool]:
             try:
                 data = json.loads(payload)
                 passed = int(data["passed"])
-                # clamp defensively: passed can never exceed total or go negative
-                return min(max(passed, 0), total), False
+                # clamp defensively: passed can never exceed total or go negative,
+                # and a timed-out case is a failed one, so at most total - passed
+                passed = min(max(int(data["passed"]), 0), total)
+                timeouts = min(max(int(data.get("case_timeouts", 0)), 0), total - passed)
+                return passed, False, timeouts
             except (json.JSONDecodeError, KeyError, ValueError, TypeError):
                 continue  # malformed sentinel line: keep scanning for a valid one
-    return 0, True  # no valid sentinel found: the harness never reported
+    return 0, True, 0  # no valid sentinel found: the harness never reported
 
 
 def _run_with_one_retry(harness: str) -> tuple[RawResult, int]:
@@ -257,7 +285,12 @@ def run_tests(
         return TestResult(
             passed=0, total=total, timed_out=True, crashed=False, infra_retries=retries
         )
-    passed, crashed = _parse_result(raw.stdout, total)
+    passed, crashed, case_timeouts = _parse_result(raw.stdout, total)
     return TestResult(
-        passed=passed, total=total, timed_out=False, crashed=crashed, infra_retries=retries
+        passed=passed,
+        total=total,
+        timed_out=False,
+        crashed=crashed,
+        infra_retries=retries,
+        case_timeouts=case_timeouts,
     )

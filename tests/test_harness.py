@@ -17,11 +17,12 @@ from pathlib import Path
 
 import pytest
 
-from codeexec.rewards import oracle
+from codeexec.rewards import harness, oracle
 from codeexec.rewards.harness import (
     RESULT_SENTINEL,
     SandboxInfraError,
     TestCases,
+    TestResult,
     _parse_result,
     _to_source,
     build_harness,
@@ -126,6 +127,7 @@ def test_build_harness_runs_and_reports() -> None:
     assert RESULT_SENTINEL in out
     assert '"passed": 2' in out
     assert '"total": 2' in out
+    assert '"case_timeouts": 0' in out
 
 
 def _run_in_process(code: str, entry_point: str, tests: TestCases, atol: float) -> int:
@@ -133,9 +135,28 @@ def _run_in_process(code: str, entry_point: str, tests: TestCases, atol: float) 
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         exec(compile(build_harness(code, entry_point, tests, atol), "<harness>", "exec"), {})
-    passed, crashed = _parse_result(buf.getvalue(), len(tests))
+    passed, crashed, _ = _parse_result(buf.getvalue(), len(tests))
     assert not crashed
     return passed
+
+
+def test_a_case_over_its_budget_is_counted_as_a_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A case stopped by the per-case alarm fails, and is reported as a timeout,
+    apart from a wrong answer (ADR-008 status update). Budget lowered to 1s.
+    """
+    monkeypatch.setattr(harness, "PER_CASE_TIMEOUT_SECONDS", 1)
+    code = "def f(n):\n    while n == 99:\n        pass\n    return n * 2"
+    tests = [((1,), 2), ((2,), 5), ((99,), 198), ((3,), 6)]  # (2,) is a wrong answer
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        exec(compile(build_harness(code, "f", tests, 0.0), "<harness>", "exec"), {})
+    assert _parse_result(buf.getvalue(), len(tests)) == (2, False, 1)
+
+
+def test_time_limited_means_a_time_limit_fired() -> None:
+    assert TestResult(3, 4, timed_out=False, crashed=False, case_timeouts=1).time_limited
+    assert TestResult(0, 4, timed_out=True, crashed=False).time_limited
+    assert not TestResult(3, 4, timed_out=False, crashed=False).time_limited
 
 
 def test_the_embedded_rule_is_oracle_py() -> None:
@@ -205,11 +226,11 @@ def test_every_stored_test_can_be_written_into_a_harness() -> None:
 # --------------------------------------------------------------------------- #
 def test_parse_result_basic() -> None:
     out = f'{RESULT_SENTINEL} {{"passed": 3, "total": 5}}'
-    assert _parse_result(out, 5) == (3, False)
+    assert _parse_result(out, 5) == (3, False, 0)
 
 
 def test_parse_result_missing_sentinel_is_crash() -> None:
-    assert _parse_result("some output\nno sentinel here", 5) == (0, True)
+    assert _parse_result("some output\nno sentinel here", 5) == (0, True, 0)
 
 
 def test_parse_result_takes_last_valid_line() -> None:
@@ -219,19 +240,27 @@ def test_parse_result_takes_last_valid_line() -> None:
         "noise\n"
         f'{RESULT_SENTINEL} {{"passed": 3, "total": 5}}'
     )
-    assert _parse_result(out, 5) == (3, False)
+    assert _parse_result(out, 5) == (3, False, 0)
 
 
 def test_parse_result_skips_trailing_garbage() -> None:
     """Regression: a malformed trailing sentinel line must not mask a valid one."""
     out = f'{RESULT_SENTINEL} {{"passed": 2, "total": 5}}\n{RESULT_SENTINEL} THIS_IS_NOT_JSON'
-    assert _parse_result(out, 5) == (2, False)
+    assert _parse_result(out, 5) == (2, False, 0)
 
 
 def test_parse_result_clamps_overcount() -> None:
     """A parseable-but-impossible count is clamped to total."""
     out = f'{RESULT_SENTINEL} {{"passed": 99, "total": 5}}'
-    assert _parse_result(out, 5) == (5, False)
+    assert _parse_result(out, 5) == (5, False, 0)
+
+
+def test_parse_result_reads_case_timeouts_and_clamps_them() -> None:
+    """Timed-out cases are failed cases, so there can be at most total - passed."""
+    out = f'{RESULT_SENTINEL} {{"passed": 3, "total": 5, "case_timeouts": 2}}'
+    assert _parse_result(out, 5) == (3, False, 2)
+    out = f'{RESULT_SENTINEL} {{"passed":3, "total":5, "case_timeouts": 9}}'
+    assert _parse_result(out, 5) == (3, False, 2)
 
 
 # --------------------------------------------------------------------------- #
@@ -275,6 +304,8 @@ def test_slow_case_fails_only_itself_not_whole_suite() -> None:
     assert result.passed == 3  # the three fast cases pass
     assert not result.crashed  # sentinel printed; suite did NOT crash
     assert not result.timed_out  # outer process did not time out
+    assert result.case_timeouts == 1  # the slow case is reported as a timeout
+    assert result.time_limited
 
 
 @pytest.mark.integration

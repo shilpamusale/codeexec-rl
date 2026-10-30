@@ -64,8 +64,14 @@ def subprocess_run_tests(code: str, entry_point: str, tests: TestCases, atol: fl
         )
     except subprocess.TimeoutExpired:
         return TestResult(passed=0, total=total, timed_out=True, crashed=False)
-    passed, crashed = _parse_result(out.stdout, total)
-    return TestResult(passed=passed, total=total, timed_out=False, crashed=crashed)
+    passed, crashed, case_timeouts = _parse_result(out.stdout, total)
+    return TestResult(
+        passed=passed, 
+        total=total, 
+        timed_out=False, 
+        crashed=crashed,
+        case_timeouts=case_timeouts,
+        )
 
 
 def _result_dict(result: TestResult | None) -> dict[str, object] | None:

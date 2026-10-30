@@ -69,8 +69,14 @@ def _host_run(code: str, entry_point: str, tests: TestCases, atol: float) -> Tes
     """The real harness, run by the host's Python instead of Docker."""
     harness = build_harness(code, entry_point, tests, atol)
     out = subprocess.run([sys.executable, "-"], input=harness, capture_output=True, text=True)
-    passed, crashed = _parse_result(out.stdout, len(tests))
-    return TestResult(passed=passed, total=len(tests), timed_out=False, crashed=crashed)
+    passed, crashed, case_timeouts = _parse_result(out.stdout, len(tests))
+    return TestResult(
+        passed=passed,
+        total=len(tests),
+        timed_out=False,
+        crashed=crashed,
+        case_timeouts=case_timeouts,
+    )
 
 
 def _compare(completions: dict[str, str], run: RunTestsFn = _host_run) -> dict[str, Any]:
