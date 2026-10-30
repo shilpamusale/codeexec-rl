@@ -145,6 +145,21 @@ def test_our_program_timing_out_is_put_down_to_time_limits() -> None:
     assert classify(timed_out, passes, relaxed=None) == "time limits"
 
 
+def test_our_tests_out_of_time_explain_only_the_failures_they_caused() -> None:
+    """ADR-008's per-test timeouts are a time limit too, but a wrong answer beside a
+    slow test is still a disagreement to explain."""
+
+    passes = EvalPlusGrade(base_status="pass", plus_status="pass", base_failed=(), plus_failed=())
+    visible = TestResult(1, 1, timed_out=False, crashed=False)
+
+    def ours(case_timeouts: int) -> SuiteGrade:  # plus: 3 tests, 1 passed
+        plus = TestResult(1, 3, timed_out=False, crashed=False, case_timeouts=case_timeouts)
+        return SuiteGrade(visible=visible, plus=plus)
+
+    assert classify(ours(2), passes, relaxed=passes) == "time limits"  # both ran out of time
+    assert classify(ours(1), passes, relaxed=passes) == "unexplained"  # one was a wrong answer
+
+
 def test_refuses_to_overwrite_a_report(tmp_path: Path) -> None:
     out = tmp_path / "parity.json"
     out.write_text("{}")

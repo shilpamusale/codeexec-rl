@@ -21,8 +21,9 @@ Completions for problems outside the set (Mbpp/255) are set aside and counted.
 ADR-015 expects one source of disagreement, the two system's time limits: ours 
 are 2 s per test and 10 s per program (ADR-008), EvalPlus's max(1 s, 4 x the 
 canonical's time) per test. So each disagreement is graded again by EvalPlus with 
-generous limits, and put down to time limits if that agrees with ours, or if our
-program timed out. Any other is unexplained: under ADR-015 the port is then fixed
+generous limits, and put down to time limits if that agrees with ours, or if every
+test ours failed ran out of time (ADR-008's per-test timeouts) or our whole program
+did. Any other is unexplained: under ADR-015 the port is then fixed
 before any training run.
 
 Evalplus runs the model's code outside the sandbox, in its own guarded subprocess, 
@@ -53,7 +54,7 @@ from evalplus.evaluate import check_correctness
 
 from codeexec.eval.extract import extract_function
 from codeexec.eval.grade import RunTestsFn, SuiteGrade, grade_two_suites
-from codeexec.rewards.harness import run_tests
+from codeexec.rewards.harness import TestResult, run_tests
 from codeexec.tasks.datasets import training_problems
 from codeexec.tasks.problem import Problem
 from codeexec.train.launch import git_state
@@ -137,10 +138,18 @@ def classify(ours: SuiteGrade, evalplus: EvalPlusGrade, relaxed: EvalPlusGrade |
     mine = ours_verdict(ours)
     if mine == evalplus.verdict:
         return "agree"
-    ours_timed_out = ours.visible.timed_out or (ours.plus is not None and ours.plus.timed_out)
-    if ours_timed_out or (relaxed is not None and relaxed.verdict == mine):
+    # The run that decided our verdict: plus runs only if visible passed (grade.py).
+    decided = ours.visible if ours.plus is None else ours.plus
+    if _out_of_time(decided) or (relaxed is not None and relaxed.verdict == mine):
         return "time limits"
     return "unexplained"
+
+
+def _out_of_time(result: TestResult) -> bool:
+    """Every test `result` failed ran out of time, or the whole program did."""
+    if result.timed_out:
+        return True  # no result line, so which tests failed is unknown
+    return result.case_timeouts > 0 and result.passed + result.case_timeouts == result.total
 
 
 def evalplus_ground_truth() -> tuple[dict[str, Any], dict[str, Any]]:
