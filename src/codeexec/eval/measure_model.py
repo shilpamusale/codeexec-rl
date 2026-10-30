@@ -15,7 +15,9 @@ reward (skip_special_tokens=True), and gap.py grades them.
 
 The frozen-100 subset is summarized separately, in its Phase 3 order. With
 --compare, its per-problem results are checked against an earlier record: the
-engine check. Differences are reported, never resolved away.
+engine check. Differences are reported, never resolved away.So are regrades:
+every problem graded again alone because a time limit fired under load (gap.py,
+ADR-008 status update) is listed, with the concurrent verdict it replaced.
 
 Without --model, the pinned base model from configs/grpo.toml is measured. The
 output keeps every completion, so any number in it can be re-derived without a
@@ -132,6 +134,26 @@ def generate(
     return [str(t) for t in texts], [out.outputs[0].finish_reason for out in outputs]
 
 
+def regrade_summary(results: Mapping[str, ProblemResult]) -> dict[str, list[str]]:
+    """The problems measure graded again alone because a time limit fired under load,
+    those whose verdict changed alone, and those that ran out of time even alone."""
+
+    summary: dict[str, list[str]] = {"problems": [], "changed": [], "time_limited_alone": []}
+    for tid, result in results.items():
+        if result.concurrent is None:
+            continue
+        summary["problems"].append(tid)
+        if _verdict(result) != _verdict(result.concurrent):
+            summary["changed"].append(tid)
+        if result.time_limited:
+            summary["time_limited_alone"].append(tid)
+    return summary
+
+
+def _verdict(result: ProblemResult) -> tuple[bool, bool, bool]:
+    return result.visible_pass, result.plus_b, result.plus_full
+
+
 def build_report(
     *,
     meta: Mapping[str, Any],
@@ -141,7 +163,9 @@ def build_report(
     frozen_ids: Sequence[str],
     record: Mapping[str, Mapping[str, bool]] | None = None,
 ) -> dict[str, Any]:
-    """The measurement: the full set, the frozen-100 subset, and the engine check."""
+    """The measurement: the full set, the frozen-100 subset, the engine check, and the
+    problems graded again alone."""
+
     frozen = {tid: results[tid] for tid in frozen_ids}
     return {
         "meta": dict(meta),
@@ -153,6 +177,7 @@ def build_report(
         "engine_check": None
         if record is None
         else {"compared": len(frozen), "disagreements": disagreements(frozen, record)},
+        "regraded_alone": regrade_summary(results),
         "per_problem": {
             tid: {**asdict(r), "finish_reason": finish_reasons[tid]} for tid, r in results.items()
         },
@@ -272,9 +297,15 @@ def write_and_print(out: Path, report: Mapping[str, Any]) -> int:
             f"{name:<13} n={s['n']} visible {s['visible']} plus_b {s['plus_b']} "
             f"G = {s['gap_pp']:+.1f} pp 95% CI [{lo:+.1f}, {hi:+.1f}]"
         )
+
     if report["engine_check"] is not None:
         found = report["engine_check"]["disagreements"]
         print(f"engine check: {len(found)} disagreements {found}")
+    regraded = report["regraded_alone"]
+    print(
+        f"regraded alone: {len(regraded['problems'])}; verdict changed: {regraded['changed']}; "
+        f"time-limited even alone: {regraded['time_limited_alone']}"
+    )
     print(f"wrote {out}")
     return 0
 

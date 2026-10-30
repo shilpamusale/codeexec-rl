@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import sys
 import types
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -151,6 +152,34 @@ def test_report_holds_both_sets_and_the_engine_check() -> None:
     assert report["engine_check"] == {"compared": 2, "disagreements": ["Mbpp/3"]}
     assert report["per_problem"]["Mbpp/3"]["finish_reason"] == "length"
     assert set(report["completions"]) == set(results)
+
+
+def test_report_lists_the_problems_graded_again_alone() -> None:
+    """ADR-008 status update: every regrade is listed, and the verdict it replaced is kept."""
+    slow = ProblemResult(False, False, False, False, time_limited=True)
+    results = {
+        "Mbpp/2": ProblemResult(
+            False, True, True, True, concurrent=replace(slow, visible_pass=True)
+        ),
+        "Mbpp/3": replace(slow, concurrent=slow),  # out of time even alone
+        "Mbpp/4": ProblemResult(False, True, True, True),  # no time limit fired
+    }
+
+    report = build_report(
+        meta={},
+        completions=dict.fromkeys(results, ""),
+        finish_reasons=dict.fromkeys(results, "stop"),
+        results=results,
+        frozen_ids=["Mbpp/2"],
+    )
+
+    assert report["regraded_alone"] == {
+        "problems": ["Mbpp/2", "Mbpp/3"],
+        "changed": ["Mbpp/2"],
+        "time_limited_alone": ["Mbpp/3"],
+    }
+    assert report["per_problem"]["Mbpp/2"]["concurrent"]["plus_b"] is False  # what it replaced
+    assert report["per_problem"]["Mbpp/4"]["concurrent"] is None
 
 
 def test_no_record_means_no_engine_check() -> None:
