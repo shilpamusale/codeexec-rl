@@ -22,7 +22,7 @@ per_device_train_batch_size = 4 # sets peak training memory
 gradient_accumulation_steps = 32 # sets prompts per step, not memory
 
 # Optimizer (provisional).
-learning_rate = 1e-6
+learning_rate = 1e-6 # doubles once if the learning check fails (ADR-011 status update, C5)
 lr_scheduler_type = "constant"  # the rate at step k never depends on the planned run length
 max_grad_norm = 1.0
 beta = 0.0 # KL penalty off; what would turn it on: ADR-011 status update (C4)
@@ -46,11 +46,11 @@ vllm_max_model_length = 1024
 bf16 = true
 gradient_checkpointing = true
 
-# Run length, logging, checkpoints (provisional)
-max_steps = 200
+# Run length (fixed), logging, checkpoints
+max_steps = 200 # G_final is measured here (ADR-011 status update, C5)
 logging_steps = 1
 save_strategy = "steps"
-save_steps = 50
+save_steps = 50 # 50, 100, 150: the trajectory, never used in place of step 200
 report_to = "wandb"
 
 log_completions = true # every step's completions to <output_dir>/completions/ (ADR-014, C3)
