@@ -21,6 +21,14 @@ logger = logging.getLogger(__name__)
 IMAGE = "codeexec-sandbox"
 TIMEOUT_SECONDS = 10
 
+# The program's stdout and stderr go to files in the scratch mount, each capped
+# at this size, and are copied out after it exits (ADR-005 status update, C2).
+# The harness's result line needs about 100 bytes and stderr is never graded;
+# with no cap, one print loop could push gigabytes into host memory. The cap
+# also bounds every other file the program writes.
+OUTPUT_LIMIT_BYTES = 2**20
+
+
 # subprocess backstop: a few seconds longer than the in-container limit, so the
 # container's own `timeout` fires first in the normal case and this only trips
 # if the container runtime itself wedges.
@@ -69,14 +77,23 @@ def run_code(code: str) -> RawResult:
     The code is delivered over stdin, not as a command-line argument, so a multi-line
     program with quotes and special characters arrives intact. The container is
     network-isolated, runs on a read-only filesystem with a small writable scratch mount,
-    and is bounded in memory, process count, and wall-clock time. The time limit is enforced
-    inside the container by `timeout`, with a subprocess-level backdrop.Inside `timeout`,
-    a shell prints STARTED_MARKER and then `exec`s the program, so exit codes are the program's own.
+    and is bounded in memory, process count, output size, and wall-clock time. The time
+    limit is enforced inside the container by `timeout`, with a subprocess-level backstop.
+    Inside `timeout`, a shell caps file sizes, prints STARTED_MARKER, runs the program with
+    its output going to files, copies them out, and exits with the program's own code.
     `--pull never` means a missing image fails at once instead of being fetched.
     The container is always removed, whether it exits, errors, or times out.
     """
     container_name = f"codeexec-{uuid.uuid4().hex}"
-    start_then_run = f"echo '{STARTED_MARKER}' >&2; exec python"
+
+    # The image's /bin/sh is dash: `ulimit -f` counts 512-byte blocks and sets the
+    # soft and hard limits both, so the program cannot lift it. It comes before the marker,
+    # so a sandbox that cannot set it fails as infrastructure, never scored (ADR-014).
+    start_then_run = (
+        f"ulimit -f {OUTPUT_LIMIT_BYTES // 512} && echo '{STARTED_MARKER}' >&2 && "
+        "{ python >/sandbox/.stdout 2>/sandbox/.stderr; status=$?;"
+        "cat /sandbox/.stdout; cat /sandbox/.stderr >&2; exit $status; }"
+    )
 
     try:
         completed = subprocess.run(
@@ -107,7 +124,10 @@ def run_code(code: str) -> RawResult:
             ],
             input=code,
             capture_output=True,
-            text=True,
+            # Undecodable bytes are replaced: nothing a program writes can raise here
+            # and stop a training step (ADR-005 status update, C2).
+            encoding="utf-8",
+            errors="replace",
             timeout=SUBPROCESS_TIMEOUT_SECONDS,
         )
         return RawResult(

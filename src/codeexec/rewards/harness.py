@@ -76,29 +76,29 @@ _signal.signal(_signal.SIGALRM, _alarm_handler)
 
 class _Sink(_io.StringIO):
     # EvalPlus's swallow_io (ADR-015 status update): what the program writes is
-    # checked as StringIO checks it, then discarded; reading raises, as from 
+    # checked as StringIO checks it, then discarded; reading raises, as from
     # EvalPlus's WriteOnlyStringIO.
     def write(self, _s):
         _n = super().write(_s)
         self.seek(0)
         self.truncate()
         return _n
-    
+
     def read(self, *_a, **_k):
         raise OSError
-    
+
     def readline(self, *_a, **_k):
         raise OSError
-    
+
     def readlines(self, *_a, **_k):
         raise OSError
-    
+
     def readable(self, *_a, **_k):
         return False
 
 _SINK = _Sink()
 # The real streams, saved before the model's code runs. Each test call swaps
-# then for the sink; the result line is written to the real stdout.
+# them for the sink; the result line is written to the real stdout.
 _STREAMS = (_sys.stdout, _sys.stderr, _sys.stdin)
 
 

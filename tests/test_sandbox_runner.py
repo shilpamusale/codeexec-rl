@@ -130,6 +130,51 @@ def test_infinite_loop_times_out() -> None:
     assert result.returncode != 0
 
 
+def test_stdout_is_capped_and_writng_past_the_cap_fails() -> None:
+    """ADR-005 status update (C2): output past the cap never reaches the host."""
+    code = "import os\nos.write(1, b'x' * (3 * 2**20))\nprint('past the cap')"
+    result = run_code(code)
+
+    assert result.infra_error is False  # the program really ran
+    # One write, cut shotrt at the cap; the print after it raised instead.
+    assert result.stdout.count("x") == len(result.stdout) == runner.OUTPUT_LIMIT_BYTES
+    assert result.returncode != 0
+    assert "File too large" in result.stderr
+
+
+def test_stderr_is_capped_too() -> None:
+    result = run_code("import os\nos.write(2, b'e' * (3 * 2**20))\n")
+
+    assert result.infra_error is False
+    assert result.returncode == 0
+    assert result.stderr.count("e") == len(result.stderr) == runner.OUTPUT_LIMIT_BYTES
+
+
+def test_the_program_cannot_lift_the_cap() -> None:
+    code = (
+        "import resource\n"
+        "resource.setrlimit(resource.RLIMIT_FSIZE, (resource.RLIM_INFINITY,) * 2)\n"
+        "print('LIFTED THE CAP')"
+    )
+    result = run_code(code)
+
+    assert result.infra_error is False
+    assert result.returncode != 0
+    assert "LIFTED THE CAP" not in result.stdout
+
+
+def test_bytes_that_are_not_utf8_cannot_raise() -> None:
+    """ADR-005 status update (C2): undecodeable bytes are replaced, so no output can
+    stop a training step."""
+
+    result = run_code("import os\nos.write(1, b'\\xff ok\\n')\nos.write(2, b'\\xfe')\n")
+
+    assert result.infra_error is False
+    assert result.returncode == 0
+    assert result.stdout == "\ufffd ok\n"
+    assert result.stderr == "\ufffd"
+
+
 def test_normal_run_is_not_infra_and_stderr_is_clean() -> None:
     """The start marker reaches stderr from the real image, and is stripped before return."""
     result = run_code("print('hi')")
@@ -166,3 +211,13 @@ def test_bad_timeout_command_line_is_infra(monkeypatch: pytest.MonkeyPatch) -> N
 
     assert result.returncode == 125
     assert result.infra_error is True
+
+
+def test_a_cap_that_cannot_be_set_is_infra(monkeypatch: pytest.MonkeyPatch) -> None:
+    """If the shell cannot set the output cap, the program never runs: no marker,
+    so an infrastructure failure, never scored (ADR-005 status update, C2)."""
+    monkeypatch.setattr(runner, "OUTPUT_LIMIT_BYTES", -512)  # `ulimit -f -1` is refused
+    result = run_code("print('never runs)'")
+
+    assert result.infra_error is True
+    assert "never runs" not in result.stdout
