@@ -57,7 +57,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--max-steps", type=int, help="override the config (1 = smoke step)")
     parser.add_argument("--report-to", help="override the config's tracker (none = no tracker)")
-    parser.add_argument("--resume", action="store_true", help="continue from the last checkpoint")
     parser.add_argument("--allow-dirty", action="store_true", help="run with uncommitted changes")
     return parser.parse_args(argv)
 
@@ -72,14 +71,12 @@ def git_state(repo: Path = Path(".")) -> dict[str, Any]:
     return {"commit": git("rev-parse", "HEAD"), "dirty": bool(git("status", "--porcelain"))}
 
 
-def prepare_output_dir(path: Path, resume: bool) -> None:
-    """A fresh run gets an empty directory; a resumed run needs its earlier one."""
+def prepare_output_dir(path: Path) -> None:
+    """Every run gets an empty directory. An earlier run is never overwritten or continued:
+    a failed run starts over from step 0 (ADR-010 status update, C6)."""
 
-    has_run = path.is_dir() and any(path.iterdir())
-    if resume and not has_run:
-        raise LaunchError(f"--resume given, but {path} holds no earlier run")
-    if not resume and has_run:
-        raise LaunchError(f"{path} already holds a run; pass --resume or another --output-root")
+    if path.is_dir() and any(path.iterdir()):
+        raise LaunchError(f"{path} already holds a run; move it away or pass another --output-root")
     path.mkdir(parents=True, exist_ok=True)
 
 
@@ -131,7 +128,7 @@ def train(args: argparse.Namespace) -> None:
         report_to=args.report_to,
     )
     check_tracker(kwargs["report_to"])
-    prepare_output_dir(output_dir, args.resume)
+    prepare_output_dir(output_dir)
 
     # The training stack, only now that every cheap check has passed.
     import torch
@@ -158,7 +155,6 @@ def train(args: argparse.Namespace) -> None:
         "overrides": {
             "max_steps": args.max_steps,
             "report_to": args.report_to,
-            "resume": args.resume,
             "allow_dirty": args.allow_dirty,
         },
         "grpo": kwargs,
@@ -179,7 +175,7 @@ def train(args: argparse.Namespace) -> None:
         train_dataset=Dataset.from_list([dict(r) for r in records]),
     )
 
-    trainer.train(resume_from_checkpoint=True if args.resume else None)
+    trainer.train()
     trainer.save_model(str(output_dir / "final"))
 
     record["finished_at"] = datetime.now(UTC).isoformat()

@@ -33,25 +33,25 @@ def test_arm_and_seed_are_required() -> None:
 def test_defaults_come_from_the_shared_config() -> None:
     args = parse_args(["--arm", "V0", "--seed", "1"])
     assert (args.config, args.output_root) == (Path("configs/grpo.toml"), Path("runs"))
-    assert (args.max_steps, args.report_to, args.resume) == (None, None, False)
+    assert (args.max_steps, args.report_to) == (None, None)
+
+
+def test_there_is_no_resume() -> None:
+    """ADR-010 status update (C6): a failed run starts over; it is never resumed."""
+    with pytest.raises(SystemExit):
+        parse_args(["--arm", "V1", "--seed", "0", "--resume"])
 
 
 def test_a_fresh_run_gets_its_own_directory(tmp_path: Path) -> None:
     run = tmp_path / "runs" / "V1-seed0"
-    prepare_output_dir(run, resume=False)
+    prepare_output_dir(run)
     assert run.is_dir()
 
 
 def test_an_earlier_run_is_never_overwritten(tmp_path: Path) -> None:
     (tmp_path / "run.json").write_text("{}")
     with pytest.raises(LaunchError, match="already holds a run"):
-        prepare_output_dir(tmp_path, resume=False)
-    prepare_output_dir(tmp_path, resume=True)  # resuming it is fine
-
-
-def test_resume_needs_an_earlier_run(tmp_path: Path) -> None:
-    with pytest.raises(LaunchError, match="holds no earlier run"):
-        prepare_output_dir(tmp_path / "missing", resume=True)
+        prepare_output_dir(tmp_path)
 
 
 def test_git_state_reports_the_commit_and_uncommitted_changes(tmp_path: Path) -> None:
