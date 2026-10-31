@@ -130,13 +130,13 @@ def test_infinite_loop_times_out() -> None:
     assert result.returncode != 0
 
 
-def test_stdout_is_capped_and_writng_past_the_cap_fails() -> None:
+def test_stdout_is_capped_and_writing_past_the_cap_fails() -> None:
     """ADR-005 status update (C2): output past the cap never reaches the host."""
     code = "import os\nos.write(1, b'x' * (3 * 2**20))\nprint('past the cap')"
     result = run_code(code)
 
     assert result.infra_error is False  # the program really ran
-    # One write, cut shotrt at the cap; the print after it raised instead.
+    # One write, cut short at the cap; the print after it raised instead.
     assert result.stdout.count("x") == len(result.stdout) == runner.OUTPUT_LIMIT_BYTES
     assert result.returncode != 0
     assert "File too large" in result.stderr
@@ -164,7 +164,7 @@ def test_the_program_cannot_lift_the_cap() -> None:
 
 
 def test_bytes_that_are_not_utf8_cannot_raise() -> None:
-    """ADR-005 status update (C2): undecodeable bytes are replaced, so no output can
+    """ADR-005 status update (C2): undecodable bytes are replaced, so no output can
     stop a training step."""
 
     result = run_code("import os\nos.write(1, b'\\xff ok\\n')\nos.write(2, b'\\xfe')\n")
@@ -217,7 +217,7 @@ def test_a_cap_that_cannot_be_set_is_infra(monkeypatch: pytest.MonkeyPatch) -> N
     """If the shell cannot set the output cap, the program never runs: no marker,
     so an infrastructure failure, never scored (ADR-005 status update, C2)."""
     monkeypatch.setattr(runner, "OUTPUT_LIMIT_BYTES", -512)  # `ulimit -f -1` is refused
-    result = run_code("print('never runs)'")
+    result = run_code("print('never runs')")
 
     assert result.infra_error is True
     assert "never runs" not in result.stdout

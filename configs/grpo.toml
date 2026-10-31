@@ -33,7 +33,7 @@ num_iterations = 1 # one optimizer step per generation batch: fully on-policy
 # Sampling (provisional)
 temperature = 1.0
 top_p = 1.0
-mask_truncated_completions = false # check completions/clipped_ratio first 
+mask_truncated_completions = false # stays off: ADR-014 status update (C3) 
 
 # Generation engine (ADR-011): vLLM inside the trainer, sharing the GPU.
 use_vllm = true
@@ -53,6 +53,7 @@ save_strategy = "steps"
 save_steps = 50
 report_to = "wandb"
 
-
+log_completions = true # every step's completions to <output_dir>/completions/ (ADR-014, C3)
+num_completions_to_print = 2 # the console shows two; the log keeps all
 
 
