@@ -15,6 +15,7 @@ from codeexec.env import CodeExecEnv
 from codeexec.rewards.harness import SandboxInfraError, TestCases, TestResult
 from codeexec.tasks.problem import Problem
 from codeexec.tasks.problem import TestCase as Case
+from codeexec.train.config import BASELINE_MAX_NEW_TOKENS
 from codeexec.train.reward import CodeExecReward
 
 CORRECT = "     return a + b\n"
@@ -103,6 +104,27 @@ def test_logs_the_share_of_calls_in_which_a_time_limit_fired() -> None:
     assert logged["codeexec/malformed_rate"] == 0.25
 
 
+def test_logs_malformed_completions_at_the_token_limit() -> None:
+    """ADR-014 status update (C3): which malformed completions used the whole budget,
+    as a rate per batch and as two flags per completion for TRL's completions log."""
+    full, short = [0] * BASELINE_MAX_NEW_TOKENS, [0] * 10
+    logged: dict[str, float] = {}
+    extra: dict[str, list[bool]] = {}
+    _call(
+        CodeExecReward(ENV),
+        ["Mbpp/2", "Mbpp/3", "Mbpp/2", "Mbpp/3"],
+        [MALFORMED, MALFORMED, CORRECT, CORRECT],
+        completion_ids=[full, short, full, short],
+        log_metric=logged.__setitem__,
+        log_extra=extra.__setitem__,
+    )
+    assert logged["codeexec/malformed_at_limit_rate"] == 0.25  # only the first is both
+    assert extra == {
+        "codeexec/malformed": [True, True, False, False],
+        "codeexec/at_limit": [True, False, True, False],
+    }
+
+
 def test_accepts_trls_other_keyword_arguments() -> None:
     rewards = _call(
         CodeExecReward(ENV),
@@ -148,6 +170,8 @@ def test_length_mismatch_is_an_error_not_a_truncation() -> None:
         CodeExecReward(ENV)(
             prompts=[ENV.prompt("Mbpp/2")], completions=[CORRECT, CORRECT], task_id=["Mbpp/2"]
         )
+    with pytest.raises(ValueError, match="batch length mismatch"):
+        _call(CodeExecReward(ENV), ["Mbpp/2"], [CORRECT], completion_ids=[[1], [2]])
 
 
 def test_prompt_that_is_not_the_environment_is_rejected() -> None:
