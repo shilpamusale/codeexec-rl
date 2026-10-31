@@ -62,7 +62,9 @@ _ORACLE_SRC = Path(oracle.__file__).read_text()
 # The per-case runner, embedded after the rule. Stdlib-only and
 # underscore-prefixed, like the rule, so the model's code cannot collide with it.
 _HARNESS_RUNNER_SRC = """
+import io as _io
 import signal as _signal
+import sys as _sys
 
 class _CaseTimeout(Exception):
     pass
@@ -72,12 +74,44 @@ def _alarm_handler(_signum, _frame):
 
 _signal.signal(_signal.SIGALRM, _alarm_handler)
 
+class _Sink(_io.StringIO):
+    # EvalPlus's swallow_io (ADR-015 status update): what the program writes is
+    # checked as StringIO checks it, then discarded; reading raises, as from 
+    # EvalPlus's WriteOnlyStringIO.
+    def write(self, _s):
+        _n = super().write(_s)
+        self.seek(0)
+        self.truncate()
+        return _n
+    
+    def read(self, *_a, **_k):
+        raise OSError
+    
+    def readline(self, *_a, **_k):
+        raise OSError
+    
+    def readlines(self, *_a, **_k):
+        raise OSError
+    
+    def readable(self, *_a, **_k):
+        return False
+
+_SINK = _Sink()
+# The real streams, saved before the model's code runs. Each test call swaps
+# then for the sink; the result line is written to the real stdout.
+_STREAMS = (_sys.stdout, _sys.stderr, _sys.stdin)
+
+
 def _run_one_case(_fn, _args, _expected, _atol, _entry_point, _budget):
     # Arm a per-case alarm; cancel it the instant the case returns so a fast
     # case never leaves a pending alarm to fire during the next one.
     _signal.alarm(_budget)
     try:
-        _result = _fn(*_args)
+        try:
+            _sys.stdout = _sys.stderr = _sys.stdin = _SINK
+            _result = _fn(*_args)
+        finally:
+            _sys.stdout, _sys.stderr, _sys.stdin = _STREAMS
         return "pass" if _passes(_result, _expected, _atol, _entry_point, _args) else "fail"
     except _CaseTimeout:
         # Out of time: a failure, reported apart from a wrong answer (ADR-008).
@@ -168,7 +202,9 @@ def _to_source(value: object) -> str:
 
 def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) -> str:
     """Return a self-contained Python program that runs `code` against `tests`
-    and prints one sentinel JSON line: {"passed": int, "total": int}.
+    and prints one sentinel JSON line: {"passed": int, "total": int, "case_timeouts": int}.
+    The program's own output never reaches it: each test call writes to a sink, as
+    in EvalPlus (ADR-015 status update).
 
     `tests` is a list of (args_tuple, expected) pairs.
     """
@@ -209,7 +245,8 @@ def build_harness(code: str, entry_point: str, tests: TestCases, atol: float) ->
     lines.append("        _case_timeouts += 1")
     lines.append(
         f"print('{RESULT_SENTINEL} ' + _json.dumps("
-        "{'passed': _passed, 'total': len(_cases), 'case_timeouts': _case_timeouts}))"
+        "{'passed': _passed, 'total': len(_cases), 'case_timeouts': _case_timeouts}),"
+        " file=_STREAMS[0], flush=True)"
     )
 
     return "\n".join(lines)

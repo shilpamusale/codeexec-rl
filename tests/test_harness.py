@@ -12,6 +12,8 @@ import ast
 import contextlib
 import io
 import math
+import subprocess
+import sys
 import warnings
 from pathlib import Path
 
@@ -188,6 +190,43 @@ def test_huge_int_expected_output_is_graded() -> None:
     code = "def starts_one_ends(n):\n    return 18 * 10 ** (n - 2)"
     tests = [((5000,), 18 * 10**4998), ((2,), 18)]
     assert _run_in_process(code, "starts_one_ends", tests, 0.0) == 2
+
+
+def _run_as_the_sandbox_does(code: str, tests: TestCases) -> subprocess.CompletedProcess[str]:
+    """The harness fed to a fresh Python over stdin, as the sandbox feeds it, minus Docker."""
+    harness_src = build_harness(code, "add", tests, 0.0)
+    return subprocess.run(
+        [sys.executable, "-"], input=harness_src, capture_output=True, text=True, timeout=30
+    )
+
+
+ADDS = [((1, 2), 3), ((3, 4), 7)]
+
+
+@pytest.mark.parametrize(
+    "prints",
+    [
+        "    print(a, end=' ')\n",  # no final newline: it used to glue onto the result line
+        "    print('adding', a, b)\n    print('to stderr', file=sys.stderr)\n",
+        "    sys.stdout.write('partial')\n",
+        "    sys.stdout = None\n",  # rebinding stdout cannot lose the result line
+    ],
+)
+def test_the_program_s_own_output_is_swallowed(prints: str) -> None:
+    """ADR-015 status update (C2): each test call writes to a sink, as in EvalPlus, so a
+    correct program that prints passes, and the result line is all that comes out."""
+    code = f"def add(a, b):\n    import sys\n{prints}    return a + b\n"
+    out = _run_as_the_sandbox_does(code, ADDS)
+    assert _parse_result(out.stdout, len(ADDS)) == (2, False, 0)
+    assert len(out.stdout.splitlines()) == 1
+    assert out.stderr == ""
+
+
+def test_reading_stdin_fails_the_test_as_in_evalplus() -> None:
+    """EvalPlus points stdin at a stream that raises when read; so does the harness."""
+    code = "def add(a, b):\n    import sys\n    sys.stdin.read()\n    return a + b\n"
+    out = _run_as_the_sandbox_does(code, ADDS)
+    assert _parse_result(out.stdout, len(ADDS)) == (0, False, 0)
 
 
 # Two HumanEval+ problems store expected outputs too large for the sandbox to run
