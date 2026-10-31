@@ -59,7 +59,7 @@ class CodeExecReward:
         completion_ids: Sequence[Sequence[int]] | None = None,
         log_metric: LogMetric | None = None,
         log_extra: LogExtra | None = None,
-        **kwargs: object,  # TRL's other extras (trainer_state, log_extra, ...), unused
+        **kwargs: object,  # TRL's other extras (trainer_state, ...), unused
     ) -> list[float]:
         if not len(prompts) == len(completions) == len(task_id):
             raise ValueError(
@@ -96,10 +96,10 @@ class CodeExecReward:
             log_metric("codeexec/time_limited_rate", time_limited / len(steps))
             log_metric("codeexec/infra_retries", float(sum(s.infra_retries for s in steps)))
             log_metric("codeexec/grading_seconds", elapsed)
-            if log_extra is not None:
-                log_extra("codeexec/malformed", malformed)
-                if at_limit is not None:
-                    log_extra("codeexec/at_limit", at_limit)
+        if log_extra is not None:
+            log_extra("codeexec/malformed", malformed)
+            if at_limit is not None:
+                log_extra("codeexec/at_limit", at_limit)
         return [s.reward for s in steps]
 
     def _grade(self, task_ids: Sequence[str], completions: Sequence[str]) -> list[StepResult]:

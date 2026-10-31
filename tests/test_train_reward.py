@@ -125,6 +125,19 @@ def test_logs_malformed_completions_at_the_token_limit() -> None:
     }
 
 
+def test_logs_the_flags_without_log_metric() -> None:
+    """The completion flags do not depend on the batch metrics being logged."""
+    extra: dict[str, list[bool]] = {}
+    _call(
+        CodeExecReward(ENV),
+        ["Mbpp/2"],
+        [MALFORMED],
+        completion_ids=[[0]],
+        log_extra=extra.__setitem__,
+    )
+    assert extra == {"codeexec/malformed": [True], "codeexec/at_limit": [False]}
+
+
 def test_accepts_trls_other_keyword_arguments() -> None:
     rewards = _call(
         CodeExecReward(ENV),
