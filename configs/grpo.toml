@@ -51,6 +51,7 @@ max_steps = 200 # G_final is measured here (ADR-011 status update, C5)
 logging_steps = 1
 save_strategy = "steps"
 save_steps = 50 # 50, 100, 150: the trajectory, never used in place of step 200
+save_only_model = true # weights only, ~6 GB each; a failed run starts over (ADR-010, C6)
 report_to = "wandb"
 
 log_completions = true # every step's completions to <output_dir>/completions/ (ADR-014, C3)
