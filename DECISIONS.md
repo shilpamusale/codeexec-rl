@@ -324,6 +324,8 @@ That is about 6% of the low end of the 90-180 GPU-hour estimate, before any trai
 - *How long.* Everything is kept until Phase 5's measurements are done; after that, only each run's step-200 weights.
 - *Corrections to the decision above.* Lambda's documentation now mounts a filesystem at `/home/ubuntu/<name>`, not `/lambda/nfs/<name>`, so the path is read on the instance at launch. And a filesystem binds later sessions to its region: when us-east-1 has no capacity, the data can move only through instances in both regions (rsync between filesystems), so the backup instance types are tried in us-east-1 first.
 
+- *The spec's Phase 4 gate.* It asks that checkpointing work and that runs be resumable. Checkpointing stays, every checkpoint kept; resuming is replaced by starting over, for the reasons above, and the gate is read that way.
+
 ---
 
 ## ADR-011
@@ -361,6 +363,8 @@ Alternatives considered:
 - *Why.* A KL penalty pulls the policy toward the base model, so it damps every change training makes, the visible-test overfitting H1 measures included, and ΔG would then depend on the chosen coefficient. Drift that any training causes is controlled by the design instead: V0 trains as long on a dense reward, and H1 is read from the difference between the arms (THESIS). The penalty would also cost a full second copy of the model as the reference (about 3 GB in bf16) and a forward pass per step, on a card the first step left with about 5.6 GB free. And the settings keep each step small: learning rate 1e-6, 200 steps, one optimizer step per generation batch, gradients clipped at norm 1.0.
 - *What would turn it on, fixed before any run.* Only training-side signals count, never the held-out results the study measures. From step 40 on, when the last 20 steps no longer overlap the first 20, two signals are compared between those windows: TRL's `reward`, if its average over the last 20 steps is more than 0.1 below its average over the first 20 (the policy is getting worse at what it is rewarded for); and TRL's `entropy`, if its average over the last 20 steps is below a tenth of its average over the first 20 (the policy has collapsed onto few outputs). If either holds in any run, every arm and seed moves to `beta = 0.04`, DeepSeekMath's GRPO value; memory is checked again against the 40 GB budget, with vLLM's sleep mode as the configuration's first fallback; and the runs are repeated.
 - *Stable.* A run in which neither holds is stable. This is the "first stable run" on which ADR-005's warm-pool rule is judged.
+
+- *The spec's W&B list.* It names KL among the curves to log. With `beta` at 0.0 there is no reference model, so TRL computes no KL; entropy, logged at every step, takes its place as the drift signal and is the collapse trigger above. If `beta` moves to 0.04, TRL computes and logs KL with it.
 
 **Status update — run length and the measurement point (Section C, C5; recorded before the first run).** Every run trains for 200 steps. At 16 prompts a step, that is about 8.7 passes over the 368 problems, the same in both arms, and at the first step's 19 s about an hour of training per run.
 - *G_final is measured at step 200* in every arm and seed, and ΔG = G_final − G_baseline uses that measurement alone. The checkpoints at steps 50, 100 and 150 are measured by the same command and reported as the trajectory, but none is ever used in place of step 200: choosing the checkpoint with the largest or smallest ΔG after seeing them would turn one measurement into several.

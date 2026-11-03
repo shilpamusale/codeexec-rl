@@ -69,13 +69,13 @@ def test_entropy_collapse_fires_below_a_tenth() -> None:
     assert checks.stable is False
 
 
-def test_a_run_under_40_stable_is_not_judged() -> None:
+def test_a_run_under_40_steps_is_not_judged() -> None:
     checks = check_run(_log([0.4] * 20 + [0.0] * 19))
     assert (checks.stable, checks.learned, checks.reward_collapsed_at) == (None, None, None)
 
 
 def test_grading_share_with_and_without_time_limits() -> None:
-    """Steps where a time fired take longer to grad: 4 s at a rate of 0, 8 s at
+    """Steps where a time limit fired take longer to grade: 4 s at a rate of 0, 8 s at
     0.1. Over 20 s steps that is 30% in all, and 20% at a rate of zero.
     """
     rates = [0.0, 0.1] * 100
