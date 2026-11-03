@@ -159,6 +159,11 @@ Every training checkpoint is measured by the same command, so ΔG is a subtracti
 - *Accepted.* A program that deliberately reopens a parent process's output pipe through `/proc` still writes to the host directly, bounded only by the 10 s limit. Output is never scored, so nothing rewards it, and no accidental print does it.
 - *What would reverse it.* If host memory grows with sandbox output during a training run, the runner also bounds what it reads from `docker run`.
 
+**Status update — how the warm-pool rule is read (training-session preparation, D1; recorded before the first run).** The rule above compares grading with step time in the first stable run (ADR-011 status update, C4), and points at the timeout budgets instead of a warm pool when the timeout tail drives the share rather than the mean. `codeexec.train.checks` computes both from the run's per-step log, so neither is judged by eye:
+- *The share* is the run's average grading time (`codeexec/grading_seconds`) over its average step time (TRL's `step_time`: generation, grading, and the forward and backward passes of one optimizer step).
+- *The share without time limits* is the intercept of a straight line fitted to each step's grading time against its time-limited rate (`codeexec/time_limited_rate`, ADR-008 status update), over the same step time: the grading time of a step in which no time limit fired.
+- *Reading.* Within 25%, nothing changes. Over 25% even without time limits, the warm pool is adopted: it changes how programs start, not what they are scored, so once a parity check shows its verdicts match, it can be adopted between runs. Over 25% only because of time limits, the budgets stay: changing them would change the reward and the measurement, so every run and the ΔG reference would be redone, and the cost of keeping them is time, not correctness. If the time-limited rate never varied, the fit cannot separate the two, and the decision is made and recorded before any further run.
+
 ---
 
 ## ADR-006
