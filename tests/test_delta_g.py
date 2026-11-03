@@ -58,12 +58,12 @@ def test_delta_g_is_the_last_step_minus_the_reference() -> None:
     steps = {50: 13.0, 100: 15.0, 150: 14.0, 200: 16.5}
     summary = summarize_run({s: _measurement(g) for s, g in steps.items()}, REFERENCE, 200)
     assert summary["delta_g_pp"] == pytest.approx(4.5)
-    assert summary["delta_g_full_pp"] == pytest.approx(4.0)  # against the full siote's 12.5
+    assert summary["delta_g_full_pp"] == pytest.approx(4.0)  # against the full suite's 12.5
     deltas = [row["delta_g_pp"] for row in summary["trajectory"].values()]
     assert deltas == pytest.approx([1.0, 3.0, 2.0, 4.5])  # the trajectory, in step order
 
 
-def test_g_final_needs_the_last_steps() -> None:
+def test_g_final_needs_the_last_step() -> None:
     with pytest.raises(InstrumentError, match="no measurement at step 200"):
         summarize_run({50: _measurement(13.0), 100: _measurement(15.0)}, REFERENCE, 200)
 
