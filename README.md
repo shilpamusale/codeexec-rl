@@ -87,6 +87,8 @@ pip install -e ".[dev,train]" -c requirements/train.lock
 python -m codeexec.train.launch --arm V1 --seed 0
 ```
 
+A session on the box follows [RUNBOOK.md](RUNBOOK.md).
+
 CI runs the same checks on every commit.
 
 ---
