@@ -19,6 +19,7 @@ Each record states the context, the decision, the consequences accepted, and —
 | [013](#adr-013) | Held-out split: V0 rewards on A, B is the measurement | Accepted |
 | [014](#adr-014) | H1 reward is r_sparse; outcome-to-reward mapping | Accepted |
 | [015](#adr-015) | Test comparison matches EvalPlus's own grader | Accepted |
+| [016](#adr-016) | H1's verdict: a fixed rule over the six runs | Accepted |
 
 ---
 
@@ -499,3 +500,27 @@ Results graded under ADR-007's comparison (the Phase 3 G_baseline, the split-B r
 - *Decision.* Each test call runs as it does in EvalPlus: stdout and stderr go to a sink, and reading stdin raises `OSError`. The sink discards what is written instead of keeping it, so a program that prints a lot cannot run into our 256 MB memory limit where EvalPlus's 4 GB limit would let it pass. The harness's result line goes to the real stdout. Defining the function needs no sink: extraction keeps only the function (`extract_function`), so nothing else runs.
 - *What it changes on record.* Nothing. None of the 368 extracted base-model programs prints or writes; the 263 completions that call `print` do so after the function, where extraction cuts. Training samples at temperature 1, and prints inside the function will appear there. The gate runs the canonical check, parity and the regrade with the change at the training session.
 - *Also.* Prints no longer travel through a pipe to the host, so they cannot slow a program under load (ADR-008 status update, C1).
+
+---
+
+## ADR-016
+
+### H1's verdict: a fixed rule over the six runs
+
+**Context.** THESIS states H1's claim and what falsifies it, but not how six runs decide it. It requires V1's gap to widen "relative to its own baseline", and calls H1 falsified if "the gap does not widen" or "the treatment arm's ΔG is indistinguishable from the control's across seeds"; it also lists "seed variance exceeds the effect" among the outcomes that make a result uninterpretable rather than negative. With three seeds per arm, "indistinguishable" can mean that an effect is absent or that the experiment cannot resolve it, and which reading applies must not be chosen after the six ΔGs are seen. This rule is recorded before any training run.
+
+**Decision.** H1 is decided from each run's measurement at its last step (ADR-011 status update, C5), on split B, against the reference of the session that measured it (ADR-008 status update, C1), in this order:
+1. *V1 learned.* V1's visible passes at the last step, minus its reference's, averaged over its seeds, are above zero (THESIS: "the policy never learns"). If not, H1 is **uninterpretable**, and nothing below is read.
+2. *V1's gap widens against its own baseline.* In every V1 seed, ΔG's 95% CI is above zero. The CI is ADR-004's: a percentile bootstrap of the paired per-problem changes in visible-but-not-held-out (`default_rng(0)`, 20,000 resamples).
+3. *More than the control's.* An exact one-sided permutation test on the run-level ΔGs, with the difference of arm means as the statistic, at 5%. With three seeds per arm there are 20 possible splits, so p reaches 0.05 only when every V1 run's ΔG exceeds every V0 run's. It assumes no distribution, which three runs per arm could not check.
+4. *Verdict.* **Supported** if 1, 2 and 3 hold. **Falsified** if the effect is shown to be small, below 2 pp, about 7 of the 368 problems and a sixth of the base model's gap: either the 95% Welch interval for D (V1's mean ΔG minus V0's) lies below 2 pp, or the 95% t interval for V1's own mean ΔG does (THESIS's "the gap does not widen", whatever the control did). **Unresolved** otherwise: the effect, if any, is smaller than these runs can resolve (THESIS).
+
+The full-suite ΔG and each problem's change are reported alongside as secondary readouts (THESIS) and do not enter the verdict. `codeexec.eval.h1` computes it from the exported measurements.
+
+**Consequences.**
+- "Indistinguishable" is split into its two readings: falsified when the effect is shown to be small, unresolved when it cannot be told.
+- Support needs a clean result, every V1 seed widening and the arms completely separated. With three seeds, unresolved is a realistic outcome unless the effect is large and consistent; more seeds, not a looser rule, would be the remedy.
+- If the cut order drops to two seeds per arm, only 6 splits are possible and p cannot reach 0.05, so H1 can then be falsified or unresolved but not supported; that is stated with the result.
+- The Welch and t intervals use Student's t quantiles, so SciPy joins the `dev` extra, pinned.
+
+**What would reverse it.** Nothing in the six results. The rule changes only if the design changes before the runs, for instance more seeds per arm, which would allow a finer test, and any change is recorded before the runs it applies to.
